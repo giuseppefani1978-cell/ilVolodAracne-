@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IL VOLO D’ARACNE</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8e24aa;
+            --primary-dark: #5c007a;
+            --bg-light: #f5f5f5;
+            --text-dark: #333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body, html { height: 100%; width: 100%; overflow: hidden; background-color: var(--bg-light); }
+        
+        #header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1000;
+        }
+        
+        #map { height: calc(100% - 54px); width: 100%; z-index: 1; }
+        
+        #dashboard-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        #dashboard-toggle:active { transform: scale(0.95); }
+        
+        #dashboard {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 75%;
+            background: white;
+            z-index: 1000;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        #dashboard.open { transform: translateY(0); }
+        
+        .dash-header {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .dash-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .waypoint {
+            background: var(--bg-light);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .waypoint-title { font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
+        
+        .waypoint-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .waypoint-inputs input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .waypoint-stats { font-size: 0.8rem; color: #666; margin-top: 5px; }
+        
+        .controls { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #e0e0e0;
+            color: #333;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn.active { background: var(--primary); color: white; }
+        .btn-action { background: #25D366; color: white; margin-top: 10px; }
+        .btn-maps { background: #4285F4; color: white; margin-top: 10px; }
+        
+        #totals {
+            padding: 15px;
+            background: var(--primary-dark);
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        
+        .remove-btn { color: red; cursor: pointer; border: none; background: none; font-size: 1.1rem; }
+        .close-btn { color: #333; cursor: pointer; border: none; background: none; font-size: 1.5rem; }
+        
+        .poi-loader {
+            position: absolute; top: 70px; left: 10px; z-index: 1000;
+            background: rgba(255,255,255,0.9); padding: 5px 10px; border-radius: 5px;
+            font-size: 0.8rem; display: none;
+        }
+
+        #instruction {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            background: #f9f2fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">IL VOLO D’ARACNE</div>
+    <div id="poi-status" class="poi-loader">Caricamento POI...</div>
+    <div id="map"></div>
+    
+    <button id="dashboard-toggle"><i class="fas fa-route"></i></button>
+    
+    <div id="dashboard" class="open">
+        <div class="dash-header">
+            <h3 id="dash-title">Il Mio Percorso</h3>
+            <div class="header-actions">
+                <button class="remove-btn" onclick="resetRoute()" title="Reset"><i class="fas fa-trash-alt"></i> <span class="t-reset">Reset</span></button>
+                <button class="close-btn" onclick="toggleDashboard()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="dash-content">
+            <p id="instruction"></p>
+
+            <div class="controls">
+                <button class="btn active" id="mode-car" onclick="setMode('driving')"><i class="fas fa-car"></i> <span class="t-car">Auto</span></button>
+                <button class="btn" id="mode-foot" onclick="setMode('foot')"><i class="fas fa-walking"></i> <span class="t-walk">A piedi</span></button>
+            </div>
+            
+            <div id="waypoints-list"></div>
+            
+            <button class="btn btn-maps" onclick="exportToMaps()"><i class="fas fa-map-marked-alt"></i> <span class="t-gmaps">Apri in Google Maps</span></button>
+            <button class="btn btn-action" onclick="exportToWhatsApp()"><i class="fab fa-whatsapp"></i> <span class="t-wa">Invia su WhatsApp</span></button>
+        </div>
+        <div id="totals">
+            Totale: <span id="total-dist">0 km</span> • <span id="total-time">0 min</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // i18n multilingue
+        const dict = {
+            it: {
+                title: "Il Mio Percorso", car: "Auto/Scooter", walk: "A piedi",
+                instr_start: "📍 Seleziona sulla mappa o sui marker il tuo punto di partenza.",
+                instr_add: "Tocca la mappa a schermo intero per aggiungere altre tappe.",
+                gmaps: "Apri in Google Maps", wa: "Invia su WhatsApp",
+                note_ph: "Aggiungi una nota...", stop_ph: "Tempo di sosta (min)",
+                total: "Totale", start: "Partenza", reset: "Resetta",
+                confirm_reset: "Vuoi davvero cancellare tutto l'itinerario?",
+                incl_stop: "inclusi", min_stop: "min di sosta"
+            },
+            fr: {
+                title: "Mon Itinéraire", car: "Voiture", walk: "À pied",
+                instr_start: "📍 Sélectionnez sur la carte le point de départ.",
+                instr_add: "Touchez la carte (tableau de bord fermé) pour ajouter des étapes.",
+                gmaps: "Ouvrir dans Google Maps", wa: "Envoyer sur WhatsApp",
+                note_ph: "Ajouter une note...", stop_ph: "Durée sur place (min)",
+                total: "Total", start: "Départ", reset: "Reset",
+                confirm_reset: "Voulez-vous vraiment réinitialiser tout l'itinéraire ?",
+                incl_stop: "dont", min_stop: "min sur place"
+            },
+            en: {
+                title: "My Route", car: "Car", walk: "Walking",
+                instr_start: "📍 Select your starting point on the map.",
+                instr_add: "Tap the map (with dashboard closed) to add more steps.",
+                gmaps: "Open in Google Maps", wa: "Send on WhatsApp",
+                note_ph: "Add a note...", stop_ph: "Stop time (min)",
+                total: "Total", start: "Start", reset: "Reset",
+                confirm_reset: "Do you really want to reset the entire route?",
+                incl_stop: "incl.", min_stop: "min stop"
+            }
+        };
+
+        const userLang = (navigator.language || 'it').slice(0, 2);
+        const lang = dict[userLang] ? userLang : 'it';
+        const t = dict[lang];
+
+        // Application des traductions basiques
+        document.getElementById('dash-title').innerText = t.title;
+        document.querySelector('.t-car').innerText = t.car;
+        document.querySelector('.t-walk').innerText = t.walk;
+        document.querySelector('.t-gmaps').innerText = t.gmaps;
+        document.querySelector('.t-wa').innerText = t.wa;
+        document.querySelector('.t-reset').innerText = t.reset;
+
+        // Initialisation de la carte
+        const map = L.map('map').setView([40.18, 18.22], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let waypoints = [];
+        let routeLayer = null;
+        let mode = 'driving';
+
+        // Icônes
+        const poiIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+        const routeIcon = L.icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+        });
+
+        const markers = [];
+        const pois = [
+            "Basilica di S.M Annunziata, Lecce", "Cave di bauxite, Otranto", "Faro di punta Palascia", 
+            "Isola di Sant’Emiliano, Otranto", "Porto Badisco", "Grotta dei Cervi, Otranto", 
+            "Porto Miggiano", "Grotta della Zinzulusa", "Bosco della Scarra", "Porto Enea", 
+            "Tempio di Minerva, Castro", "Cala dell’Acquaviva", "Torre di Ripe", "Grotta Verde, Andrano", 
+            "Castello di Caprarica", "Grotta delle Tre Porte", "Parco naturale di Ugento", 
+            "Chiesa della Madonna del Casale, Ugento", "Palazzo Giurupi", "Isola di S. Andrea, Gallipoli", 
+            "La Montagna spaccata, Gallipoli", "Torre del Fiume, Nardò", "Torre dell’Alto, Nardò", 
+            "Grotta del Cavallo", "Torre Uluzzo", "Palude del Capitano", "Spiaggia del Frascone", 
+            "Torre Chianca, Porto Cesareo", "Isola dei Conigli, Porto Cesareo", "Faraglione di S. Andrea, Melendugno", 
+            "Le due Sorelle, Torre dell'Orso", "Le Cesine", "Santuario della Grottella, Copertino",
+            "Santa Caterina d’Alessandria, Galatina", "Santa Caterina, Gallipoli", "Santa Cesarea Terme", 
+            "Punta della Suina", "Salina dei Monaci, Torre Colimena", "Santa Maria al Bagno", 
+            "Laghi Alimini, Cannole", "Baia dei Turchi, Otranto", "Baia del Mulino d’acqua, Otranto", 
+            "Abbazia di Santa Maria di Cerrate", "Torre Sant’Andrea", "Grotta della Poesia, Roca Vecchia", 
+            "Parco naturale di Torcito, Cannole", "Borgagne, Melendugno", "Anfiteatro di Rudiae, Lecce", 
+            "Castello di Copertino", "Castello di Otranto"
+        ];
+
+        async function geocodePOIs() {
+            const status = document.getElementById('poi-status');
+            status.style.display = 'block';
+            const cachedPois = JSON.parse(localStorage.getItem('aracne_pois')) || {};
+            
+            for(let i=0; i<pois.length; i++) {
+                const name = pois[i];
+                if(cachedPois[name]) {
+                    addPOIMarker(name, cachedPois[name].lat, cachedPois[name].lon);
+                    continue;
+                }
+                try {
+                    status.innerText = "Caricamento: " + name;
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name + ", Lecce, Puglia, Italy")}&limit=1`);
+                    const data = await res.json();
+                    if(data && data.length > 0) {
+                        cachedPois[name] = { lat: data[0].lat, lon: data[0].lon };
+                        addPOIMarker(name, data[0].lat, data[0].lon);
+                        localStorage.setItem('aracne_pois', JSON.stringify(cachedPois));
+                    }
+                    await new Promise(r => setTimeout(r, 1500));
+                } catch(e) { console.error(e); }
+            }
+            status.style.display = 'none';
+        }
+
+        function addPOIMarker(name, lat, lon) {
+            const safeName = name.replace(/'/g, "\\'");
+            L.marker([lat, lon], {icon: poiIcon}).addTo(map)
+                .bindPopup(`<b>${name}</b><br><button onclick="addWaypoint(${lat}, ${lon}, '${safeName}')" style="margin-top:5px; padding:5px; background:var(--primary); color:white; border:none; border-radius:3px; cursor:pointer;">Aggiungi al percorso</button>`);
+        }
+
+        setTimeout(geocodePOIs, 1000);
+
+        function toggleDashboard() {
+            document.getElementById('dashboard').classList.toggle('open');
+        }
+
+        document.getElementById('dashboard-toggle').addEventListener('click', toggleDashboard);
+
+        map.on('click', function(e) {
+            if(document.getElementById('dashboard').classList.contains('open')) {
+                return;
+            }
+            addWaypoint(e.latlng.lat, e.latlng.lng, `Tappa ${waypoints.length + 1}`);
+        });
+
+        // Structure du Waypoint : on ajoute "stopTime"
+        function addWaypoint(lat, lng, name) {
+            waypoints.push({ lat, lng, name, note: "", stopTime: 0, dist: 0, time: 0 });
+            map.closePopup();
+            updateDashboard();
+            calculateRoute();
+            
+            if(waypoints.length === 1 && !document.getElementById('dashboard').classList.contains('open')) {
+                toggleDashboard();
+            }
+        }
+
+        function removeWaypoint(index) {
+            waypoints.splice(index, 1);
+            updateDashboard();
+            calculateRoute();
+        }
+
+        function resetRoute() {
+            if(confirm(t.confirm_reset)) {
+                waypoints = [];
+                updateDashboard();
+                calculateRoute();
+            }
+        }
+
+        function updateNote(index, value) {
+            waypoints[index].note = value;
+        }
+
+        function updateStopTime(index, value) {
+            waypoints[index].stopTime = parseInt(value) || 0;
+            calculateRoute(); // Relancer le calcul global
+        }
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('mode-car').classList.toggle('active', mode === 'driving');
+            document.getElementById('mode-foot').classList.toggle('active', mode === 'foot');
+            calculateRoute();
+        }
+
+        function updateInstructions() {
+            const instrEl = document.getElementById('instruction');
+            if (waypoints.length === 0) {
+                instrEl.innerHTML = `<strong style="color:var(--primary);">${t.instr_start}</strong>`;
+            } else {
+                instrEl.innerHTML = `<span style="color:#666;">${t.instr_add}</span>`;
+            }
+        }
+
+        function updateDashboard() {
+            updateInstructions();
+            const list = document.getElementById('waypoints-list');
+            list.innerHTML = '';
+            
+            waypoints.forEach((wp, i) => {
+                const distText = wp.dist > 0 ? `<br><i class="fas fa-road"></i> ${(wp.dist/1000).toFixed(1)} km &nbsp; <i class="fas fa-clock"></i> Viaggio: ${Math.round(wp.time/60)} min` : '';
+                const stopVal = wp.stopTime > 0 ? wp.stopTime : '';
+                
+                list.innerHTML += `
+                    <div class="waypoint">
+                        <div class="waypoint-title">
+                            ${i === 0 ? t.start + ': ' : ''}${wp.name}
+                            <button class="remove-btn" style="float:right;" onclick="removeWaypoint(${i})"><i class="fas fa-times-circle"></i></button>
+                        </div>
+                        <div class="waypoint-inputs">
+                            <input type="text" class="waypoint-note" placeholder="${t.note_ph}" value="${wp.note}" onchange="updateNote(${i}, this.value)">
+                            <input type="number" class="waypoint-stop" placeholder="${t.stop_ph}" value="${stopVal}" min="0" onchange="updateStopTime(${i}, this.value)">
+                        </div>
+                        <div class="waypoint-stats" id="stats-${i}">${distText}</div>
+                    </div>
+                `;
+            });
+            
+            markers.forEach(m => map.removeLayer(m));
+            markers.length = 0;
+            
+            waypoints.forEach((wp, i) => {
+                const m = L.marker([wp.lat, wp.lng], {icon: routeIcon}).addTo(map)
+                    .bindTooltip(i === 0 ? t.start : `Tappa ${i+1}`, {permanent: true, direction: 'top'});
+                markers.push(m);
+            });
+        }
+
+        async function calculateRoute() {
+            if(routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+            
+            // Calculer la somme des temps d'arrêt
+            let totalStopMin = waypoints.reduce((sum, wp) => sum + (parseInt(wp.stopTime) || 0), 0);
+            
+            if(waypoints.length < 2) {
+                let stopText = totalStopMin > 0 ? ` <br><span style="font-size:0.9rem;">(${t.incl_stop} ${totalStopMin} ${t.min_stop})</span>` : "";
+                document.getElementById('total-dist').innerText = "0 km";
+                document.getElementById('total-time').innerHTML = `0 min${stopText}`;
+                return;
+            }
+            
+            const coords = waypoints.map(wp => `${wp.lng},${wp.lat}`).join(';');
+            const url = `https://router.project-osrm.org/route/v1/${mode}/${coords}?overview=full&geometries=geojson&steps=true`;
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if(data.routes && data.routes.length > 0) {
+                    const route = data.routes[0];
+                    
+                    routeLayer = L.geoJSON(route.geometry, {
+                        style: { color: 'var(--primary)', weight: 5, opacity: 0.8 }
+                    }).addTo(map);
+                    
+                    map.fitBounds(routeLayer.getBounds(), {padding: [50, 50]});
+                    
+                    const totalKm = (route.distance / 1000).toFixed(1);
+                    const travelMin = Math.round(route.duration / 60);
+                    const grandTotalMin = travelMin + totalStopMin;
+                    
+                    let stopText = totalStopMin > 0 ? ` <br><span style="font-size:0.9rem; font-weight:normal;">(${t.incl_stop} ${totalStopMin} ${t.min_stop})</span>` : "";
+                    
+                    document.getElementById('total-dist').innerText = `${totalKm} km`;
+                    document.getElementById('total-time').innerHTML = `${grandTotalMin} min${stopText}`;
+                    
+                    if(route.legs) {
+                        for(let i=0; i<route.legs.length; i++) {
+                            waypoints[i+1].dist = route.legs[i].distance;
+                            waypoints[i+1].time = route.legs[i].duration;
+                            
+                            const statEl = document.getElementById(`stats-${i+1}`);
+                            if(statEl) {
+                                statEl.innerHTML = `<br><i class="fas fa-road"></i> ${(waypoints[i+1].dist/1000).toFixed(1)} km &nbsp; <i class="fas fa-clock"></i> Viaggio: ${Math.round(waypoints[i+1].time/60)} min`;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error("Routing error:", e);
+            }
+        }
+
+        function exportToMaps() {
+            if(waypoints.length < 1) return alert("Aggiungi almeno una tappa!");
+            const origin = `${waypoints[0].lat},${waypoints[0].lng}`;
+            let url = `https://www.google.com/maps/dir/?api=1&origin=${origin}`;
+            
+            if(waypoints.length > 1) {
+                const dest = waypoints[waypoints.length-1];
+                url += `&destination=${dest.lat},${dest.lng}`;
+            }
+            if(waypoints.length > 2) {
+                const wps = waypoints.slice(1, -1).map(wp => `${wp.lat},${wp.lng}`).join('|');
+                url += `&waypoints=${wps}`;
+            }
+            url += `&travelmode=${mode === 'driving' ? 'driving' : 'walking'}`;
+            window.open(url, '_blank');
+        }
+
+        function exportToWhatsApp() {
+            if(waypoints.length < 1) return alert("Aggiungi almeno una tappa!");
+            
+            let text = "*IL VOLO D'ARACNE - Il mio percorso:*\n\n";
+            waypoints.forEach((wp, i) => {
+                text += `${i+1}. ${wp.name}`;
+                if(wp.stopTime > 0) text += ` (${wp.stopTime} min)`;
+                if(wp.note) text += `\n   _Nota: ${wp.note}_`;
+                text += "\n";
+            });
+            
+            const totalKm = document.getElementById('total-dist').innerText;
+            // On extrait le texte brut sans le HTML du <span>
+            let totalMinText = document.getElementById('total-time').innerText.replace(/\n/g, " ");
+            
+            text += `\n*${t.total}:* ${totalKm} • ${totalMinText}\n`;
+            
+            const origin = `${waypoints[0].lat},${waypoints[0].lng}`;
+            let mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}`;
+            if(waypoints.length > 1) {
+                const dest = waypoints[waypoints.length-1];
+                mapsUrl += `&destination=${dest.lat},${dest.lng}`;
+            }
+            if(waypoints.length > 2) {
+                const wps = waypoints.slice(1, -1).map(wp => `${wp.lat},${wp.lng}`).join('|');
+                mapsUrl += `&waypoints=${wps}`;
+            }
+            
+            text += `\nApri in Google Maps: ${mapsUrl}`;
+            const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        updateInstructions();
+    </script>
+</body>
+</html>
