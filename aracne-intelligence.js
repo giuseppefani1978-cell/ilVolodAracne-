@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.2";
+  const VERSION = "0.4.3";
 
   const LANGS = [
     "it",
@@ -1341,7 +1341,10 @@
       const result=
         await bridge
           ?.createRouteFromText
-          ?.(normalizeNumberWordsForBridge(text));
+          ?.(normalizeNumberWordsForBridge(text), {
+            keepAssistantOpen: intents.length > 1,
+            intents
+          });
 
       if(result?.ok) {
         sections.push(tr("routeSection") + "\n" + (result.spokenText||result.text));
