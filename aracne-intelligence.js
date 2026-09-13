@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.3";
+  const VERSION = "0.4.4";
 
   const LANGS = [
     "it",
@@ -823,6 +823,58 @@
     return out;
   }
 
+  function explicitIntents(text, places=[]) {
+    const n=normalize(text);
+    const l=INTENT_LEXICON[lang()]||INTENT_LEXICON.it;
+    const found=[];
+
+    const add = name => {
+      if(!found.includes(name)) found.push(name);
+    };
+
+    if(phraseCount(n,l.scope)) add("scope");
+
+    // Information requests must survive even when the same sentence
+    // also asks for a route or another action.
+    if(phraseCount(n,l.tell) || (genericPlaceQuestion(n) && places.length)) {
+      add("tell");
+    }
+
+    if(phraseCount(n,l.compare) && places.length>=2) {
+      add("compare");
+    }
+
+    if(phraseCount(n,l.nearbyMe)) {
+      add("near_me");
+    }
+
+    if(phraseCount(n,l.nearbyPlace) && places.length) {
+      add("near_place");
+    }
+
+    const strongRoute=phraseCount(n,l.routeStrong);
+    const softRoute=phraseCount(n,l.routeSoft);
+    const requestRoute=phraseCount(n,l.routeRequest);
+
+    // Explicit route noun, or a natural planning request with context.
+    if(
+      strongRoute
+      ||
+      (
+        requestRoute
+        &&
+        (hasDurationSignal(n) || hasThemeSignal(n) || places.length || softRoute)
+      )
+    ) {
+      add("route");
+    }
+
+    if(phraseCount(n,l.add)) add("add");
+    if(phraseCount(n,l.open)) add("open");
+
+    return found;
+  }
+
   function understand(text, knownPlaces=null) {
     const n=normalize(text);
     const places=Array.isArray(knownPlaces)?knownPlaces:getPlaces(text);
@@ -905,11 +957,14 @@
       intent="unknown";
     }
 
-    const activeIntents=[];
+    const activeIntents=explicitIntents(text, places);
 
+    // Add high-confidence scored intents not already captured explicitly.
     for(const candidate of ["scope","tell","compare","near_me","near_place","route","add","open"]) {
       const threshold=minimum[candidate]||5;
-      if((scores[candidate]||0)>=threshold) activeIntents.push(candidate);
+      if((scores[candidate]||0)>=threshold && !activeIntents.includes(candidate)) {
+        activeIntents.push(candidate);
+      }
     }
 
     // "scope" is explanatory: do not mix it with an operational request.
@@ -927,7 +982,9 @@
 
     return {
       intent,
-      intents:activeIntents.length ? activeIntents : (intent!=="unknown" ? [intent] : []),
+      intents:(activeIntents.length
+        ? ["tell","compare","near_me","near_place","add","open","route","scope"].filter(x=>activeIntents.includes(x))
+        : (intent!=="unknown" ? [intent] : [])),
       confidence:Math.min(1,bestScore/10),
       score:bestScore,
       scores,
