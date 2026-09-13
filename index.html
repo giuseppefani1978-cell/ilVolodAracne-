@@ -774,12 +774,12 @@
       <div class="modal-head assistant-head">
         <div>
           <h2 data-i18n="assistant_title">Parla con Aracne</h2>
-          <p data-i18n="assistant_sub" style="margin-top:3px">Detta una nota. Nessuna AI esterna: tutto viene organizzato localmente nell’app.</p>
+          <p data-i18n="assistant_sub" style="margin-top:3px">Detta o scrivi una domanda. Aracne usa la conoscenza locale dell’app e non cerca su Internet.</p>
         </div>
         <button class="modal-close" data-modal-close="assistantModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="assistant-body">
-        <p class="assistant-intro" data-i18n="assistant_intro">Puoi dettare o scrivere liberamente. Aracne può salvare la nota, preparare una caption, suggerire hashtag o trasformare parole semplici in un percorso.</p>
+        <p class="assistant-intro" data-i18n="assistant_intro">Chiedile informazioni sui luoghi, cosa c’è vicino, di aggiungere tappe o creare un percorso. Puoi anche continuare a salvare note, creare caption e suggerire hashtag.</p>
 
         <div class="assistant-label" data-i18n="assistant_voice_lang">Lingua della voce</div>
         <div class="assistant-lang-row" id="assistantLangRow">
@@ -836,7 +836,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.2.0"></script>
+  <script src="./aracne-intelligence.js?v=0.3.0"></script>
 
   <script>
   (() => {
@@ -997,10 +997,10 @@
     Object.keys(transportI18n).forEach(k=>Object.assign(dict[k],transportI18n[k]));
 
     const assistantI18n={
-      it:{local_storage_title:"Note salvate su questo dispositivo",local_storage_warning:"Le note sono conservate solo nello storage locale di questo browser. Non sono sincronizzate online e possono sparire se cancelli i dati del sito, usi la navigazione privata o cambi browser/dispositivo.",view_notes:"Vedi le mie note",share_notes:"Condividi / salva",notes_backup_title:"Le mie note · Il Volo d’Aracne",notes_backup_empty:"Non ci sono ancora note da condividere.",notes_backup_copied:"Note copiate: puoi salvarle dove preferisci.",assistant_open:"Parla con Aracne",assistant_title:"Parla con Aracne",assistant_sub:"Detta una nota. Nessuna AI esterna: tutto viene organizzato localmente nell’app.",assistant_intro:"Puoi dettare o scrivere liberamente. Aracne può salvare la nota, preparare una caption, suggerire hashtag o trasformare parole semplici in un percorso.",assistant_voice_lang:"Lingua della voce",assistant_ready:"Microfono spento",assistant_listening:"Ti ascolto…",assistant_unsupported:"Microfono vocale non disponibile qui. Prova la versione GitHub Pages in Safari oppure usa la dettatura della tastiera.",assistant_placeholder:"Parla o scrivi qui la tua nota…",mic_start:"Avvia microfono",mic_stop:"Stop",assistant_privacy:"Il microfono parte solo dopo un tuo tocco e viene fermato con Stop o chiudendo questa finestra. Se il browser non supporta il riconoscimento vocale, usa il microfono della tastiera del telefono.",save_note:"Salva nota",create_caption:"Crea caption",suggest_hashtags:"Suggerisci hashtag",use_route:"Usa per il percorso",assistant_result:"Risultato",copy_result:"Copia",share_result:"Condividi",assistant_saved:"Nota salvata in Viaggio → Diario di Aracne (solo su questo dispositivo).",assistant_empty:"Scrivi o detta prima una nota.",assistant_permission_error:"Non riesco ad avviare il microfono. Controlla il permesso del browser.",assistant_caption_title:"Caption suggerita",assistant_hashtags_title:"Hashtag suggeriti",assistant_route_title:"Percorso interpretato",assistant_route_created:"Percorso creato dalle indicazioni della nota.",assistant_route_no_match:"Non ho trovato abbastanza indicazioni. Prova a citare un luogo, Mare/Natura/Cultura/Sapori, una durata o il mezzo di trasporto.",journal_title:"Diario di Aracne",journal_sub:"Note di viaggio",journal_empty:"Nessuna nota salvata. Usa il microfono o la tastiera per raccontare una visita.",delete_note:"Elimina",manual_dictation_hint:"Puoi sempre usare il microfono della tastiera del telefono.",assistant_summary_prefix:"Appunto dal Salento",assistant_route_places:"Tappe",assistant_route_mode:"Mezzo",assistant_route_duration:"Tempo disponibile"},
-      fr:{local_storage_title:"Notes enregistrées sur cet appareil",local_storage_warning:"Les notes sont conservées uniquement dans le stockage local de ce navigateur. Elles ne sont pas synchronisées en ligne et peuvent disparaître si vous effacez les données du site, utilisez la navigation privée ou changez de navigateur/appareil.",view_notes:"Voir mes notes",share_notes:"Partager / sauvegarder",notes_backup_title:"Mes notes · Il Volo d’Aracne",notes_backup_empty:"Il n’y a pas encore de notes à partager.",notes_backup_copied:"Notes copiées : vous pouvez les sauvegarder où vous le souhaitez.",assistant_open:"Parler à Aracne",assistant_title:"Parler à Aracne",assistant_sub:"Dictez une note. Aucune IA externe : tout est organisé localement dans l’app.",assistant_intro:"Vous pouvez dicter ou écrire librement. Aracne peut enregistrer la note, préparer une légende, suggérer des hashtags ou transformer des indications simples en parcours.",assistant_voice_lang:"Langue de la voix",assistant_ready:"Microphone éteint",assistant_listening:"Je vous écoute…",assistant_unsupported:"Micro vocal indisponible ici. Essayez la version GitHub Pages dans Safari ou utilisez la dictée du clavier.",assistant_placeholder:"Parlez ou écrivez votre note ici…",mic_start:"Activer le micro",mic_stop:"Stop",assistant_privacy:"Le micro ne démarre qu’après votre action et s’arrête avec Stop ou à la fermeture de cette fenêtre. Si le navigateur ne gère pas la reconnaissance vocale, utilisez le micro du clavier du téléphone.",save_note:"Enregistrer la note",create_caption:"Créer une légende",suggest_hashtags:"Suggérer des hashtags",use_route:"Utiliser pour le parcours",assistant_result:"Résultat",copy_result:"Copier",share_result:"Partager",assistant_saved:"Note enregistrée dans Voyage → Journal d’Aracne (sur cet appareil uniquement).",assistant_empty:"Dictez ou écrivez d’abord une note.",assistant_permission_error:"Impossible de démarrer le micro. Vérifiez l’autorisation du navigateur.",assistant_caption_title:"Légende suggérée",assistant_hashtags_title:"Hashtags suggérés",assistant_route_title:"Parcours interprété",assistant_route_created:"Parcours créé à partir des indications de la note.",assistant_route_no_match:"Je n’ai pas trouvé assez d’indications. Citez un lieu, Mer/Nature/Culture/Saveurs, une durée ou le moyen de transport.",journal_title:"Journal d’Aracne",journal_sub:"Notes de voyage",journal_empty:"Aucune note enregistrée. Utilisez le micro ou le clavier pour raconter une visite.",delete_note:"Supprimer",manual_dictation_hint:"Vous pouvez toujours utiliser le micro du clavier du téléphone.",assistant_summary_prefix:"Note du Salento",assistant_route_places:"Étapes",assistant_route_mode:"Transport",assistant_route_duration:"Temps disponible"},
-      en:{local_storage_title:"Notes saved on this device",local_storage_warning:"Notes are stored only in this browser’s local storage. They are not synced online and may disappear if you clear site data, use private browsing, or switch browser/device.",view_notes:"View my notes",share_notes:"Share / back up",notes_backup_title:"My notes · Il Volo d’Aracne",notes_backup_empty:"There are no notes to share yet.",notes_backup_copied:"Notes copied: you can save them wherever you prefer.",assistant_open:"Talk to Aracne",assistant_title:"Talk to Aracne",assistant_sub:"Dictate a note. No external AI: everything is organised locally in the app.",assistant_intro:"Dictate or type freely. Aracne can save the note, prepare a caption, suggest hashtags or turn simple instructions into a route.",assistant_voice_lang:"Voice language",assistant_ready:"Microphone off",assistant_listening:"Listening…",assistant_unsupported:"Voice microphone is not available here. Try the GitHub Pages version in Safari or use keyboard dictation.",assistant_placeholder:"Speak or type your note here…",mic_start:"Start microphone",mic_stop:"Stop",assistant_privacy:"The microphone starts only after your tap and stops with Stop or when this window closes. If the browser does not support voice recognition, use your phone keyboard microphone.",save_note:"Save note",create_caption:"Create caption",suggest_hashtags:"Suggest hashtags",use_route:"Use for route",assistant_result:"Result",copy_result:"Copy",share_result:"Share",assistant_saved:"Note saved in Journey → Aracne Journal (on this device only).",assistant_empty:"Dictate or type a note first.",assistant_permission_error:"I can’t start the microphone. Check the browser permission.",assistant_caption_title:"Suggested caption",assistant_hashtags_title:"Suggested hashtags",assistant_route_title:"Interpreted route",assistant_route_created:"Route created from the note instructions.",assistant_route_no_match:"I could not find enough instructions. Mention a place, Sea/Nature/Culture/Flavours, a duration or a transport mode.",journal_title:"Aracne Journal",journal_sub:"Travel notes",journal_empty:"No saved notes yet. Use the microphone or keyboard to record a visit.",delete_note:"Delete",manual_dictation_hint:"You can always use the microphone on your phone keyboard.",assistant_summary_prefix:"Salento note",assistant_route_places:"Stops",assistant_route_mode:"Transport",assistant_route_duration:"Available time"},
-      es:{local_storage_title:"Notas guardadas en este dispositivo",local_storage_warning:"Las notas se guardan solo en el almacenamiento local de este navegador. No se sincronizan en línea y pueden desaparecer si borras los datos del sitio, usas navegación privada o cambias de navegador/dispositivo.",view_notes:"Ver mis notas",share_notes:"Compartir / guardar",notes_backup_title:"Mis notas · Il Volo d’Aracne",notes_backup_empty:"Todavía no hay notas para compartir.",notes_backup_copied:"Notas copiadas: puedes guardarlas donde prefieras.",assistant_open:"Habla con Aracne",assistant_title:"Habla con Aracne",assistant_sub:"Dicta una nota. Sin IA externa: todo se organiza localmente en la app.",assistant_intro:"Puedes dictar o escribir libremente. Aracne puede guardar la nota, preparar un texto, sugerir hashtags o convertir indicaciones sencillas en una ruta.",assistant_voice_lang:"Idioma de la voz",assistant_ready:"Micrófono apagado",assistant_listening:"Te escucho…",assistant_unsupported:"El micrófono de voz no está disponible aquí. Prueba la versión de GitHub Pages en Safari o usa el dictado del teclado.",assistant_placeholder:"Habla o escribe aquí tu nota…",mic_start:"Activar micrófono",mic_stop:"Stop",assistant_privacy:"El micrófono solo empieza después de tu toque y se detiene con Stop o al cerrar esta ventana. Si el navegador no admite reconocimiento de voz, usa el micrófono del teclado del teléfono.",save_note:"Guardar nota",create_caption:"Crear texto",suggest_hashtags:"Sugerir hashtags",use_route:"Usar para la ruta",assistant_result:"Resultado",copy_result:"Copiar",share_result:"Compartir",assistant_saved:"Nota guardada en Viaje → Diario de Aracne (solo en este dispositivo).",assistant_empty:"Dicta o escribe primero una nota.",assistant_permission_error:"No puedo iniciar el micrófono. Comprueba el permiso del navegador.",assistant_caption_title:"Texto sugerido",assistant_hashtags_title:"Hashtags sugeridos",assistant_route_title:"Ruta interpretada",assistant_route_created:"Ruta creada a partir de las indicaciones de la nota.",assistant_route_no_match:"No he encontrado suficientes indicaciones. Cita un lugar, Mar/Naturaleza/Cultura/Sabores, una duración o el medio de transporte.",journal_title:"Diario de Aracne",journal_sub:"Notas de viaje",journal_empty:"Todavía no hay notas guardadas. Usa el micrófono o el teclado para contar una visita.",delete_note:"Eliminar",manual_dictation_hint:"Siempre puedes usar el micrófono del teclado del teléfono.",assistant_summary_prefix:"Nota del Salento",assistant_route_places:"Etapas",assistant_route_mode:"Transporte",assistant_route_duration:"Tiempo disponible"}
+      it:{local_storage_title:"Note salvate su questo dispositivo",local_storage_warning:"Le note sono conservate solo nello storage locale di questo browser. Non sono sincronizzate online e possono sparire se cancelli i dati del sito, usi la navigazione privata o cambi browser/dispositivo.",view_notes:"Vedi le mie note",share_notes:"Condividi / salva",notes_backup_title:"Le mie note · Il Volo d’Aracne",notes_backup_empty:"Non ci sono ancora note da condividere.",notes_backup_copied:"Note copiate: puoi salvarle dove preferisci.",assistant_open:"Parla con Aracne",assistant_title:"Parla con Aracne",assistant_sub:"Detta o scrivi una domanda. Aracne usa la conoscenza locale dell’app e non cerca su Internet.",assistant_intro:"Chiedile informazioni sui luoghi, cosa c’è vicino, di aggiungere tappe o creare un percorso. Puoi anche continuare a salvare note, creare caption e suggerire hashtag.",assistant_voice_lang:"Lingua della voce",assistant_ready:"Microfono spento",assistant_listening:"Ti ascolto…",assistant_unsupported:"Microfono vocale non disponibile qui. Prova la versione GitHub Pages in Safari oppure usa la dettatura della tastiera.",assistant_placeholder:"Parla o scrivi qui la tua nota…",mic_start:"Avvia microfono",mic_stop:"Stop",assistant_privacy:"Il microfono parte solo dopo un tuo tocco e viene fermato con Stop o chiudendo questa finestra. Se il browser non supporta il riconoscimento vocale, usa il microfono della tastiera del telefono.",save_note:"Salva nota",create_caption:"Crea caption",suggest_hashtags:"Suggerisci hashtag",use_route:"Usa per il percorso",assistant_result:"Risultato",copy_result:"Copia",share_result:"Condividi",assistant_saved:"Nota salvata in Viaggio → Diario di Aracne (solo su questo dispositivo).",assistant_empty:"Scrivi o detta prima una nota.",assistant_permission_error:"Non riesco ad avviare il microfono. Controlla il permesso del browser.",assistant_caption_title:"Caption suggerita",assistant_hashtags_title:"Hashtag suggeriti",assistant_route_title:"Percorso interpretato",assistant_route_created:"Percorso creato dalle indicazioni della nota.",assistant_route_no_match:"Non ho trovato abbastanza indicazioni. Prova a citare un luogo, Mare/Natura/Cultura/Sapori, una durata o il mezzo di trasporto.",journal_title:"Diario di Aracne",journal_sub:"Note di viaggio",journal_empty:"Nessuna nota salvata. Usa il microfono o la tastiera per raccontare una visita.",delete_note:"Elimina",manual_dictation_hint:"Puoi sempre usare il microfono della tastiera del telefono.",assistant_summary_prefix:"Appunto dal Salento",assistant_route_places:"Tappe",assistant_route_mode:"Mezzo",assistant_route_duration:"Tempo disponibile"},
+      fr:{local_storage_title:"Notes enregistrées sur cet appareil",local_storage_warning:"Les notes sont conservées uniquement dans le stockage local de ce navigateur. Elles ne sont pas synchronisées en ligne et peuvent disparaître si vous effacez les données du site, utilisez la navigation privée ou changez de navigateur/appareil.",view_notes:"Voir mes notes",share_notes:"Partager / sauvegarder",notes_backup_title:"Mes notes · Il Volo d’Aracne",notes_backup_empty:"Il n’y a pas encore de notes à partager.",notes_backup_copied:"Notes copiées : vous pouvez les sauvegarder où vous le souhaitez.",assistant_open:"Parler à Aracne",assistant_title:"Parler à Aracne",assistant_sub:"Dictez ou écrivez une question. Aracne utilise les connaissances locales de l’app et ne recherche pas sur Internet.",assistant_intro:"Demandez-lui des informations sur les lieux, ce qu’il y a autour, d’ajouter des étapes ou de créer un parcours. Vous pouvez aussi continuer à enregistrer des notes, préparer une légende et des hashtags.",assistant_voice_lang:"Langue de la voix",assistant_ready:"Microphone éteint",assistant_listening:"Je vous écoute…",assistant_unsupported:"Micro vocal indisponible ici. Essayez la version GitHub Pages dans Safari ou utilisez la dictée du clavier.",assistant_placeholder:"Parlez ou écrivez votre note ici…",mic_start:"Activer le micro",mic_stop:"Stop",assistant_privacy:"Le micro ne démarre qu’après votre action et s’arrête avec Stop ou à la fermeture de cette fenêtre. Si le navigateur ne gère pas la reconnaissance vocale, utilisez le micro du clavier du téléphone.",save_note:"Enregistrer la note",create_caption:"Créer une légende",suggest_hashtags:"Suggérer des hashtags",use_route:"Utiliser pour le parcours",assistant_result:"Résultat",copy_result:"Copier",share_result:"Partager",assistant_saved:"Note enregistrée dans Voyage → Journal d’Aracne (sur cet appareil uniquement).",assistant_empty:"Dictez ou écrivez d’abord une note.",assistant_permission_error:"Impossible de démarrer le micro. Vérifiez l’autorisation du navigateur.",assistant_caption_title:"Légende suggérée",assistant_hashtags_title:"Hashtags suggérés",assistant_route_title:"Parcours interprété",assistant_route_created:"Parcours créé à partir des indications de la note.",assistant_route_no_match:"Je n’ai pas trouvé assez d’indications. Citez un lieu, Mer/Nature/Culture/Saveurs, une durée ou le moyen de transport.",journal_title:"Journal d’Aracne",journal_sub:"Notes de voyage",journal_empty:"Aucune note enregistrée. Utilisez le micro ou le clavier pour raconter une visite.",delete_note:"Supprimer",manual_dictation_hint:"Vous pouvez toujours utiliser le micro du clavier du téléphone.",assistant_summary_prefix:"Note du Salento",assistant_route_places:"Étapes",assistant_route_mode:"Transport",assistant_route_duration:"Temps disponible"},
+      en:{local_storage_title:"Notes saved on this device",local_storage_warning:"Notes are stored only in this browser’s local storage. They are not synced online and may disappear if you clear site data, use private browsing, or switch browser/device.",view_notes:"View my notes",share_notes:"Share / back up",notes_backup_title:"My notes · Il Volo d’Aracne",notes_backup_empty:"There are no notes to share yet.",notes_backup_copied:"Notes copied: you can save them wherever you prefer.",assistant_open:"Talk to Aracne",assistant_title:"Talk to Aracne",assistant_sub:"Dictate or type a question. Aracne uses the app’s local knowledge and does not search the Internet.",assistant_intro:"Ask about places, what is nearby, adding stops or creating a route. You can also keep saving notes, creating captions and suggesting hashtags.",assistant_voice_lang:"Voice language",assistant_ready:"Microphone off",assistant_listening:"Listening…",assistant_unsupported:"Voice microphone is not available here. Try the GitHub Pages version in Safari or use keyboard dictation.",assistant_placeholder:"Speak or type your note here…",mic_start:"Start microphone",mic_stop:"Stop",assistant_privacy:"The microphone starts only after your tap and stops with Stop or when this window closes. If the browser does not support voice recognition, use your phone keyboard microphone.",save_note:"Save note",create_caption:"Create caption",suggest_hashtags:"Suggest hashtags",use_route:"Use for route",assistant_result:"Result",copy_result:"Copy",share_result:"Share",assistant_saved:"Note saved in Journey → Aracne Journal (on this device only).",assistant_empty:"Dictate or type a note first.",assistant_permission_error:"I can’t start the microphone. Check the browser permission.",assistant_caption_title:"Suggested caption",assistant_hashtags_title:"Suggested hashtags",assistant_route_title:"Interpreted route",assistant_route_created:"Route created from the note instructions.",assistant_route_no_match:"I could not find enough instructions. Mention a place, Sea/Nature/Culture/Flavours, a duration or a transport mode.",journal_title:"Aracne Journal",journal_sub:"Travel notes",journal_empty:"No saved notes yet. Use the microphone or keyboard to record a visit.",delete_note:"Delete",manual_dictation_hint:"You can always use the microphone on your phone keyboard.",assistant_summary_prefix:"Salento note",assistant_route_places:"Stops",assistant_route_mode:"Transport",assistant_route_duration:"Available time"},
+      es:{local_storage_title:"Notas guardadas en este dispositivo",local_storage_warning:"Las notas se guardan solo en el almacenamiento local de este navegador. No se sincronizan en línea y pueden desaparecer si borras los datos del sitio, usas navegación privada o cambias de navegador/dispositivo.",view_notes:"Ver mis notas",share_notes:"Compartir / guardar",notes_backup_title:"Mis notas · Il Volo d’Aracne",notes_backup_empty:"Todavía no hay notas para compartir.",notes_backup_copied:"Notas copiadas: puedes guardarlas donde prefieras.",assistant_open:"Habla con Aracne",assistant_title:"Habla con Aracne",assistant_sub:"Dicta o escribe una pregunta. Aracne usa el conocimiento local de la app y no busca en Internet.",assistant_intro:"Pregúntale por lugares, qué hay cerca, cómo añadir etapas o crear una ruta. También puedes seguir guardando notas, creando textos y sugiriendo hashtags.",assistant_voice_lang:"Idioma de la voz",assistant_ready:"Micrófono apagado",assistant_listening:"Te escucho…",assistant_unsupported:"El micrófono de voz no está disponible aquí. Prueba la versión de GitHub Pages en Safari o usa el dictado del teclado.",assistant_placeholder:"Habla o escribe aquí tu nota…",mic_start:"Activar micrófono",mic_stop:"Stop",assistant_privacy:"El micrófono solo empieza después de tu toque y se detiene con Stop o al cerrar esta ventana. Si el navegador no admite reconocimiento de voz, usa el micrófono del teclado del teléfono.",save_note:"Guardar nota",create_caption:"Crear texto",suggest_hashtags:"Sugerir hashtags",use_route:"Usar para la ruta",assistant_result:"Resultado",copy_result:"Copiar",share_result:"Compartir",assistant_saved:"Nota guardada en Viaje → Diario de Aracne (solo en este dispositivo).",assistant_empty:"Dicta o escribe primero una nota.",assistant_permission_error:"No puedo iniciar el micrófono. Comprueba el permiso del navegador.",assistant_caption_title:"Texto sugerido",assistant_hashtags_title:"Hashtags sugeridos",assistant_route_title:"Ruta interpretada",assistant_route_created:"Ruta creada a partir de las indicaciones de la nota.",assistant_route_no_match:"No he encontrado suficientes indicaciones. Cita un lugar, Mar/Naturaleza/Cultura/Sabores, una duración o el medio de transporte.",journal_title:"Diario de Aracne",journal_sub:"Notas de viaje",journal_empty:"Todavía no hay notas guardadas. Usa el micrófono o el teclado para contar una visita.",delete_note:"Eliminar",manual_dictation_hint:"Siempre puedes usar el micrófono del teclado del teléfono.",assistant_summary_prefix:"Nota del Salento",assistant_route_places:"Etapas",assistant_route_mode:"Transporte",assistant_route_duration:"Tiempo disponible"}
     };
     Object.keys(assistantI18n).forEach(k=>Object.assign(dict[k],assistantI18n[k]));
 
@@ -1088,6 +1088,7 @@
     let voiceLang = lang;
     let recognition = null;
     let isListening = false;
+    let voiceKeepListening = false;
     let assistantResultText = "";
     let selectedMood="mix";
     let filter="all";
@@ -1109,7 +1110,7 @@
           ["fa-leaf","Agisci","Completa missioni su acqua, rifiuti, mobilità dolce e prodotti locali. Guadagni Aracne Points e fai crescere il tuo Filo Verde."],
           ["fa-spider","Il mio viaggio","Nel Passaporto Aracne trovi punti, Filo Verde, badge, impatto indicativo e i luoghi che hai inserito nel tuo viaggio."],
           ["fa-share-nodes","Condividi","Puoi condividere percorso e note su WhatsApp, usare il menu di condivisione del telefono o aggiungere il marchio IL VOLO D’ARACNE e #IlVoloDAracne alle foto destinate ai social."],
-          ["fa-microphone","Parla con Aracne","Detta o scrivi una nota in Italiano, Français, English o Español. Puoi salvarla nel diario, creare una caption e hashtag oppure usarla per suggerire un percorso con regole locali, senza AI esterna."],
+          ["fa-microphone","Parla con Aracne","Detta o scrivi una domanda in Italiano, Français, English o Español. Aracne conosce i luoghi dell’app, può raccontarli, cercare cosa c’è vicino, aggiungere più tappe e creare percorsi. La conoscenza è locale all’app: non è ancora un assistente generalista su Internet."],
           ["fa-hard-drive","Note & memoria locale","Le note si trovano in Viaggio → Diario di Aracne. Sono salvate nello storage locale del browser su questo dispositivo: non sono nel cloud, non si sincronizzano e possono sparire se cancelli i dati del sito, usi la navigazione privata o cambi browser/dispositivo. Usa “Condividi / salva” per conservarne una copia altrove."],
           ["fa-dove","Storia & libro","Tocca la rondine e il titolo IL VOLO D’ARACNE in alto per scoprire la storia del progetto, i miti del viaggio e il collegamento al libro."],
           ["fa-language","Lingua","Puoi cambiare in qualsiasi momento tra Italiano, Français, English ed Español dal pulsante della lingua in alto."]
@@ -1126,7 +1127,7 @@
           ["fa-leaf","Agir","Réalisez des missions liées à l’eau, aux déchets, à la mobilité douce et aux produits locaux. Vous gagnez des Aracne Points et faites progresser votre Filo Verde."],
           ["fa-spider","Mon voyage","Le Passeport Aracne regroupe vos points, votre Filo Verde, vos badges, votre impact indicatif et les lieux ajoutés à votre voyage."],
           ["fa-share-nodes","Partager","Partagez parcours et notes sur WhatsApp, utilisez le menu de partage du téléphone, ou ajoutez automatiquement IL VOLO D’ARACNE et #IlVoloDAracne à une photo pour les réseaux sociaux."],
-          ["fa-microphone","Parler à Aracne","Dictez ou écrivez une note en Italiano, Français, English ou Español. Vous pouvez la conserver dans le journal, préparer une légende et des hashtags ou l’utiliser pour proposer un parcours avec des règles locales, sans IA externe."],
+          ["fa-microphone","Parler à Aracne","Dictez ou écrivez une question en Italiano, Français, English ou Español. Aracne connaît les lieux de l’app, peut les raconter, chercher ce qu’il y a autour, ajouter plusieurs étapes et créer des parcours. Sa connaissance reste locale à l’app : ce n’est pas encore un assistant généraliste sur Internet."],
           ["fa-hard-drive","Notes & stockage local","Vos notes se trouvent dans Voyage → Journal d’Aracne. Elles sont stockées localement dans ce navigateur sur cet appareil : elles ne sont pas dans le cloud, ne se synchronisent pas et peuvent disparaître si vous effacez les données du site, utilisez la navigation privée ou changez de navigateur/appareil. Utilisez “Partager / sauvegarder” pour en garder une copie ailleurs."],
           ["fa-dove","Histoire & livre","Touchez l’hirondelle et le titre IL VOLO D’ARACNE en haut pour découvrir l’histoire du projet, les mythes du voyage et le lien vers le livre."],
           ["fa-language","Langue","Vous pouvez passer à tout moment entre Italiano, Français, English et Español grâce au bouton de langue en haut."]
@@ -1143,7 +1144,7 @@
           ["fa-leaf","Act","Complete missions about water, waste, low-impact mobility and local products. You earn Aracne Points and grow your Filo Verde."],
           ["fa-spider","My journey","Your Aracne Passport shows points, Filo Verde, badges, indicative impact and the places you added to your journey."],
           ["fa-share-nodes","Share","Share routes and notes through WhatsApp, use your phone’s share sheet, or automatically stamp IL VOLO D’ARACNE and #IlVoloDAracne on social photos."],
-          ["fa-microphone","Talk to Aracne","Dictate or type a note in Italiano, Français, English or Español. Save it to the journal, create a caption and hashtags, or use local rules to suggest a route without external AI."],
+          ["fa-microphone","Talk to Aracne","Dictate or type a question in Italiano, Français, English or Español. Aracne knows the places in the app, can describe them, find what is nearby, add several stops and create routes. Its knowledge is local to the app: it is not yet a general Internet assistant."],
           ["fa-hard-drive","Notes & local storage","Your notes are in Journey → Aracne Journal. They are stored locally in this browser on this device: they are not in the cloud, do not sync, and may disappear if you clear site data, use private browsing, or switch browser/device. Use “Share / back up” to keep a copy elsewhere."],
           ["fa-dove","Story & book","Tap the swallow and IL VOLO D’ARACNE title at the top to discover the project story, travel myths and the book link."],
           ["fa-language","Language","Switch at any time between Italiano, Français, English and Español using the language button at the top."]
@@ -1160,7 +1161,7 @@
           ["fa-leaf","Actuar","Completa misiones sobre agua, residuos, movilidad ligera y productos locales. Ganas Aracne Points y haces crecer tu Filo Verde."],
           ["fa-spider","Mi viaje","El Pasaporte Aracne reúne tus puntos, Filo Verde, insignias, impacto indicativo y los lugares añadidos a tu viaje."],
           ["fa-share-nodes","Compartir","Comparte rutas y notas por WhatsApp, usa el menú de compartir del teléfono o añade automáticamente IL VOLO D’ARACNE y #IlVoloDAracne a las fotos para redes sociales."],
-          ["fa-microphone","Habla con Aracne","Dicta o escribe una nota en Italiano, Français, English o Español. Puedes guardarla en el diario, crear un texto y hashtags o usar reglas locales para proponer una ruta sin IA externa."],
+          ["fa-microphone","Habla con Aracne","Dicta o escribe una pregunta en Italiano, Français, English o Español. Aracne conoce los lugares de la app, puede describirlos, buscar qué hay cerca, añadir varias etapas y crear rutas. Su conocimiento es local a la app: todavía no es un asistente generalista de Internet."],
           ["fa-hard-drive","Notas y almacenamiento local","Tus notas están en Viaje → Diario de Aracne. Se guardan localmente en este navegador y dispositivo: no están en la nube, no se sincronizan y pueden desaparecer si borras los datos del sitio, usas navegación privada o cambias de navegador/dispositivo. Usa “Compartir / guardar” para conservar una copia en otro lugar."],
           ["fa-dove","Historia y libro","Toca la golondrina y el título IL VOLO D’ARACNE de arriba para conocer la historia del proyecto, los mitos del viaje y el enlace al libro."],
           ["fa-language","Idioma","Puedes cambiar en cualquier momento entre Italiano, Français, English y Español desde el botón de idioma de arriba."]
@@ -1469,24 +1470,29 @@
       }
     }
 
-    async function startVoiceRecognition(){
+    async function startVoiceRecognition(isRestart=false){
       const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
       if(!SR){
+        voiceKeepListening=false;
         setAssistantStatus("unsupported");
         toast(t("assistant_unsupported"));
         $("#assistantTranscript")?.focus();
         return;
       }
 
-      stopVoiceRecognition();
-      const permissionOk=await requestMicrophonePermission();
-      if(!permissionOk) return;
+      if(!isRestart){
+        stopVoiceRecognition();
+        const permissionOk=await requestMicrophonePermission();
+        if(!permissionOk)return;
+        voiceKeepListening=true;
+      }
 
       try{
         recognition=new SR();
         recognition.lang=localeForVoice(voiceLang);
         recognition.continuous=true;
         recognition.interimResults=true;
+        recognition.maxAlternatives=1;
 
         const base=$("#assistantTranscript").value.trim();
         let finalBuffer=base?base+" ":"";
@@ -1502,7 +1508,7 @@
           let interim="";
           for(let i=event.resultIndex;i<event.results.length;i++){
             const tr=event.results[i][0].transcript;
-            if(event.results[i].isFinal) finalBuffer+=tr.trim()+" ";
+            if(event.results[i].isFinal)finalBuffer+=tr.trim()+" ";
             else interim+=tr;
           }
           $("#assistantTranscript").value=(finalBuffer+interim).trim();
@@ -1510,34 +1516,67 @@
 
         recognition.onerror=(e)=>{
           console.warn("Speech recognition",e);
-          if(e.error!=="aborted"){
-            if(["not-allowed","service-not-allowed","audio-capture"].includes(e.error)){
-              setAssistantStatus("unsupported");
-              toast(t("assistant_permission_error"));
-            }else{
-              toast(t("assistant_unsupported"));
-            }
+          if(["not-allowed","service-not-allowed","audio-capture","network"].includes(e.error)){
+            voiceKeepListening=false;
+            setAssistantStatus("unsupported");
+            toast(e.error==="network"?t("assistant_unsupported"):t("assistant_permission_error"));
+          }else if(e.error!=="aborted"&&e.error!=="no-speech"){
+            console.warn("Speech recognition non-fatal",e.error);
           }
         };
 
         recognition.onend=()=>{
+          recognition=null;
+
+          // Mobile browsers often end SpeechRecognition after a short pause.
+          // Keep listening until the user explicitly taps Stop or closes the modal.
+          if(voiceKeepListening){
+            setTimeout(()=>{
+              if(voiceKeepListening&&!recognition){
+                startVoiceRecognition(true);
+              }
+            },250);
+            return;
+          }
+
           isListening=false;
-          if($("#assistantStatus")?.classList.contains("listening")) setAssistantStatus("ready");
+          setAssistantStatus("ready");
           $("#assistantMicStart").disabled=false;
           $("#assistantMicStop").disabled=true;
-          recognition=null;
         };
 
         recognition.start();
       }catch(e){
-        console.warn(e);
-        setAssistantStatus("unsupported");
-        toast(t("assistant_unsupported"));
-        $("#assistantTranscript")?.focus();
+        console.warn("Speech recognition start",e);
+        recognition=null;
+
+        if(voiceKeepListening){
+          setTimeout(()=>{
+            if(voiceKeepListening&&!recognition){
+              startVoiceRecognition(true);
+            }
+          },400);
+        }else{
+          setAssistantStatus("unsupported");
+          $("#assistantMicStart").disabled=false;
+          $("#assistantMicStop").disabled=true;
+        }
       }
     }
+
     function stopVoiceRecognition(){
-      if(recognition){try{recognition.stop();}catch(e){} recognition=null;}
+      voiceKeepListening=false;
+
+      const currentRecognition=recognition;
+      recognition=null;
+
+      if(currentRecognition){
+        try{
+          currentRecognition.onend=null;
+          currentRecognition.stop();
+        }catch(e){}
+      }
+
       isListening=false;
       if($("#assistantMicStart"))$("#assistantMicStart").disabled=false;
       if($("#assistantMicStop"))$("#assistantMicStop").disabled=true;
@@ -2133,12 +2172,25 @@ window.aracneIntelligenceBridge = {
 
   getPlaces: () => poiData,
 
+  // Reserved for the future local-business knowledge base.
+  getBusinesses: () => [],
+
   findPlaces: (text) => {
     return findMentionedPois(text);
   },
 
   addPlace: async (id) => {
-    return requestAddPoi(id);
+    const p=getPoi(id);
+    if(!p)return false;
+    if(!(await ensureCoords(p)))return false;
+    if(waypoints.some(w=>w.id===p.id))return true;
+
+    const index=bestInsertionIndex(p);
+    waypoints.splice(index,0,{...p,note:""});
+    saveState();
+    renderAll();
+    await drawRoute();
+    return true;
   },
 
   openPlace: async (id) => {
@@ -2149,14 +2201,16 @@ window.aracneIntelligenceBridge = {
       return false;
     }
 
-    openPoiDetail(p);
+    closeModal("assistantModal");
+    setTimeout(()=>openPoiDetail(p),120);
 
     return true;
   },
 
   nearMe: async () => {
 
-    nearest();
+    closeModal("assistantModal");
+    setTimeout(nearest,120);
 
     return true;
   },
