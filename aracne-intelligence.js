@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.4";
+  const VERSION = "0.4.5";
 
   const LANGS = [
     "it",
@@ -19,6 +19,7 @@
 
   let bridge = null;
   let currentLanguage = "it";
+  let activeRequestLanguage = null;
   let askButton = null;
 
 
@@ -372,28 +373,89 @@
     return LANGS.includes(code) ? code : null;
   }
 
-  function lang() {
+  function detectTextLanguage(text) {
+    const n=normalize(text);
+    if(!n)return null;
 
-    const voice =
+    const hints={
+      fr:[
+        "parle moi","raconte moi","cree","creer","construis","propose","parcours","itineraire",
+        "autour de","pres de","depuis","heures","heure","trois","deux","j aimerais","je voudrais",
+        "qu est ce","que voir","ajoute"
+      ],
+      it:[
+        "parlami","raccontami","crea","creami","costruisci","proponi","percorso","itinerario",
+        "vicino a","partendo da","ore","ora","tre","due","vorrei","mi piacerebbe","cosa vedere","aggiungi"
+      ],
+      en:[
+        "tell me","create","build","suggest","route","itinerary","around","near","starting from",
+        "hours","hour","three","two","i would like","i d like","what is","what to see","add"
+      ],
+      es:[
+        "hablame","cuentame","crea","construye","propon","ruta","itinerario","cerca de","alrededor de",
+        "desde","horas","hora","tres","dos","me gustaria","que hay","que ver","anade","agrega"
+      ]
+    };
+
+    const scores={it:0,fr:0,en:0,es:0};
+
+    for(const [code,phrases] of Object.entries(hints)) {
+      for(const phrase of phrases) {
+        const p=normalize(phrase);
+        if(p && n.includes(p)) {
+          scores[code] += p.includes(" ") ? 3 : 1;
+        }
+      }
+    }
+
+    // Small grammatical clues, used only as tie-breakers.
+    const grammar={
+      fr:/\b(je|moi|de|du|des|et|avec|pour|une|un|les)\b/g,
+      it:/\b(io|mi|di|da|e|con|per|una|un|gli)\b/g,
+      en:/\b(i|me|of|from|and|with|for|a|the)\b/g,
+      es:/\b(yo|me|de|desde|y|con|para|una|un|los)\b/g
+    };
+    for(const [code,re] of Object.entries(grammar)) {
+      scores[code] += Math.min(2,(n.match(re)||[]).length*0.15);
+    }
+
+    let best=null,bestScore=0,second=0;
+    for(const code of LANGS) {
+      const score=scores[code]||0;
+      if(score>bestScore) {
+        second=bestScore;
+        bestScore=score;
+        best=code;
+      } else if(score>second) {
+        second=score;
+      }
+    }
+
+    // Require a meaningful signal, not just generic grammar words.
+    return bestScore>=2.5 && bestScore>second ? best : null;
+  }
+
+  function lang() {
+    const active=
+      normalizeLanguageCode(activeRequestLanguage);
+
+    const voice=
       normalizeLanguageCode(
         bridge?.getVoiceLanguage?.()
       );
 
-    const app =
+    const app=
       normalizeLanguageCode(
         bridge?.getLanguage?.()
       );
 
-    const internal =
+    const internal=
       normalizeLanguageCode(
         currentLanguage
       );
 
-    /*
-     * The language selected in the Aracne voice UI has priority.
-     * Then use the application language, then the internal fallback.
-     */
-    return voice || app || internal || "it";
+    // During a request, the language inferred from the question wins.
+    return active || voice || app || internal || "it";
   }
 
   function setLanguage(language) {
@@ -407,7 +469,6 @@
 
     return lang();
   }
-
 
   function tr(key, ...args) {
 
@@ -443,7 +504,12 @@
       )
 
       .replace(
-        /[^a-z0-9\s-]/g,
+        /[-–—]/g,
+        " "
+      )
+
+      .replace(
+        /[^a-z0-9\s]/g,
         " "
       )
 
@@ -825,7 +891,8 @@
 
   function explicitIntents(text, places=[]) {
     const n=normalize(text);
-    const l=INTENT_LEXICON[lang()]||INTENT_LEXICON.it;
+    const queryLanguage=detectTextLanguage(text)||lang();
+    const l=INTENT_LEXICON[queryLanguage]||INTENT_LEXICON.it;
     const found=[];
 
     const add = name => {
@@ -878,7 +945,8 @@
   function understand(text, knownPlaces=null) {
     const n=normalize(text);
     const places=Array.isArray(knownPlaces)?knownPlaces:getPlaces(text);
-    const l=INTENT_LEXICON[lang()]||INTENT_LEXICON.it;
+    const queryLanguage=detectTextLanguage(text)||lang();
+    const l=INTENT_LEXICON[queryLanguage]||INTENT_LEXICON.it;
 
     const scores={
       scope:0,
@@ -989,6 +1057,7 @@
       score:bestScore,
       scores,
       places,
+      language:queryLanguage,
       signals:{
         duration:hasDurationSignal(n),
         theme:hasThemeSignal(n),
@@ -1393,25 +1462,6 @@
       actions.push("near_place");
     }
 
-    // Route intent: keep informational sections already built.
-    if(intents.includes("route")) {
-      const result=
-        await bridge
-          ?.createRouteFromText
-          ?.(normalizeNumberWordsForBridge(text), {
-            keepAssistantOpen: intents.length > 1,
-            intents
-          });
-
-      if(result?.ok) {
-        sections.push(tr("routeSection") + "\n" + (result.spokenText||result.text));
-        actions.push("route");
-      } else {
-        sections.push(tr("routeSection") + "\n" + tr("routeFail"));
-        ok=false;
-      }
-    }
-
     // Avoid adding the same POIs twice when the same sentence already created a route.
     if(intents.includes("add") && !intents.includes("route")) {
       if(!places.length) {
@@ -1436,6 +1486,27 @@
       }
       actions.push("open");
     }
+
+
+    // Route intent: keep informational sections already built.
+    if(intents.includes("route")) {
+      const result=
+        await bridge
+          ?.createRouteFromText
+          ?.(normalizeNumberWordsForBridge(text), {
+            keepAssistantOpen: intents.length > 1,
+            intents
+          });
+
+      if(result?.ok) {
+        sections.push(tr("routeSection") + "\n" + (result.spokenText||result.text));
+        actions.push("route");
+      } else {
+        sections.push(tr("routeSection") + "\n" + tr("routeFail"));
+        ok=false;
+      }
+    }
+
 
     // Fallback when no scored intent was strong enough.
     if(!sections.length) {
@@ -1604,6 +1675,8 @@
     const replyLanguage=
       normalizeLanguageCode(options.lang)
       ||
+      detectTextLanguage(text)
+      ||
       normalizeLanguageCode(bridge?.getVoiceLanguage?.())
       ||
       normalizeLanguageCode(bridge?.getLanguage?.())
@@ -1613,6 +1686,7 @@
       "it";
 
     currentLanguage=replyLanguage;
+    activeRequestLanguage=replyLanguage;
 
     /*
      * Evite qu'Aracne
@@ -1654,6 +1728,8 @@
       );
     }
 
+
+    activeRequestLanguage=null;
 
     return result;
   }
@@ -1974,6 +2050,8 @@
     execute,
 
     analyze: text => understand(text, getPlaces(text)),
+
+    detectLanguage: detectTextLanguage,
 
     setLanguage,
 
