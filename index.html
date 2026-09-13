@@ -837,7 +837,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.4.4"></script>
+  <script src="./aracne-intelligence.js?v=0.4.5"></script>
 
   <script>
   (() => {
@@ -1233,16 +1233,20 @@
 
     function openGeneratedRoute(){
       openSheet("routes");
+
       const scroll=$("#routes .sheet-scroll");
       const target=$("#routeThreadSection");
       if(!scroll||!target)return;
 
-      // Wait for the sheet transition/render, then jump directly to "Your thread".
-      setTimeout(()=>{
-        const top=Math.max(0,target.offsetTop-12);
-        try{scroll.scrollTo({top,behavior:"smooth"});}
-        catch(e){scroll.scrollTop=top;}
-      },140);
+      // Reset first so an old scroll position cannot trap the sheet.
+      scroll.scrollTop=0;
+
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          const top=Math.max(0,target.offsetTop-10);
+          scroll.scrollTop=top;
+        });
+      });
     }
 
     function closeSheets(){
@@ -2122,13 +2126,18 @@
     $("#assistantViewNotes").addEventListener("click",openJournalNotes);
     $("#journalViewBtn").addEventListener("click",()=>$("#journalList")?.scrollIntoView({behavior:"smooth",block:"start"}));
     $("#journalShareBtn").addEventListener("click",shareJournalNotes);
-    $$(".voice-lang").forEach(b=>b.addEventListener("click",()=>{voiceLang=b.dataset.voiceLang;syncVoiceLangButtons();if(recognition){stopVoiceRecognition();toast(t("assistant_ready"));}}));
+    $(".voice-lang").forEach(b=>b.addEventListener("click",()=>{
+      voiceLang=b.dataset.voiceLang;
+      window.AracneIntelligence?.setLanguage?.(voiceLang);
+      syncVoiceLangButtons();
+      if(recognition){stopVoiceRecognition();toast(t("assistant_ready"));}
+    }));
     $("#assistantMicStart").addEventListener("click",startVoiceRecognition);
     $("#assistantMicStop").addEventListener("click",stopVoiceRecognition);
     $("#assistantSave").addEventListener("click",saveAssistantNote);
     $("#assistantCaption").addEventListener("click",()=>{const text=assistantText();if(!text)return toast(t("assistant_empty"));showAssistantResult(t("assistant_caption_title"),buildAssistantCaption(text));});
     $("#assistantHashtags").addEventListener("click",()=>{const text=assistantText();if(!text)return toast(t("assistant_empty"));showAssistantResult(t("assistant_hashtags_title"),assistantHashtags(text));});
-    $("#assistantRoute").addEventListener("click",()=>{const text=assistantText();if(!text)return toast(t("assistant_empty"));const info=chooseRouteFromAssistant(text);if(!info.ok){showAssistantResult(t("assistant_route_title"),t("assistant_route_no_match"));return;}if(info.detectedMode)mode=info.detectedMode;waypoints=info.selected.map(p=>({...p}));saveState();renderAll();drawRoute();showAssistantResult(t("assistant_route_title"),routeAssistantText(info));toast(t("assistant_route_created"));setTimeout(()=>{closeModal("assistantModal");openSheet("routes");},850);});
+    $("#assistantRoute").addEventListener("click",()=>{const text=assistantText();if(!text)return toast(t("assistant_empty"));const info=chooseRouteFromAssistant(text);if(!info.ok){showAssistantResult(t("assistant_route_title"),t("assistant_route_no_match"));return;}if(info.detectedMode)mode=info.detectedMode;waypoints=info.selected.map(p=>({...p}));saveState();renderAll();drawRoute();showAssistantResult(t("assistant_route_title"),routeAssistantText(info));toast(t("assistant_route_created"));setTimeout(()=>{closeModal("assistantModal");openGeneratedRoute();},850);});
     $("#assistantCopyResult").addEventListener("click",async()=>{if(!assistantResultText)return;try{await navigator.clipboard.writeText(assistantResultText);toast(t("caption_copied"));}catch(e){toast(t("share_fail"));}});
     $("#assistantShareResult").addEventListener("click",async()=>{if(!assistantResultText)return;if(navigator.share){try{await navigator.share({title:"IL VOLO D’ARACNE",text:assistantResultText+"\n\n#IlVoloDAracne"});}catch(e){if(e?.name!=="AbortError")toast(t("share_fail"));}}else{try{await navigator.clipboard.writeText(assistantResultText+"\n\n#IlVoloDAracne");toast(t("caption_copied"));}catch(e){toast(t("share_fail"));}}});
     $("#assistantViewGeneratedRoute").addEventListener("click",()=>{
@@ -2263,7 +2272,7 @@ window.aracneIntelligenceBridge = {
 
     renderAll();
 
-    drawRoute();
+    await drawRoute();
 
     const resultText =
       routeAssistantText(info);
