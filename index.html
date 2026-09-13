@@ -836,7 +836,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.4.2"></script>
+  <script src="./aracne-intelligence.js?v=0.4.3"></script>
 
   <script>
   (() => {
@@ -2215,7 +2215,7 @@ window.aracneIntelligenceBridge = {
     return true;
   },
 
-  createRouteFromText: async (text) => {
+  createRouteFromText: async (text, options = {}) => {
 
     const info =
       chooseRouteFromAssistant(text);
@@ -2248,20 +2248,30 @@ window.aracneIntelligenceBridge = {
       routeAssistantText(info);
 
 
-    setTimeout(
-      () => {
+    /*
+     * For a simple "create a route" command, keep the historical behaviour:
+     * show the route sheet automatically.
+     *
+     * For a composed request (for example "tell me about Gallipoli AND
+     * create a 3-hour route"), keep the Aracne modal open so the user can
+     * actually read/hear the complete composed answer.
+     */
+    if (!options.keepAssistantOpen) {
+      setTimeout(
+        () => {
 
-        closeModal(
-          "assistantModal"
-        );
+          closeModal(
+            "assistantModal"
+          );
 
-        openSheet(
-          "routes"
-        );
+          openSheet(
+            "routes"
+          );
 
-      },
-      900
-    );
+        },
+        900
+      );
+    }
 
 
     return {
