@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.3.0";
+  const VERSION = "0.4.0";
 
   const LANGS = [
     "it",
@@ -42,10 +42,10 @@
         "Scrivi o detta prima una domanda.",
 
       scope:
-        "Aracne conosce i luoghi e i percorsi presenti nell’app. Può raccontarti un luogo, cercare cosa c’è vicino, aggiungere tappe e creare itinerari. Non è ancora un assistente generalista su Internet.",
+        "Inizia da ciò che vuoi fare: «Crea o proponi un percorso…», «Parlami di…», «Cosa c’è vicino a…?» oppure «Aggiungi…». Puoi formulare la frase in modo naturale: Aracne prova a riconoscere l’intenzione, il luogo, il tema e la durata. Conosce i contenuti dell’app e non è ancora un assistente generalista su Internet.",
 
       unknown:
-        "Posso aiutarti soprattutto con i luoghi presenti nell’app, ciò che c’è vicino, i percorsi e le funzioni di HIRUNDU. Prova per esempio: «Cosa c’è vicino a Otranto?», «Raccontami Porto Badisco» o «Creami un percorso natura di 3 ore».",
+        "Non ho collegato bene la frase a un’azione. Prova a iniziare con «Crea/Proponi un percorso», «Parlami di», «Cosa c’è vicino a» o «Aggiungi», poi descrivi liberamente ciò che vuoi: per esempio «Vorrei una passeggiata nella natura di tre ore partendo da Lecce».",
 
       noPlace:
         "Non ho identificato un luogo preciso nella domanda.",
@@ -101,10 +101,10 @@
         "Écris ou dicte d’abord une question.",
 
       scope:
-        "Aracne connaît les lieux et les parcours présents dans l’app. Elle peut raconter un lieu, chercher ce qu’il y a autour, ajouter des étapes et créer des itinéraires. Ce n’est pas encore un assistant généraliste connecté à Internet.",
+        "Commence par ce que tu veux faire : «Crée ou propose un parcours…», «Parle-moi de…», «Qu’est-ce qu’il y a autour de… ?» ou «Ajoute…». Tu peux ensuite formuler la phrase naturellement : Aracne essaie d’identifier l’intention, le lieu, le thème et la durée. Elle connaît le contenu de l’app et n’est pas encore un assistant généraliste sur Internet.",
 
       unknown:
-        "Je peux surtout t’aider avec les lieux présents dans l’app, ce qu’il y a autour, les parcours et les fonctions de HIRUNDU. Essaie par exemple : « Qu’est-ce qu’il y a autour d’Otranto ? », « Raconte-moi Porto Badisco » ou « Crée-moi un parcours nature de 3 heures ».",
+        "Je n’ai pas relié correctement ta phrase à une action. Commence par «Crée/Propose un parcours», «Parle-moi de», «Qu’est-ce qu’il y a autour de» ou «Ajoute», puis précise librement ce que tu veux : par exemple «J’aimerais une balade nature de trois heures en partant de Lecce».",
 
       noPlace:
         "Je n’ai pas identifié de lieu précis dans la question.",
@@ -160,10 +160,10 @@
         "Type or dictate a question first.",
 
       scope:
-        "Aracne knows the places and routes contained in the app. It can describe a place, find what is nearby, add stops and create itineraries. It is not yet a general Internet assistant.",
+        "Start with what you want to do: “Create or suggest a route…”, “Tell me about…”, “What is around…?” or “Add…”. You can then phrase the request naturally: Aracne tries to identify the intent, place, theme and duration. It knows the app’s content and is not yet a general Internet assistant.",
 
       unknown:
-        "I can mainly help with places already in the app, nearby discoveries, routes and HIRUNDU features. Try: “What is near Otranto?”, “Tell me about Porto Badisco”, or “Create a 3-hour nature route”.",
+        "I could not confidently connect that sentence to an action. Start with “Create/Suggest a route”, “Tell me about”, “What is around” or “Add”, then describe what you want naturally; for example: “I’d like a three-hour nature walk starting from Lecce”.",
 
       noPlace:
         "I could not identify a specific place in the question.",
@@ -219,10 +219,10 @@
         "Escribe o dicta primero una pregunta.",
 
       scope:
-        "Aracne conoce los lugares y recorridos presentes en la app. Puede describir un lugar, buscar qué hay cerca, añadir etapas y crear itinerarios. Todavía no es un asistente generalista conectado a Internet.",
+        "Empieza por lo que quieres hacer: «Crea o propón una ruta…», «Háblame de…», «¿Qué hay cerca de…?» o «Añade…». Después puedes formular la frase de forma natural: Aracne intenta identificar la intención, el lugar, el tema y la duración. Conoce el contenido de la app y todavía no es un asistente generalista de Internet.",
 
       unknown:
-        "Puedo ayudarte sobre todo con los lugares presentes en la app, lo que hay cerca, las rutas y las funciones de HIRUNDU. Prueba: «¿Qué hay cerca de Otranto?», «Cuéntame Porto Badisco» o «Crea una ruta de naturaleza de 3 horas».",
+        "No he relacionado bien la frase con una acción. Empieza con «Crea/Propón una ruta», «Háblame de», «¿Qué hay cerca de?» o «Añade», y después describe libremente lo que quieres; por ejemplo: «Me gustaría un paseo de naturaleza de tres horas saliendo de Lecce».",
 
       noPlace:
         "No he identificado un lugar concreto en la pregunta.",
@@ -677,80 +677,210 @@
 
 
   /* =========================================
-     COMPREHENSION
+     COMPREHENSION v0.4
+     Intent scoring multilingue — IT / FR / EN / ES
      ========================================= */
 
-  function isCapabilities(text) {
+  const INTENT_LEXICON = {
+    it: {
+      scope:["cosa puoi fare","cosa sai fare","come funziona","come puoi aiutarmi","aiutami a capire"],
+      routeStrong:["percorso","itinerario","circuito","giro turistico"],
+      routeSoft:["passeggiata","camminata","escursione","gita","tour","giornata","mezza giornata"],
+      routeRequest:["crea","creami","prepara","proponi","organizza","fammi","fai","costruisci","vorrei","voglio","mi piacerebbe","consigliami","suggerisci","cosa posso fare","cosa fare"],
+      origin:["partendo da","a partire da","con partenza da","da"],
+      nearbyMe:["vicino a me","intorno a me","nei miei dintorni"],
+      nearbyPlace:["vicino a","intorno a","nei dintorni di","nei pressi di","cosa c e vicino","cosa vedere vicino"],
+      add:["aggiungi","aggiungere","inserisci","inserire","metti","includi","includere"],
+      open:["apri","mostra","fammi vedere","visualizza"],
+      tell:["raccontami","parlami di","parlami","dimmi di","spiegami","descrivimi","cosa sai di","cosa vedere a","cosa c e a"],
+      compare:["confronta","confronto","differenza tra","meglio tra"]
+    },
+    fr: {
+      scope:["que peux tu faire","qu est ce que tu fais","comment ca marche","comment peux tu m aider","a quoi sers tu"],
+      routeStrong:["parcours","itineraire","circuit","circuit touristique"],
+      routeSoft:["balade","promenade","excursion","sortie","visite","journee","demi journee","tour"],
+      routeRequest:["cree","creer","propose","proposer","fais","faire","prepare","preparer","organise","organiser","construis","construire","je voudrais","j aimerais","je veux","suggere","suggerer","conseille moi","que faire","qu est ce que je peux faire"],
+      origin:["en partant de","au depart de","a partir de","depuis"],
+      nearbyMe:["autour de moi","pres de moi","a proximite de moi","dans les environs"],
+      nearbyPlace:["autour de","pres de","a proximite de","aux alentours de","dans les environs de","qu est ce qu il y a autour de","que voir pres de"],
+      add:["ajoute","ajouter","mets","mettre","insere","inserer","inclus","inclure"],
+      open:["ouvre","ouvrir","montre","montre moi","affiche","fais moi voir"],
+      tell:["parle moi de","raconte moi","dis moi","explique moi","decris moi","que sais tu de","que voir a","qu est ce qu il y a a"],
+      compare:["compare","comparaison","difference entre","lequel choisir entre"]
+    },
+    en: {
+      scope:["what can you do","what do you do","how does this work","how can you help me","what are you for"],
+      routeStrong:["route","itinerary","circuit","travel plan"],
+      routeSoft:["walk","walking tour","excursion","outing","day trip","half day","tour","trip"],
+      routeRequest:["create","build","make","plan","suggest","recommend","prepare","organize","organise","i want","i would like","i d like","can you make","can you suggest","what can i do","what to do"],
+      origin:["starting from","start from","departing from","from"],
+      nearbyMe:["near me","around me","close to me","in my area"],
+      nearbyPlace:["near","around","close to","nearby","what is around","what s around","what can i see near"],
+      add:["add","include","insert","put"],
+      open:["open","show","show me","display"],
+      tell:["tell me about","tell me","explain","describe","what do you know about","what to see in","what is in"],
+      compare:["compare","comparison","difference between","which is better"]
+    },
+    es: {
+      scope:["que puedes hacer","que sabes hacer","como funciona","como puedes ayudarme","para que sirves"],
+      routeStrong:["ruta","itinerario","recorrido","circuito"],
+      routeSoft:["paseo","caminata","excursion","salida","visita","dia","medio dia","tour"],
+      routeRequest:["crea","crear","propon","propone","proponer","haz","hacer","prepara","organiza","organizar","construye","quiero","me gustaria","recomiendame","sugiere","sugerir","que puedo hacer","que hacer"],
+      origin:["saliendo de","partiendo de","a partir de","desde"],
+      nearbyMe:["cerca de mi","a mi alrededor","en mis alrededores"],
+      nearbyPlace:["cerca de","alrededor de","en los alrededores de","proximo a","que hay cerca de","que ver cerca de"],
+      add:["anade","añade","anadir","añadir","agrega","agregar","incluye","incluir","inserta"],
+      open:["abre","abrir","muestra","muestrame","ensena","enseñame"],
+      tell:["hablame de","háblame de","cuentame","cuéntame","dime","explicame","explícame","describe","que sabes de","que ver en","que hay en"],
+      compare:["compara","comparacion","comparación","diferencia entre","cual elegir entre"]
+    }
+  };
 
-    return /\b(que peux tu faire|qu est ce que tu fais|comment ca marche|cosa puoi fare|cosa sai fare|what can you do|what do you do|que puedes hacer|como funciona)\b/
-      .test(
-        normalize(text)
-      );
+  const NUMBER_WORDS = {
+    it:{uno:"1",una:"1",un:"1",due:"2",tre:"3",quattro:"4",cinque:"5",sei:"6",sette:"7",otto:"8"},
+    fr:{un:"1",une:"1",deux:"2",trois:"3",quatre:"4",cinq:"5",six:"6",sept:"7",huit:"8"},
+    en:{one:"1",two:"2",three:"3",four:"4",five:"5",six:"6",seven:"7",eight:"8"},
+    es:{uno:"1",una:"1",un:"1",dos:"2",tres:"3",cuatro:"4",cinco:"5",seis:"6",siete:"7",ocho:"8"}
+  };
+
+  function phraseCount(n, phrases) {
+    let count=0;
+    for(const phrase of phrases||[]) {
+      const p=normalize(phrase);
+      if(p && n.includes(p)) count++;
+    }
+    return count;
   }
 
-
-  function isNearMe(text) {
-
-    return /\b(autour de moi|pres de moi|a proximite de moi|vicino a me|intorno a me|near me|around me|cerca de mi|a mi alrededor)\b/
-      .test(
-        normalize(text)
-      );
+  function hasDurationSignal(n) {
+    return /\b\d+(?:[\.,]\d+)?\s*(?:h|ore|ora|heures?|heure|hours?|hour|horas?|hora|min|mins|minutes?|minuti|minutos?)\b/.test(n)
+      || /\b(mezza giornata|demi journee|half day|medio dia|giornata intera|journee entiere|full day|dia entero)\b/.test(n)
+      || /\b(uno|una|un|due|tre|quattro|cinque|sei|sette|otto|deux|trois|quatre|cinq|six|sept|huit|one|two|three|four|five|seven|eight|dos|tres|cuatro|cinco|seis|siete|ocho)\s+(?:ore|ora|heures?|hours?|horas?)\b/.test(n);
   }
 
-
-  function isNearbyPlace(text) {
-
-    return /\b(autour de|pres de|a proximite de|vicino a|intorno a|near|around|close to|cerca de|alrededor de)\b/
-      .test(
-        normalize(text)
-      );
+  function hasThemeSignal(n) {
+    return /\b(natura|nature|natural|mare|mer|sea|mar|spiaggia|plage|beach|playa|cultura|culture|storia|histoire|history|historia|arte|food|cibo|cucina|gastronomia|saveurs|flavours|flavors|sabores|comida|tramonto|sunset|atardecer|coucher de soleil)\b/.test(n);
   }
 
-
-  function isRoute(text) {
-
-    const n =
-      normalize(text);
-
-
-    return (
-
-      /\b(percorso|itinerario|route|itineraire|itinerary|ruta)\b/
-        .test(n)
-
-      &&
-
-      /\b(crea|creami|prepara|fammi|fai|costruisci|cree|creer|prepare|fais|create|build|make|plan|haz)\b/
-        .test(n)
-    );
+  function genericPlaceQuestion(n) {
+    return /\b(che cosa c e|cosa c e|cosa vedere|qu est ce qu il y a|que voir|quoi voir|what is there|what s there|what to see|que hay|que ver)\b/.test(n);
   }
 
-
-  function isAdd(text) {
-
-    return /\b(aggiungi|aggiungere|inserisci|ajoute|ajouter|mets|add|include|anade|añade|agrega)\b/
-      .test(
-        normalize(text)
-      );
+  function normalizeNumberWordsForBridge(text) {
+    let out=normalize(text);
+    const maps=[NUMBER_WORDS[lang()]||{},NUMBER_WORDS.it,NUMBER_WORDS.fr,NUMBER_WORDS.en,NUMBER_WORDS.es];
+    const merged=Object.assign({},...maps);
+    for(const [word,digit] of Object.entries(merged)) {
+      out=out.replace(new RegExp("\\b"+word+"\\b","g"),digit);
+    }
+    return out;
   }
 
+  function understand(text, knownPlaces=null) {
+    const n=normalize(text);
+    const places=Array.isArray(knownPlaces)?knownPlaces:getPlaces(text);
+    const l=INTENT_LEXICON[lang()]||INTENT_LEXICON.it;
 
-  function isOpen(text) {
+    const scores={
+      scope:0,
+      route:0,
+      near_me:0,
+      near_place:0,
+      add:0,
+      open:0,
+      tell:0,
+      compare:0
+    };
 
-    return /\b(apri|mostra|fammi vedere|ouvre|montre|affiche|open|show|abre|muestra)\b/
-      .test(
-        normalize(text)
-      );
+    scores.scope += phraseCount(n,l.scope)*8;
+    scores.add += phraseCount(n,l.add)*7;
+    scores.open += phraseCount(n,l.open)*6;
+    scores.tell += phraseCount(n,l.tell)*6;
+    scores.compare += phraseCount(n,l.compare)*6;
+    scores.near_me += phraseCount(n,l.nearbyMe)*9;
+    scores.near_place += phraseCount(n,l.nearbyPlace)*6;
+
+    const strongRoute=phraseCount(n,l.routeStrong);
+    const softRoute=phraseCount(n,l.routeSoft);
+    const requestRoute=phraseCount(n,l.routeRequest);
+    const originCue=phraseCount(n,l.origin);
+
+    scores.route += strongRoute*5;
+    scores.route += softRoute*3;
+    scores.route += requestRoute*2.5;
+    scores.route += originCue ? 1 : 0;
+    scores.route += hasDurationSignal(n) ? 2 : 0;
+    scores.route += hasThemeSignal(n) ? 1 : 0;
+    scores.route += places.length ? 0.5 : 0;
+
+    // A natural request can imply a route even without saying "route/parcours".
+    if(requestRoute && hasDurationSignal(n) && (hasThemeSignal(n)||places.length)) {
+      scores.route += 2;
+    }
+
+    if(genericPlaceQuestion(n) && places.length) {
+      scores.tell += 4;
+    }
+
+    if(places.length>=2 && scores.compare>0) {
+      scores.compare += 2;
+    }
+
+    // "Around X" can appear in a route request. Explicit route cues win.
+    if(scores.route>=5 && (strongRoute||requestRoute)) {
+      scores.near_place=Math.min(scores.near_place,5);
+    }
+
+    const priority=["scope","add","route","near_me","near_place","open","compare","tell"];
+    let intent="unknown";
+    let bestScore=0;
+
+    for(const candidate of priority) {
+      const score=scores[candidate]||0;
+      if(score>bestScore) {
+        bestScore=score;
+        intent=candidate;
+      }
+    }
+
+    const minimum={
+      scope:6,
+      add:5,
+      route:4.5,
+      near_me:6,
+      near_place:5,
+      open:5,
+      compare:5,
+      tell:4
+    };
+
+    if(intent!=="unknown" && bestScore<(minimum[intent]||5)) {
+      intent="unknown";
+    }
+
+    return {
+      intent,
+      confidence:Math.min(1,bestScore/10),
+      score:bestScore,
+      scores,
+      places,
+      signals:{
+        duration:hasDurationSignal(n),
+        theme:hasThemeSignal(n),
+        origin:originCue>0,
+        strongRoute:strongRoute>0,
+        requestRoute:requestRoute>0
+      }
+    };
   }
 
-
-  function isCompare(text) {
-
-    return /\b(compare|compara|confronta|difference|differenza|différence|entre|between)\b/
-      .test(
-        normalize(text)
-      );
-  }
+  function isCapabilities(text){return understand(text).intent==="scope";}
+  function isNearMe(text){return understand(text).intent==="near_me";}
+  function isNearbyPlace(text){return understand(text).intent==="near_place";}
+  function isRoute(text){return understand(text).intent==="route";}
+  function isAdd(text){return understand(text).intent==="add";}
+  function isOpen(text){return understand(text).intent==="open";}
+  function isCompare(text){return understand(text).intent==="compare";}
 
 
   /* =========================================
@@ -1078,6 +1208,11 @@
     const places =
       getPlaces(text);
 
+    const understanding =
+      understand(text, places);
+
+    const intent =
+      understanding.intent;
 
     const appAnswer =
       appKnowledge(text);
@@ -1088,7 +1223,7 @@
      */
 
     if (
-      isCapabilities(text)
+      intent === "scope"
     ) {
 
       return {
@@ -1103,7 +1238,11 @@
      * Questions sur HIRUNDU
      */
 
-    if (appAnswer) {
+    if (
+      appAnswer
+      &&
+      !["route","add","open","near_me","near_place"].includes(intent)
+    ) {
 
       return {
         ok: true,
@@ -1118,7 +1257,7 @@
      */
 
     if (
-      isNearMe(text)
+      intent === "near_me"
     ) {
 
       await bridge
@@ -1140,7 +1279,7 @@
 
     if (
 
-      isNearbyPlace(text)
+      intent === "near_place"
 
       &&
 
@@ -1184,13 +1323,13 @@
      */
 
     if (
-      isRoute(text)
+      intent === "route"
     ) {
 
       const result =
         await bridge
           ?.createRouteFromText
-          ?.(text);
+          ?.(normalizeNumberWordsForBridge(text));
 
 
       if (
@@ -1203,6 +1342,12 @@
 
           intent:
             "route",
+
+          confidence:
+            understanding.confidence,
+
+          analysis:
+            understanding,
 
           text:
             result.spokenText
@@ -1230,7 +1375,7 @@
      */
 
     if (
-      isAdd(text)
+      intent === "add"
     ) {
 
       if (
@@ -1293,7 +1438,7 @@
      */
 
     if (
-      isOpen(text)
+      intent === "open"
     ) {
 
       if (
@@ -1346,7 +1491,7 @@
     if (
 
       (
-        isCompare(text)
+        intent === "compare"
         &&
         places.length >= 2
       )
@@ -1908,6 +2053,8 @@
     stopSpeaking,
 
     execute,
+
+    analyze: text => understand(text, getPlaces(text)),
 
     status: () => ({
 
