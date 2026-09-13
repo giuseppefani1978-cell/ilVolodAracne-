@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.5";
+  const VERSION = "0.4.6";
 
   const LANGS = [
     "it",
