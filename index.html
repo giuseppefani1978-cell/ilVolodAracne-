@@ -2119,6 +2119,149 @@
     window.aracneNote=updateNote;
     window.aracneDeleteJournal=deleteJournal;
     window.aracnePhoto=openPhoto;
+    /* =========================================
+   ARACNE INTELLIGENCE ↔ HIRUNDU
+   ========================================= */
+
+window.aracneIntelligenceBridge = {
+
+  getLanguage: () => lang,
+
+  getVoiceLanguage: () => voiceLang,
+
+  getTranscript: () => assistantText(),
+
+  getPlaces: () => poiData,
+
+  findPlaces: (text) => {
+    return findMentionedPois(text);
+  },
+
+  addPlace: async (id) => {
+    return requestAddPoi(id);
+  },
+
+  openPlace: async (id) => {
+
+    const p = getPoi(id);
+
+    if (!p) {
+      return false;
+    }
+
+    openPoiDetail(p);
+
+    return true;
+  },
+
+  nearMe: async () => {
+
+    nearest();
+
+    return true;
+  },
+
+  createRouteFromText: async (text) => {
+
+    const info =
+      chooseRouteFromAssistant(text);
+
+    if (!info.ok) {
+
+      return {
+        ok: false
+      };
+    }
+
+    if (info.detectedMode) {
+
+      mode =
+        info.detectedMode;
+    }
+
+    waypoints =
+      info.selected.map(
+        p => ({ ...p })
+      );
+
+    saveState();
+
+    renderAll();
+
+    drawRoute();
+
+    const resultText =
+      routeAssistantText(info);
+
+
+    setTimeout(
+      () => {
+
+        closeModal(
+          "assistantModal"
+        );
+
+        openSheet(
+          "routes"
+        );
+
+      },
+      900
+    );
+
+
+    return {
+
+      ok: true,
+
+      info,
+
+      text:
+        resultText,
+
+      spokenText:
+        resultText
+    };
+  },
+
+
+  showResult: (
+    title,
+    text
+  ) => {
+
+    showAssistantResult(
+      title,
+      text
+    );
+  },
+
+
+  stopRecognition: () => {
+
+    stopVoiceRecognition();
+  },
+
+
+  toast: message => {
+
+    toast(message);
+  }
+
+};
+
+
+if (
+  window.AracneIntelligence
+) {
+
+  window
+    .AracneIntelligence
+    .connect(
+      window
+        .aracneIntelligenceBridge
+    );
+}
     setTimeout(()=>geocodeRemainingSlowly(),3500);
   })();
   </script>
