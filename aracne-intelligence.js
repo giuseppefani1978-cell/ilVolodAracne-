@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.1";
+  const VERSION = "0.4.2";
 
   const LANGS = [
     "it",
@@ -37,6 +37,11 @@
 
       title:
         "Aracne",
+
+      aboutSection: name => "Su " + name,
+      routeSection: "Percorso proposto",
+      nearbySection: "Nei dintorni",
+      actionSection: "Azione",
 
       empty:
         "Scrivi o detta prima una domanda.",
@@ -97,6 +102,11 @@
       title:
         "Aracne",
 
+      aboutSection: name => "À propos de " + name,
+      routeSection: "Parcours proposé",
+      nearbySection: "Autour",
+      actionSection: "Action",
+
       empty:
         "Écris ou dicte d’abord une question.",
 
@@ -156,6 +166,11 @@
       title:
         "Aracne",
 
+      aboutSection: name => "About " + name,
+      routeSection: "Suggested route",
+      nearbySection: "Nearby",
+      actionSection: "Action",
+
       empty:
         "Type or dictate a question first.",
 
@@ -214,6 +229,11 @@
 
       title:
         "Aracne",
+
+      aboutSection: name => "Sobre " + name,
+      routeSection: "Ruta propuesta",
+      nearbySection: "Alrededores",
+      actionSection: "Acción",
 
       empty:
         "Escribe o dicta primero una pregunta.",
@@ -885,8 +905,29 @@
       intent="unknown";
     }
 
+    const activeIntents=[];
+
+    for(const candidate of ["scope","tell","compare","near_me","near_place","route","add","open"]) {
+      const threshold=minimum[candidate]||5;
+      if((scores[candidate]||0)>=threshold) activeIntents.push(candidate);
+    }
+
+    // "scope" is explanatory: do not mix it with an operational request.
+    if(activeIntents.includes("scope") && activeIntents.length>1) {
+      const filtered=activeIntents.filter(x=>x!=="scope");
+      activeIntents.splice(0,activeIntents.length,...filtered);
+    }
+
+    // "around X" inside an explicit route request is usually a route constraint,
+    // not a second nearby command.
+    if(activeIntents.includes("route") && scores.near_place<=5 && (strongRoute||requestRoute)) {
+      const i=activeIntents.indexOf("near_place");
+      if(i>=0) activeIntents.splice(i,1);
+    }
+
     return {
       intent,
+      intents:activeIntents.length ? activeIntents : (intent!=="unknown" ? [intent] : []),
       confidence:Math.min(1,bestScore/10),
       score:bestScore,
       scores,
@@ -1238,353 +1279,125 @@
     const understanding =
       understand(text, places);
 
-    const intent =
-      understanding.intent;
+    const intents =
+      understanding.intents || [];
 
     const appAnswer =
       appKnowledge(text);
 
-
-    /*
-     * Que peux-tu faire ?
-     */
-
-    if (
-      intent === "scope"
-    ) {
-
+    if(intents.includes("scope")) {
       return {
-        ok: true,
-        intent: "scope",
-        text: tr("scope")
+        ok:true,
+        intent:"scope",
+        intents:["scope"],
+        text:tr("scope"),
+        analysis:understanding
       };
     }
 
+    const sections=[];
+    const actions=[];
+    let ok=true;
 
-    /*
-     * Questions sur HIRUNDU
-     */
-
-    if (
+    // Local HIRUNDU knowledge can coexist with information,
+    // but must not override an explicit operational action.
+    if(
       appAnswer
       &&
-      !["route","add","open","near_me","near_place"].includes(intent)
+      !intents.some(x=>["route","add","open","near_me","near_place"].includes(x))
     ) {
-
-      return {
-        ok: true,
-        intent: "app_knowledge",
-        text: appAnswer
-      };
+      sections.push(appAnswer);
     }
 
-
-    /*
-     * Autour de moi
-     */
-
-    if (
-      intent === "near_me"
-    ) {
-
-      await bridge
-        ?.nearMe
-        ?.();
-
-
-      return {
-        ok: true,
-        intent: "near_me",
-        text: tr("nearMe")
-      };
-    }
-
-
-    /*
-     * Autour d'un POI précis
-     */
-
-    if (
-
-      intent === "near_place"
-
-      &&
-
-      places.length
-
-    ) {
-
-      const origin =
-        places[0];
-
-
-      const data =
-        nearbyFrom(
-          origin
+    // Informational intent can coexist with route/add/open.
+    if(intents.includes("compare") && places.length>=2) {
+      sections.push(multiAnswer(places));
+    } else if(intents.includes("tell") && places.length) {
+      if(places.length===1) {
+        sections.push(
+          tr("aboutSection",placeName(places[0])) + "\n" + enrichPlace(places[0])
         );
-
-
-      return {
-
-        ok: true,
-
-        intent:
-          "near_place",
-
-        place:
-          origin,
-
-        data,
-
-        text:
-          formatNearby(
-            origin,
-            data
-          )
-      };
+      } else {
+        sections.push(multiAnswer(places));
+      }
     }
 
+    // Nearby intents.
+    if(intents.includes("near_me")) {
+      await bridge?.nearMe?.();
+      sections.push(tr("nearbySection") + "\n" + tr("nearMe"));
+      actions.push("near_me");
+    }
 
-    /*
-     * Créer parcours
-     */
+    if(intents.includes("near_place") && places.length) {
+      const origin=places[0];
+      const data=nearbyFrom(origin);
+      sections.push(tr("nearbySection") + "\n" + formatNearby(origin,data));
+      actions.push("near_place");
+    }
 
-    if (
-      intent === "route"
-    ) {
-
-      const result =
+    // Route intent: keep informational sections already built.
+    if(intents.includes("route")) {
+      const result=
         await bridge
           ?.createRouteFromText
           ?.(normalizeNumberWordsForBridge(text));
 
-
-      if (
-        result?.ok
-      ) {
-
-        return {
-
-          ok: true,
-
-          intent:
-            "route",
-
-          confidence:
-            understanding.confidence,
-
-          analysis:
-            understanding,
-
-          text:
-            result.spokenText
-            ||
-            result.text
-        };
+      if(result?.ok) {
+        sections.push(tr("routeSection") + "\n" + (result.spokenText||result.text));
+        actions.push("route");
+      } else {
+        sections.push(tr("routeSection") + "\n" + tr("routeFail"));
+        ok=false;
       }
-
-
-      return {
-
-        ok: false,
-
-        intent:
-          "route",
-
-        text:
-          tr("routeFail")
-      };
     }
 
-
-    /*
-     * Ajouter un ou plusieurs lieux
-     */
-
-    if (
-      intent === "add"
-    ) {
-
-      if (
-        !places.length
-      ) {
-
-        return {
-
-          ok: false,
-
-          intent:
-            "add",
-
-          text:
-            tr("noPlace")
-        };
-      }
-
-
-      /*
-       * Maximum 4 dans une commande
-       */
-
-      for (
-        const place
-        of places.slice(0, 4)
-      ) {
-
-        await bridge
-          ?.addPlace
-          ?.(
-            place.id,
-            place
-          );
-      }
-
-
-      return {
-
-        ok: true,
-
-        intent:
-          "add",
-
-        text:
-          tr(
-            "add",
-
-            places
-              .slice(0, 4)
-              .map(placeName)
-              .join(", ")
-          )
-      };
-    }
-
-
-    /*
-     * Ouvrir
-     */
-
-    if (
-      intent === "open"
-    ) {
-
-      if (
-        !places.length
-      ) {
-
-        return {
-
-          ok: false,
-
-          intent:
-            "open",
-
-          text:
-            tr("noPlace")
-        };
-      }
-
-
-      await bridge
-        ?.openPlace
-        ?.(
-          places[0].id,
-          places[0]
+    // Avoid adding the same POIs twice when the same sentence already created a route.
+    if(intents.includes("add") && !intents.includes("route")) {
+      if(!places.length) {
+        sections.push(tr("noPlace"));
+        ok=false;
+      } else {
+        for(const place of places.slice(0,4)) {
+          await bridge?.addPlace?.(place.id,place);
+        }
+        sections.push(
+          tr("actionSection") + "\n" + tr("add",places.slice(0,4).map(placeName).join(", "))
         );
-
-
-      return {
-
-        ok: true,
-
-        intent:
-          "open",
-
-        text:
-          tr(
-            "open",
-            placeName(
-              places[0]
-            )
-          )
-      };
+        actions.push("add");
+      }
     }
 
-
-    /*
-     * Plusieurs POI dans la question
-     */
-
-    if (
-
-      (
-        intent === "compare"
-        &&
-        places.length >= 2
-      )
-
-      ||
-
-      places.length >= 2
-
-    ) {
-
-      return {
-
-        ok: true,
-
-        intent:
-          "multi",
-
-        places,
-
-        text:
-          multiAnswer(
-            places
-          )
-      };
+    // Opening a place is compatible with also explaining it.
+    if(intents.includes("open") && places.length) {
+      await bridge?.openPlace?.(places[0].id,places[0]);
+      if(!intents.includes("tell")) {
+        sections.push(tr("actionSection") + "\n" + tr("open",placeName(places[0])));
+      }
+      actions.push("open");
     }
 
-
-    /*
-     * Un seul lieu
-     */
-
-    if (
-      places.length === 1
-    ) {
-
-      return {
-
-        ok: true,
-
-        intent:
-          "tell",
-
-        place:
-          places[0],
-
-        text:
-          enrichPlace(
-            places[0]
-          )
-      };
+    // Fallback when no scored intent was strong enough.
+    if(!sections.length) {
+      if(places.length>=2) {
+        sections.push(multiAnswer(places));
+      } else if(places.length===1) {
+        sections.push(enrichPlace(places[0]));
+      } else {
+        sections.push(tr("unknown"));
+        ok=false;
+      }
     }
-
-
-    /*
-     * Question hors périmètre
-     */
 
     return {
-
-      ok: false,
-
-      intent:
-        "unknown",
-
-      text:
-        tr("unknown")
+      ok,
+      intent:intents.length>1 ? "composed" : (intents[0]||understanding.intent||"unknown"),
+      intents,
+      actions,
+      places,
+      confidence:understanding.confidence,
+      analysis:understanding,
+      text:sections.filter(Boolean).join("\n\n")
     };
   }
 
