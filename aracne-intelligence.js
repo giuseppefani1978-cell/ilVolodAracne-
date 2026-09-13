@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.0";
+  const VERSION = "0.4.1";
 
   const LANGS = [
     "it",
@@ -347,18 +347,45 @@
      LANGUE
      ========================================= */
 
+  function normalizeLanguageCode(value) {
+    const code=String(value||"").toLowerCase().slice(0,2);
+    return LANGS.includes(code) ? code : null;
+  }
+
   function lang() {
 
-    const detected =
-      bridge?.getVoiceLanguage?.()
-      ||
-      bridge?.getLanguage?.()
-      ||
-      currentLanguage;
+    const voice =
+      normalizeLanguageCode(
+        bridge?.getVoiceLanguage?.()
+      );
 
-    return LANGS.includes(detected)
-      ? detected
-      : "it";
+    const app =
+      normalizeLanguageCode(
+        bridge?.getLanguage?.()
+      );
+
+    const internal =
+      normalizeLanguageCode(
+        currentLanguage
+      );
+
+    /*
+     * The language selected in the Aracne voice UI has priority.
+     * Then use the application language, then the internal fallback.
+     */
+    return voice || app || internal || "it";
+  }
+
+  function setLanguage(language) {
+    const normalized=
+      normalizeLanguageCode(language);
+
+    if(normalized) {
+      currentLanguage=normalized;
+      updateUI();
+    }
+
+    return lang();
   }
 
 
@@ -1593,7 +1620,7 @@
   }
 
 
-  function speak(text) {
+  function speak(text, languageOverride=null) {
 
     if (
 
@@ -1628,8 +1655,13 @@
       );
 
 
+    const speechLanguage=
+      normalizeLanguageCode(languageOverride)
+      ||
+      lang();
+
     utterance.lang =
-      LOCALES[lang()]
+      LOCALES[speechLanguage]
       ||
       LOCALES.it;
 
@@ -1663,7 +1695,7 @@
           )
             .toLowerCase()
             .startsWith(
-              lang()
+              speechLanguage
             )
       );
 
@@ -1691,6 +1723,23 @@
     text = getTranscript(),
     options = {}
   ) {
+
+    /*
+     * Freeze the selected reply language before stopping the microphone.
+     * This prevents mobile UI state changes from falling back to Italian.
+     */
+    const replyLanguage=
+      normalizeLanguageCode(options.lang)
+      ||
+      normalizeLanguageCode(bridge?.getVoiceLanguage?.())
+      ||
+      normalizeLanguageCode(bridge?.getLanguage?.())
+      ||
+      normalizeLanguageCode(currentLanguage)
+      ||
+      "it";
+
+    currentLanguage=replyLanguage;
 
     /*
      * Evite qu'Aracne
@@ -1727,7 +1776,8 @@
     ) {
 
       speak(
-        result.text
+        result.text,
+        replyLanguage
       );
     }
 
@@ -2000,15 +2050,11 @@
 
             () => {
 
-              currentLanguage =
-
+              setLanguage(
                 button
                   .dataset
                   .voiceLang
-
-                ||
-
-                currentLanguage;
+              );
 
 
               setTimeout(
@@ -2055,6 +2101,8 @@
     execute,
 
     analyze: text => understand(text, getPlaces(text)),
+
+    setLanguage,
 
     status: () => ({
 
