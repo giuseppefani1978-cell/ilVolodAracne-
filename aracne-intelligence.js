@@ -27,7 +27,8 @@
     language: null,
     lastPlaceIds: [],
     lastIntents: [],
-    lastRoute: null
+    lastRoute: null,
+    pendingClarification: null
   };
 
 
@@ -736,7 +737,8 @@
       food:["piu sapori","piu gastronomia","piu cibo"],
       origin:["partendo da","a partire da","con partenza da","da"],
       include:["con","includendo","passando per","attraverso"],
-      contextPlace:["li","quel posto","questa zona","quel luogo"]
+      contextPlace:["li","quel posto","questa zona","quel luogo"],
+      both:["entrambi","tutti e due","tutte e due"]
     },
     fr:{
       nearby:["et autour","autour","et a proximite","a proximite","dans les environs","et pres de la"],
@@ -749,7 +751,8 @@
       food:["plus gastronomie","plus de saveurs","plus cuisine"],
       origin:["en partant de","au depart de","a partir de","depuis"],
       include:["avec","en incluant","en passant par","via"],
-      contextPlace:["la bas","ce lieu","cet endroit","sur place"]
+      contextPlace:["la bas","ce lieu","cet endroit","sur place"],
+      both:["les deux","tous les deux","toutes les deux"]
     },
     en:{
       nearby:["and around","around there","nearby","near there","what is around"],
@@ -762,7 +765,8 @@
       food:["more food","more gastronomy","more local food"],
       origin:["starting from","start from","departing from","from"],
       include:["with","including","via","passing through"],
-      contextPlace:["there","that place","this place","on site"]
+      contextPlace:["there","that place","this place","on site"],
+      both:["both","both of them"]
     },
     es:{
       nearby:["y alrededor","alrededor","cerca de alli","en los alrededores","y cerca"],
@@ -775,7 +779,8 @@
       food:["mas gastronomia","mas sabores","mas comida"],
       origin:["saliendo de","partiendo de","a partir de","desde"],
       include:["con","incluyendo","pasando por","via"],
-      contextPlace:["alli","ese lugar","este lugar","ahi"]
+      contextPlace:["alli","ese lugar","este lugar","ahi"],
+      both:["los dos","las dos","ambos","ambas"]
     }
   };
 
@@ -791,6 +796,7 @@
     sessionState.lastPlaceIds=[];
     sessionState.lastIntents=[];
     sessionState.lastRoute=null;
+    sessionState.pendingClarification=null;
     return getContext();
   }
 
@@ -808,6 +814,12 @@
             durationHours:sessionState.lastRoute.durationHours,
             themes:[...(sessionState.lastRoute.themes||[])],
             mode:sessionState.lastRoute.mode||null
+          }
+        : null,
+      pendingClarification:sessionState.pendingClarification
+        ? {
+            type:sessionState.pendingClarification.type,
+            placeIds:[...(sessionState.pendingClarification.placeIds||[])]
           }
         : null
     };
@@ -1094,6 +1106,36 @@
     let themes=detectThemes(text,language);
     let mode=detectMode(text,language);
 
+    let resolvedPending=null;
+    const pending=sessionState.pendingClarification;
+
+    if(pending?.type==="route_origin") {
+      const pendingPlaces=placesByIds(pending.placeIds||[]);
+      const chosen=explicitPlaces.find(place=>(pending.placeIds||[]).includes(place.id));
+      const chooseBoth=hasAny(n,ctx.both||[]);
+
+      if(chosen || chooseBoth) {
+        const ordered=chosen
+          ? [chosen,...pendingPlaces.filter(place=>place.id!==chosen.id)]
+          : pendingPlaces;
+
+        resolvedPending={
+          type:"route_origin",
+          places:ordered
+        };
+
+        if(durationHours==null && pending.durationHours!=null) {
+          durationHours=pending.durationHours;
+        }
+        if(!themes.length && pending.themes?.length) {
+          themes=[...pending.themes];
+        }
+        if(!mode && pending.mode) {
+          mode=pending.mode;
+        }
+      }
+    }
+
     const cues=[];
     const addIntent=(name,pos,score=1)=>{
       if(pos<0)return;
@@ -1115,6 +1157,10 @@
     addIntent("open",earliestMatch(n,l.open),7);
     addIntent("compare",earliestMatch(n,l.compare),8);
 
+    if(resolvedPending) {
+      addIntent("route",0,10);
+    }
+
     const routeNounPos=earliestMatch(n,l.routeNouns);
     const routeVerbPos=earliestMatch(n,l.routeVerbs);
     const routeFollowupPos=earliestMatch(n,ctx.routeFollowup);
@@ -1131,9 +1177,12 @@
     if(themeModifier)themes=[themeModifier];
 
     const routeIsFollowup=
-      !!sessionState.lastRoute
-      &&
+      !!resolvedPending
+      ||
       (
+        !!sessionState.lastRoute
+        &&
+        (
         routeFollowupPos>=0
         || shorter
         || longer
@@ -1144,6 +1193,7 @@
           && routeVerbPos<0
           && (durationHours!=null || !!mode)
         )
+      )
       );
 
     if(durationHours==null && sessionState.lastRoute?.durationHours!=null) {
@@ -1176,7 +1226,9 @@
       addIntent("route",positions.length?Math.min(...positions):0,9);
     }
 
-    let places=[...explicitPlaces];
+    let places=resolvedPending?.places?.length
+      ? [...resolvedPending.places]
+      : [...explicitPlaces];
 
     const needsRememberedPlace=
       !places.length
@@ -1247,6 +1299,11 @@
 
     analysis.targets=assignTargets(n,cues,places);
 
+    if(resolvedPending?.places?.length) {
+      analysis.targets.route=[...resolvedPending.places];
+      analysis.resolvedClarification=resolvedPending.type;
+    }
+
     // Context fallback for route origin: reuse the previous origin, or the last discussed place.
     if(
       analysis.intents.includes("route")
@@ -1307,6 +1364,8 @@
       !hasOriginCue
       &&
       !hasIncludeCue
+      &&
+      !resolvedPending
     ) {
       analysis.clarification={
         type:"route_origin",
@@ -1357,6 +1416,7 @@
   }
 
   function rememberTurn(analysis, routeInfo=null) {
+    sessionState.pendingClarification=null;
     sessionState.turn+=1;
     sessionState.language=analysis.language||sessionState.language;
     sessionState.lastIntents=[...(analysis.intents||[])];
@@ -1757,6 +1817,15 @@
       let routeInfo=null;
 
       if(analysis.clarification) {
+        sessionState.pendingClarification={
+          type:analysis.clarification.type,
+          placeIds:[...(analysis.clarification.placeIds||[])],
+          durationHours:analysis.durationHours,
+          themes:[...(analysis.themes||[])],
+          mode:analysis.mode||null,
+          language:analysis.language
+        };
+
         return {
           ok:false,
           intent:"clarify",
@@ -1764,6 +1833,7 @@
           language:analysis.language,
           clarification:analysis.clarification,
           analysis,
+          context:getContext(),
           text:analysis.clarification.text
         };
       }
