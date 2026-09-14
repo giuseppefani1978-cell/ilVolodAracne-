@@ -771,12 +771,28 @@
 
   function earliestMatch(text, phrases) {
     let best=-1;
+
     for(const raw of phrases||[]) {
       const p=normalize(raw);
       if(!p)continue;
-      const i=text.indexOf(p);
-      if(i>=0 && (best<0 || i<best))best=i;
+
+      let from=0;
+      while(from<=text.length-p.length) {
+        const i=text.indexOf(p,from);
+        if(i<0)break;
+
+        const before=i===0?" ":text[i-1];
+        const after=(i+p.length)>=text.length?" ":text[i+p.length];
+
+        if(before===" " && after===" ") {
+          if(best<0 || i<best)best=i;
+          break;
+        }
+
+        from=i+1;
+      }
     }
+
     return best;
   }
 
@@ -795,7 +811,7 @@
       for(const group of groups) {
         for(const raw of group||[]) {
           const p=normalize(raw);
-          if(p && n.includes(p))scores[code]+=p.includes(" ")?3:1;
+          if(p && earliestMatch(n,[p])>=0)scores[code]+=p.includes(" ")?3:1;
         }
       }
     }
