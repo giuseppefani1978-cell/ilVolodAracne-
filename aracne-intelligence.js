@@ -730,11 +730,11 @@
     },
     fr:{
       scope:["que peux tu faire","qu est ce que tu fais","comment ca marche","comment peux tu m aider"],
-      tell:["parle moi de","parle moi","raconte moi","explique moi","dis moi","decris moi","presente moi","que sais tu de"],
+      tell:["parle moi de","parle moi d","parle moi","raconte moi","raconte moi d","explique moi","dis moi","decris moi","presente moi","que sais tu de","que sais tu d"],
       routeNouns:["parcours","trajet","itineraire","circuit","balade","promenade","excursion","tour","trip","voyage"],
       routeVerbs:["cree","creer","construis","construire","propose","proposer","prepare","preparer","organise","organiser","fais","faire","planifie","planifier","suggere","suggerer","conseille moi"],
       nearbyMe:["autour de moi","pres de moi","a proximite de moi","dans les environs"],
-      nearbyPlace:["autour de","pres de","a proximite de","aux alentours de","dans les environs de","qu est ce qu il y a autour de","que voir pres de"],
+      nearbyPlace:["autour de","autour d","pres de","pres d","a proximite de","a proximite d","aux alentours de","aux alentours d","dans les environs de","dans les environs d","qu est ce qu il y a autour de","qu est ce qu il y a autour d","que voir pres de","que voir pres d"],
       add:["ajoute","ajouter","mets","mettre","insere","inserer","inclus","inclure"],
       open:["ouvre","ouvrir","montre","montre moi","affiche","fais moi voir"],
       compare:["compare","comparaison","difference entre","lequel choisir entre"],
@@ -870,12 +870,81 @@
     return null;
   }
 
+  function placeSearchCandidates(place) {
+    const candidates=[];
+    const add=value=>{
+      const n=normalize(value);
+      if(n.length>=3 && !candidates.includes(n))candidates.push(n);
+    };
+
+    add(place?.name||"");
+    add(String(place?.id||"").replace(/_/g," "));
+
+    String(place?.name||"")
+      .split(",")
+      .forEach(add);
+
+    const words=normalize(place?.name||"").split(" ").filter(Boolean);
+    if(words.length>=2) {
+      add(words.slice(0,2).join(" "));
+      add(words.slice(-2).join(" "));
+    }
+
+    for(const word of words) {
+      if(word.length>=5)add(word);
+    }
+
+    return candidates.sort((a,b)=>b.length-a.length);
+  }
+
+  function findPlacePosition(text, place) {
+    let best=-1;
+    for(const candidate of placeSearchCandidates(place)) {
+      const i=earliestMatch(text,[candidate]);
+      if(i>=0 && (best<0 || i<best))best=i;
+    }
+    return best;
+  }
+
+  function assignTargets(text, cues, places) {
+    const mentions=places
+      .map(place=>({place,pos:findPlacePosition(text,place)}))
+      .filter(x=>x.pos>=0)
+      .sort((a,b)=>a.pos-b.pos);
+
+    const byPosition=[...cues].sort((a,b)=>a.pos-b.pos);
+    const targets={};
+
+    for(let i=0;i<byPosition.length;i++) {
+      const cue=byPosition[i];
+      const end=i+1<byPosition.length ? byPosition[i+1].pos : text.length+1;
+
+      let local=mentions
+        .filter(x=>x.pos>=cue.pos && x.pos<end)
+        .map(x=>x.place);
+
+      // Route clauses often inherit the place introduced just before:
+      // "Tell me about Gallipoli and build a 3-hour route".
+      if(cue.name==="route" && !local.length) {
+        const previous=mentions.filter(x=>x.pos<cue.pos);
+        if(previous.length)local=[previous[previous.length-1].place];
+      }
+
+      targets[cue.name]=[...new Map(local.map(p=>[p.id||p.name,p])).values()];
+    }
+
+    return targets;
+  }
+
   function buildBridgeText(text, analysis) {
-    let output=normalize(text);
+    const routePlaces=analysis.targets?.route||[];
+    let output=routePlaces.map(placeName).join(" ");
+
     if(analysis.durationHours!=null)output+=" "+analysis.durationHours+" h";
     for(const theme of analysis.themes||[])output+=" "+theme;
     if(analysis.mode)output+=" "+analysis.mode;
-    return output;
+
+    return output.trim() || normalize(text);
   }
 
   function analyze(text) {
@@ -946,6 +1015,7 @@
       mode
     };
 
+    analysis.targets=assignTargets(n,cues,places);
     analysis.bridgeText=buildBridgeText(text,analysis);
     return analysis;
   }
@@ -1308,14 +1378,17 @@
         sections.push(appAnswer);
       }
 
-      if(analysis.intents.includes("compare") && analysis.places.length>=2) {
-        sections.push(labels.compare+"\n"+multiAnswer(analysis.places));
-      } else if(analysis.intents.includes("tell") && analysis.places.length) {
-        if(analysis.places.length===1) {
-          const place=analysis.places[0];
+      const comparePlaces=analysis.targets.compare?.length ? analysis.targets.compare : analysis.places;
+      const tellPlaces=analysis.targets.tell?.length ? analysis.targets.tell : analysis.places;
+
+      if(analysis.intents.includes("compare") && comparePlaces.length>=2) {
+        sections.push(labels.compare+"\n"+multiAnswer(comparePlaces));
+      } else if(analysis.intents.includes("tell") && tellPlaces.length) {
+        if(tellPlaces.length===1) {
+          const place=tellPlaces[0];
           sections.push(labels.about+" "+placeName(place)+"\n"+enrichPlace(place));
         } else {
-          sections.push(multiAnswer(analysis.places));
+          sections.push(multiAnswer(tellPlaces));
         }
       }
 
@@ -1325,30 +1398,33 @@
         actions.push("near_me");
       }
 
-      if(analysis.intents.includes("near_place") && analysis.places.length) {
-        const origin=analysis.places[0];
+      const nearbyPlaces=analysis.targets.near_place?.length ? analysis.targets.near_place : analysis.places;
+      if(analysis.intents.includes("near_place") && nearbyPlaces.length) {
+        const origin=nearbyPlaces[0];
         const data=nearbyFrom(origin);
         sections.push(labels.nearby+"\n"+formatNearby(origin,data));
         actions.push("near_place");
       }
 
       if(analysis.intents.includes("add") && !analysis.intents.includes("route")) {
-        if(!analysis.places.length) {
+        const addPlaces=analysis.targets.add?.length ? analysis.targets.add : analysis.places;
+        if(!addPlaces.length) {
           sections.push(tr("noPlace"));
           ok=false;
         } else {
-          for(const place of analysis.places.slice(0,4)) {
+          for(const place of addPlaces.slice(0,4)) {
             await bridge?.addPlace?.(place.id,place);
           }
-          sections.push(labels.action+"\n"+tr("add",analysis.places.slice(0,4).map(placeName).join(", ")));
+          sections.push(labels.action+"\n"+tr("add",addPlaces.slice(0,4).map(placeName).join(", ")));
           actions.push("add");
         }
       }
 
-      if(analysis.intents.includes("open") && analysis.places.length) {
-        await bridge?.openPlace?.(analysis.places[0].id,analysis.places[0]);
+      const openPlaces=analysis.targets.open?.length ? analysis.targets.open : analysis.places;
+      if(analysis.intents.includes("open") && openPlaces.length) {
+        await bridge?.openPlace?.(openPlaces[0].id,openPlaces[0]);
         if(!analysis.intents.includes("tell")) {
-          sections.push(labels.action+"\n"+tr("open",placeName(analysis.places[0])));
+          sections.push(labels.action+"\n"+tr("open",placeName(openPlaces[0])));
         }
         actions.push("open");
       }
