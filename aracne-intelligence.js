@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.5.0";
+  const VERSION = "0.5.1";
 
   const LANGS = [
     "it",
@@ -738,7 +738,9 @@
       origin:["partendo da","a partire da","con partenza da","da"],
       include:["con","includendo","passando per","attraverso"],
       contextPlace:["li","quel posto","questa zona","quel luogo"],
-      both:["entrambi","tutti e due","tutte e due"]
+      both:["entrambi","tutti e due","tutte e due"],
+      between:["tra","fra"],
+      clauseBreaks:["e poi","poi","dopo","e puoi","e potresti"]
     },
     fr:{
       nearby:["et autour","autour","et a proximite","a proximite","dans les environs","et pres de la"],
@@ -752,7 +754,9 @@
       origin:["en partant de","au depart de","a partir de","depuis"],
       include:["avec","en incluant","en passant par","via"],
       contextPlace:["la bas","ce lieu","cet endroit","sur place"],
-      both:["les deux","tous les deux","toutes les deux"]
+      both:["les deux","tous les deux","toutes les deux"],
+      between:["entre"],
+      clauseBreaks:["et apres","puis","ensuite","et est ce que","et peux tu","et tu peux","apres ca"]
     },
     en:{
       nearby:["and around","around there","nearby","near there","what is around"],
@@ -766,7 +770,9 @@
       origin:["starting from","start from","departing from","from"],
       include:["with","including","via","passing through"],
       contextPlace:["there","that place","this place","on site"],
-      both:["both","both of them"]
+      both:["both","both of them"],
+      between:["between"],
+      clauseBreaks:["and then","then","after that","and can you","can you also"]
     },
     es:{
       nearby:["y alrededor","alrededor","cerca de alli","en los alrededores","y cerca"],
@@ -780,7 +786,9 @@
       origin:["saliendo de","partiendo de","a partir de","desde"],
       include:["con","incluyendo","pasando por","via"],
       contextPlace:["alli","ese lugar","este lugar","ahi"],
-      both:["los dos","las dos","ambos","ambas"]
+      both:["los dos","las dos","ambos","ambas"],
+      between:["entre"],
+      clauseBreaks:["y luego","luego","despues","despues de eso","y puedes"]
     }
   };
 
@@ -833,10 +841,10 @@
   }
 
   const SECTION_LABELS = {
-    it:{about:"Su",nearby:"Nei dintorni",route:"Percorso proposto",action:"Azione",compare:"Confronto",stops:"Tappe",duration:"Durata",mode:"Mezzo"},
-    fr:{about:"À propos de",nearby:"Autour",route:"Parcours proposé",action:"Action",compare:"Comparaison",stops:"Étapes",duration:"Durée",mode:"Transport"},
-    en:{about:"About",nearby:"Nearby",route:"Suggested route",action:"Action",compare:"Comparison",stops:"Stops",duration:"Duration",mode:"Transport"},
-    es:{about:"Sobre",nearby:"Alrededores",route:"Ruta propuesta",action:"Acción",compare:"Comparación",stops:"Etapas",duration:"Duración",mode:"Transporte"}
+    it:{about:"Su",see:"Da vedere",nearby:"Nei dintorni",route:"Percorso proposto",action:"Azione",compare:"Confronto",stops:"Tappe",duration:"Durata",mode:"Mezzo"},
+    fr:{about:"À propos de",see:"À voir",nearby:"Autour",route:"Parcours proposé",action:"Action",compare:"Comparaison",stops:"Étapes",duration:"Durée",mode:"Transport"},
+    en:{about:"About",see:"What to see",nearby:"Nearby",route:"Suggested route",action:"Action",compare:"Comparison",stops:"Stops",duration:"Duration",mode:"Transport"},
+    es:{about:"Sobre",see:"Qué ver",nearby:"Alrededores",route:"Ruta propuesta",action:"Acción",compare:"Comparación",stops:"Etapas",duration:"Duración",mode:"Transporte"}
   };
 
   const MODE_LABELS = {
@@ -857,6 +865,7 @@
     it:{
       scope:["cosa puoi fare","cosa sai fare","come funziona","come puoi aiutarmi"],
       tell:["parlami di","parlami","raccontami","spiegami","dimmi di","descrivimi","cosa sai di"],
+      see:["cosa vedere","cosa c e da vedere","che cosa vedere","da vedere"],
       routeNouns:["percorso","tragitto","itinerario","giro","passeggiata","camminata","escursione","tour","viaggio"],
       routeVerbs:["crea","creami","costruisci","proponi","prepara","organizza","fammi","suggerisci","consigliami","pianifica"],
       nearbyMe:["vicino a me","intorno a me","nei miei dintorni"],
@@ -870,6 +879,7 @@
     fr:{
       scope:["que peux tu faire","qu est ce que tu fais","comment ca marche","comment peux tu m aider"],
       tell:["parle moi de","parle moi d","parle moi","raconte moi","raconte moi d","explique moi","dis moi","decris moi","presente moi","que sais tu de","que sais tu d"],
+      see:["qu est ce qu il y a a voir","qu est ce qu il y a voir","que voir","quoi voir","a voir"],
       routeNouns:["parcours","trajet","itineraire","circuit","balade","promenade","excursion","tour","trip","voyage"],
       routeVerbs:["cree","creer","construis","construire","propose","proposer","prepare","preparer","organise","organiser","fais","faire","planifie","planifier","suggere","suggerer","conseille moi"],
       nearbyMe:["autour de moi","pres de moi","a proximite de moi","dans les environs"],
@@ -883,6 +893,7 @@
     en:{
       scope:["what can you do","what do you do","how does this work","how can you help me"],
       tell:["tell me about","tell me","talk to me about","describe","explain","what do you know about","introduce me to"],
+      see:["what to see","what is there to see","things to see","what can i see"],
       routeNouns:["route","trip","itinerary","journey","tour","walk","walking tour","excursion","trail","circuit"],
       routeVerbs:["create","build","make","plan","suggest","propose","prepare","organize","organise","recommend"],
       nearbyMe:["near me","around me","close to me","in my area"],
@@ -896,6 +907,7 @@
     es:{
       scope:["que puedes hacer","que sabes hacer","como funciona","como puedes ayudarme"],
       tell:["hablame de","hablame","cuentame","explicame","dime","describeme","presentame","que sabes de"],
+      see:["que ver","que hay que ver","que hay para ver","cosas que ver"],
       routeNouns:["ruta","trayecto","recorrido","itinerario","circuito","paseo","excursion","tour","trip","viaje"],
       routeVerbs:["crea","crear","construye","construir","propon","propone","proponer","prepara","organiza","organizar","haz","hacer","planifica","sugiere","recomienda"],
       nearbyMe:["cerca de mi","a mi alrededor","en mis alrededores"],
@@ -946,7 +958,7 @@
 
     for(const code of LANGS) {
       const l=LEXICON[code];
-      const groups=[l.scope,l.tell,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare];
+      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare];
       for(const group of groups) {
         for(const raw of group||[]) {
           const p=normalize(raw);
@@ -1007,6 +1019,74 @@
       if(hasAny(n,l.modes?.[mode]||[]))return mode;
     }
     return null;
+  }
+
+  function splitClauses(text, language) {
+    let n=normalize(text);
+    const ctx=CONTEXT_RULES[language]||CONTEXT_RULES.it;
+
+    for(const raw of ctx.clauseBreaks||[]) {
+      const sep=normalize(raw);
+      if(!sep)continue;
+      n=n.split(" "+sep+" ").join(" | ");
+    }
+
+    return n
+      .split("|")
+      .map(part=>part.trim())
+      .filter(Boolean);
+  }
+
+  function clauseSnapshot(clause, language) {
+    const l=LEXICON[language]||LEXICON.it;
+    const ctx=CONTEXT_RULES[language]||CONTEXT_RULES.it;
+    const places=(getPlaces(clause)||[])
+      .map(place=>({place,pos:findPlacePosition(clause,place)}))
+      .filter(item=>item.pos>=0)
+      .sort((a,b)=>a.pos-b.pos)
+      .map(item=>item.place);
+
+    const intents=[];
+    const add=name=>{if(!intents.includes(name))intents.push(name);};
+
+    if(hasAny(clause,l.tell))add("tell");
+    if(hasAny(clause,l.see))add("see_place");
+    if(hasAny(clause,l.nearbyPlace)||hasAny(clause,ctx.nearby))add("near_place");
+    if(hasAny(clause,l.nearbyMe))add("near_me");
+    if(hasAny(clause,l.add))add("add");
+    if(hasAny(clause,l.open))add("open");
+    if(hasAny(clause,l.compare))add("compare");
+
+    const routeNoun=hasAny(clause,l.routeNouns);
+    const routeVerb=hasAny(clause,l.routeVerbs);
+    if(routeNoun || (routeVerb && places.length))add("route");
+
+    return {
+      text:clause,
+      places,
+      intents,
+      between:hasAny(clause,ctx.between||[])
+    };
+  }
+
+  function estimateMinimumRouteHours(places, mode=null) {
+    if(!Array.isArray(places)||places.length<2)return null;
+
+    let km=0;
+    for(let i=1;i<places.length;i++) {
+      km+=distanceKm(places[i-1],places[i]);
+    }
+
+    // Straight-line distance -> conservative road/path distance.
+    km*=1.18;
+
+    const speed=
+      mode==="walking" ? 4.5
+      : mode==="cycling" ? 15
+      : 48;
+
+    const raw=km/speed;
+    return Math.max(0.5,Math.ceil(raw*2)/2);
   }
 
   function placeSearchCandidates(place) {
@@ -1151,6 +1231,7 @@
 
     addIntent("scope",earliestMatch(n,l.scope),9);
     addIntent("tell",earliestMatch(n,l.tell),8);
+    addIntent("see_place",earliestMatch(n,l.see),8);
     addIntent("near_me",earliestMatch(n,l.nearbyMe),9);
     addIntent("near_place",earliestMatch(n,l.nearbyPlace),8);
     addIntent("near_place",earliestMatch(n,ctx.nearby),7);
@@ -1280,7 +1361,20 @@
       if(i>=0)cues.splice(i,1);
     }
 
-    const order={tell:10,compare:15,near_me:20,near_place:20,add:30,open:35,route:40,scope:50};
+    const order={tell:10,see_place:15,compare:18,near_me:20,near_place:20,add:30,open:35,route:40,scope:50};
+    cues.sort((a,b)=>(order[a.name]||99)-(order[b.name]||99)||a.pos-b.pos);
+
+    const clauses=splitClauses(text,language);
+    const clauseAnalyses=clauses.map(clause=>clauseSnapshot(clause,language));
+
+    for(const clause of clauseAnalyses) {
+      for(const intentName of clause.intents) {
+        if(!cues.some(cue=>cue.name===intentName)) {
+          addIntent(intentName,Math.max(0,n.indexOf(clause.text)),8);
+        }
+      }
+    }
+
     cues.sort((a,b)=>(order[a.name]||99)-(order[b.name]||99)||a.pos-b.pos);
 
     const analysis={
@@ -1293,12 +1387,28 @@
       durationHours,
       themes,
       mode,
+      clauses:clauseAnalyses,
+      routeExactSequence:false,
       contextUsed:needsRememberedPlace || routeIsFollowup || !!themeModifier || shorter || longer || routeFollowupPos>=0,
       modifiers:{shorter,longer,theme:themeModifier},
       clarification:null
     };
 
     analysis.targets=assignTargets(n,cues,places);
+
+    // Prefer clause-local places when one sentence contains several intents.
+    for(const clause of clauseAnalyses) {
+      for(const intentName of clause.intents) {
+        if(clause.places.length) {
+          analysis.targets[intentName]=[...clause.places];
+        }
+      }
+
+      if(clause.intents.includes("route") && clause.between && clause.places.length>=2) {
+        analysis.targets.route=[...clause.places];
+        analysis.routeExactSequence=true;
+      }
+    }
 
     if(resolvedPending?.places?.length) {
       analysis.targets.route=[...resolvedPending.places];
@@ -1354,6 +1464,19 @@
     const routeTargets=analysis.targets.route||[];
     const hasOriginCue=hasAny(n,ctx.origin);
     const hasIncludeCue=hasAny(n,ctx.include);
+    const hasBetweenCue=hasAny(n,ctx.between||[]);
+
+    if(
+      analysis.intents.includes("route")
+      &&
+      analysis.durationHours==null
+      &&
+      analysis.routeExactSequence
+      &&
+      routeTargets.length>=2
+    ) {
+      analysis.durationHours=estimateMinimumRouteHours(routeTargets,analysis.mode);
+    }
 
     if(
       analysis.intents.includes("route")
@@ -1366,6 +1489,8 @@
       &&
       !hasIncludeCue
       &&
+      !hasBetweenCue
+      &&
       !resolvedPending
     ) {
       analysis.clarification={
@@ -1375,7 +1500,7 @@
       };
     }
 
-    const placeRequired=analysis.intents.some(x=>["tell","near_place","add","open"].includes(x));
+    const placeRequired=analysis.intents.some(x=>["tell","see_place","near_place","add","open"].includes(x));
     if(placeRequired && !analysis.places.length && !analysis.clarification) {
       analysis.clarification={
         type:"place",
@@ -1424,7 +1549,7 @@
 
     let focusPlaces=[];
 
-    for(const key of ["tell","near_place","open","route","add"]) {
+    for(const key of ["tell","see_place","near_place","open","route","add"]) {
       const candidates=analysis.targets?.[key]||[];
       if(candidates.length){
         focusPlaces=candidates;
@@ -1870,6 +1995,16 @@
         }
       }
 
+      const seePlaces=analysis.targets.see_place?.length
+        ? analysis.targets.see_place
+        : analysis.places;
+
+      if(analysis.intents.includes("see_place") && seePlaces.length) {
+        const origin=seePlaces[0];
+        const data=nearbyFrom(origin,4);
+        sections.push(labels.see+" · "+placeName(origin)+"\n"+formatNearby(origin,data));
+      }
+
       if(analysis.intents.includes("near_me")) {
         await bridge?.nearMe?.();
         sections.push(labels.nearby+"\n"+tr("nearMe"));
@@ -1923,7 +2058,8 @@
               placeIds:routeTargets.map(place=>place.id).filter(Boolean),
               durationHours:analysis.durationHours,
               themes:[...(analysis.themes||[])],
-              mode:analysis.mode||null
+              mode:analysis.mode||null,
+              exactPlaceSequence:!!analysis.routeExactSequence
             }
           }
         );
