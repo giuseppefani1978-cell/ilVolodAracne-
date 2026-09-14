@@ -284,6 +284,18 @@
     .popup-btn{width:100%;border:none;border-radius:12px;padding:10px;background:var(--grad);color:#fff;font-weight:800}
     .route-tooltip{background:#fff;border:none;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,.10);font-family:'Outfit';font-weight:800}
     .route-tooltip::before{display:none}
+    .aracne-thread-weaving{filter:drop-shadow(0 0 5px rgba(193,38,132,.38))}
+    .aracne-weaver{
+      width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+      background:rgba(255,255,255,.95);border:2px solid rgba(193,38,132,.28);
+      box-shadow:0 5px 16px rgba(90,20,90,.24);font-size:18px;line-height:1;
+      transform-origin:center;animation:aracneWeaverPulse .8s ease-in-out infinite alternate;
+      pointer-events:none
+    }
+    @keyframes aracneWeaverPulse{
+      from{transform:scale(.92) rotate(-5deg)}
+      to{transform:scale(1.08) rotate(5deg)}
+    }
 
 
     /* Splash / onboarding */
@@ -1095,6 +1107,9 @@
     let mode=localStorage.getItem("aracne_mode") || "driving";
     let routeLayer=null;
     let routeMarkers=[];
+    let aracneWeaveMarker=null;
+    let aracneWeaveFrame=null;
+    let pendingAracneMapWeave=false;
     let poiMarkers={};
     let userMarker=null;
     let lastRouteStats={distance:0,duration:0,carbon:0,carbonMin:0,carbonMax:0,legs:[],exact:true};
@@ -1987,7 +2002,15 @@
     }
 
     function openStory(){$("#storyModal").classList.add("show");}
-    function closeModal(id){if(id==="assistantModal")stopVoiceRecognition();$("#"+id)?.classList.remove("show");}
+    function closeModal(id){
+      if(id==="assistantModal"){
+        stopVoiceRecognition();
+        $("#"+id)?.classList.remove("show");
+        if(pendingAracneMapWeave)setTimeout(weaveAracneRoute,140);
+        return;
+      }
+      $("#"+id)?.classList.remove("show");
+    }
 
     function startThemedRoute(id){
       const r=themedRoutes.find(x=>x.id===id); if(!r)return;
@@ -2005,7 +2028,155 @@
 
     function completeMission(id){openMissionValidation(id);}
 
+    function flattenRouteLatLngs(value,out=[]){
+      if(!Array.isArray(value))return out;
+      value.forEach(item=>{
+        if(Array.isArray(item))flattenRouteLatLngs(item,out);
+        else if(item&&Number.isFinite(Number(item.lat))&&Number.isFinite(Number(item.lng)))out.push(item);
+      });
+      return out;
+    }
+
+    function stopAracneMapWeave(){
+      if(aracneWeaveFrame){
+        cancelAnimationFrame(aracneWeaveFrame);
+        aracneWeaveFrame=null;
+      }
+      if(aracneWeaveMarker){
+        try{map.removeLayer(aracneWeaveMarker);}catch(e){}
+        aracneWeaveMarker=null;
+      }
+      if(routeLayer){
+        try{
+          routeLayer.eachLayer(layer=>{
+            const el=layer.getElement?.();
+            if(!el)return;
+            el.classList.remove("aracne-thread-weaving");
+            el.style.strokeDasharray="";
+            el.style.strokeDashoffset="";
+            el.style.transition="";
+          });
+        }catch(e){}
+      }
+    }
+
+    function weaveAracneRoute(){
+      pendingAracneMapWeave=false;
+      if(!routeLayer)return;
+
+      stopAracneMapWeave();
+
+      const routePoints=[];
+      const paths=[];
+
+      try{
+        routeLayer.eachLayer(layer=>{
+          const latlngs=flattenRouteLatLngs(layer.getLatLngs?.()||[]);
+          if(latlngs.length>1)routePoints.push(...latlngs);
+
+          const el=layer.getElement?.();
+          if(el&&typeof el.getTotalLength==="function")paths.push(el);
+        });
+      }catch(e){
+        console.warn("Aracne visual thread",e);
+        return;
+      }
+
+      if(routePoints.length<2)return;
+
+      paths.forEach(path=>{
+        try{
+          const length=Math.max(1,path.getTotalLength());
+          path.classList.add("aracne-thread-weaving");
+          path.style.strokeDasharray=String(length)+" "+String(length);
+          path.style.strokeDashoffset=String(length);
+
+          if(typeof path.animate==="function"){
+            const animation=path.animate(
+              [{strokeDashoffset:String(length),opacity:.42},{strokeDashoffset:"0",opacity:.98}],
+              {duration:2600,easing:"cubic-bezier(.22,.7,.22,1)",fill:"forwards"}
+            );
+            animation.onfinish=()=>{
+              path.style.strokeDasharray="";
+              path.style.strokeDashoffset="";
+              path.classList.remove("aracne-thread-weaving");
+            };
+          }else{
+            requestAnimationFrame(()=>{
+              path.style.transition="stroke-dashoffset 2.6s cubic-bezier(.22,.7,.22,1)";
+              path.style.strokeDashoffset="0";
+              setTimeout(()=>{
+                path.style.transition="";
+                path.style.strokeDasharray="";
+                path.style.strokeDashoffset="";
+                path.classList.remove("aracne-thread-weaving");
+              },2750);
+            });
+          }
+        }catch(e){}
+      });
+
+      const segments=[];
+      let total=0;
+      for(let i=1;i<routePoints.length;i++){
+        const a=routePoints[i-1],b=routePoints[i];
+        const d=Math.max(.0001,haversine(a.lat,a.lng,b.lat,b.lng));
+        segments.push({a,b,start:total,length:d});
+        total+=d;
+      }
+      if(!segments.length||total<=0)return;
+
+      const spiderIcon=L.divIcon({
+        className:"",
+        html:'<div class="aracne-weaver" aria-hidden="true">🕷️</div>',
+        iconSize:[34,34],
+        iconAnchor:[17,17]
+      });
+
+      aracneWeaveMarker=L.marker(
+        [routePoints[0].lat,routePoints[0].lng],
+        {icon:spiderIcon,interactive:false,zIndexOffset:1200}
+      ).addTo(map);
+
+      const duration=2600;
+      const started=performance.now();
+
+      const tick=now=>{
+        const progress=Math.min(1,(now-started)/duration);
+        const eased=1-Math.pow(1-progress,2.4);
+        const target=eased*total;
+
+        let segment=segments[segments.length-1];
+        for(const candidate of segments){
+          if(target<=candidate.start+candidate.length){
+            segment=candidate;
+            break;
+          }
+        }
+
+        const local=Math.max(0,Math.min(1,(target-segment.start)/segment.length));
+        const lat=segment.a.lat+(segment.b.lat-segment.a.lat)*local;
+        const lng=segment.a.lng+(segment.b.lng-segment.a.lng)*local;
+
+        if(aracneWeaveMarker)aracneWeaveMarker.setLatLng([lat,lng]);
+
+        if(progress<1){
+          aracneWeaveFrame=requestAnimationFrame(tick);
+        }else{
+          aracneWeaveFrame=null;
+          setTimeout(()=>{
+            if(aracneWeaveMarker){
+              try{map.removeLayer(aracneWeaveMarker);}catch(e){}
+              aracneWeaveMarker=null;
+            }
+          },650);
+        }
+      };
+
+      aracneWeaveFrame=requestAnimationFrame(tick);
+    }
     async function drawRoute(){
+      stopAracneMapWeave();
       if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
       routeMarkers.forEach(m=>map.removeLayer(m));routeMarkers=[];
       waypoints.forEach((p,i)=>{
@@ -2301,6 +2472,8 @@ window.aracneIntelligenceBridge = {
     renderAll();
 
     await drawRoute();
+
+    pendingAracneMapWeave=!!routeLayer;
 
     const resultText =
       routeAssistantText(info);
