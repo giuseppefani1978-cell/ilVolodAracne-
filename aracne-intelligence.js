@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.4.0";
+  const VERSION = "0.4.1";
 
   const LANGS = [
     "it",
@@ -1431,11 +1431,22 @@
 
       // Route is deliberately executed last so informational intentions are composed first.
       if(analysis.intents.includes("route")) {
+        const routeTargets=
+          analysis.targets?.route?.length
+            ? analysis.targets.route
+            : analysis.places;
+
         const result=await bridge?.createRouteFromText?.(
           analysis.bridgeText,
           {
             keepAssistantOpen:analysis.intents.length>1,
-            intents:analysis.intents
+            intents:analysis.intents,
+            routeRequest:{
+              placeIds:routeTargets.map(place=>place.id).filter(Boolean),
+              durationHours:analysis.durationHours,
+              themes:[...(analysis.themes||[])],
+              mode:analysis.mode||null
+            }
           }
         );
 
