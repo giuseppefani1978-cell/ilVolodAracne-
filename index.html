@@ -836,7 +836,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.3.0"></script>
+  <script src="./aracne-intelligence.js?v=0.4.0"></script>
 
   <script>
   (() => {
@@ -2215,7 +2215,7 @@ window.aracneIntelligenceBridge = {
     return true;
   },
 
-  createRouteFromText: async (text) => {
+  createRouteFromText: async (text, options = {}) => {
 
     const info =
       chooseRouteFromAssistant(text);
@@ -2248,20 +2248,22 @@ window.aracneIntelligenceBridge = {
       routeAssistantText(info);
 
 
-    setTimeout(
-      () => {
+    if (!options.keepAssistantOpen) {
+      setTimeout(
+        () => {
 
-        closeModal(
-          "assistantModal"
-        );
+          closeModal(
+            "assistantModal"
+          );
 
-        openSheet(
-          "routes"
-        );
+          openSheet(
+            "routes"
+          );
 
-      },
-      900
-    );
+        },
+        900
+      );
+    }
 
 
     return {
