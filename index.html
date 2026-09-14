@@ -836,7 +836,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.4.0"></script>
+  <script src="./aracne-intelligence.js?v=0.4.1"></script>
 
   <script>
   (() => {
@@ -1665,6 +1665,60 @@
       if(selected.length<2)return {ok:false,mentioned,cats,hours,detectedMode};
       return {ok:true,selected,mentioned,cats,hours,detectedMode};
     }
+    function chooseRouteFromStructuredRequest(request,text=""){
+      if(!request || typeof request!=="object") return chooseRouteFromAssistant(text);
+
+      const requestedIds=Array.isArray(request.placeIds)?request.placeIds.filter(Boolean):[];
+      const mentioned=requestedIds.map(getPoi).filter(Boolean).filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
+      const cats=Array.isArray(request.themes)?request.themes.filter(Boolean):[];
+      const hours=Number.isFinite(Number(request.durationHours))?Number(request.durationHours):null;
+      const detectedMode=["driving","cycling","walking"].includes(request.mode)?request.mode:null;
+      const maxStops=hours!==null?(hours<=2?2:hours<=5?3:4):3;
+
+      let selected=[...mentioned];
+
+      if(selected.length<maxStops){
+        const origin=selected[0]||null;
+        let candidates=poiData.filter(p=>
+          Number.isFinite(Number(p.lat))
+          && Number.isFinite(Number(p.lng))
+          && !selected.some(x=>x.id===p.id)
+        );
+
+        if(cats.length){
+          const themed=candidates.filter(p=>
+            cats.includes(p.cat)
+            || (cats.includes("sunset")&&p.tags?.includes("tramonto"))
+          );
+          if(themed.length)candidates=themed;
+        }
+
+        if(origin){
+          candidates.sort((a,b)=>
+            haversine(origin.lat,origin.lng,a.lat,a.lng)
+            - haversine(origin.lat,origin.lng,b.lat,b.lng)
+          );
+        }
+
+        selected.push(...candidates.slice(0,Math.max(0,maxStops-selected.length)));
+      }
+
+      selected=[...new Map(selected.map(p=>[p.id,p])).values()];
+
+      if(selected.length<2){
+        return chooseRouteFromAssistant(text);
+      }
+
+      return {
+        ok:true,
+        selected,
+        mentioned,
+        cats,
+        hours,
+        detectedMode
+      };
+    }
+
     function routeAssistantText(info){
       const places=info.selected.map(p=>p.name).join(" → "); const m=info.detectedMode?({driving:t("car"),cycling:t("bike"),walking:t("walk")}[info.detectedMode]):modeLabel();
       const lines=[`${t("assistant_route_places")}: ${places}`,`${t("assistant_route_mode")}: ${m}`]; if(info.hours!==null)lines.push(`${t("assistant_route_duration")}: ${info.hours} h`);return lines.join("\n");
@@ -2218,7 +2272,10 @@ window.aracneIntelligenceBridge = {
   createRouteFromText: async (text, options = {}) => {
 
     const info =
-      chooseRouteFromAssistant(text);
+      chooseRouteFromStructuredRequest(
+        options.routeRequest,
+        text
+      );
 
     if (!info.ok) {
 
@@ -2242,7 +2299,7 @@ window.aracneIntelligenceBridge = {
 
     renderAll();
 
-    drawRoute();
+    await drawRoute();
 
     const resultText =
       routeAssistantText(info);
