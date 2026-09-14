@@ -2147,8 +2147,9 @@
 
       aracneWeaveFrame=requestAnimationFrame(tick);
     }
-    async function drawRoute(){
+    async function drawRoute(options={}){
       stopAracneMapWeave();
+      pendingAracneMapWeave=false;
       lastRouteGeometryPoints=[];
       if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
       routeMarkers.forEach(m=>map.removeLayer(m));routeMarkers=[];
@@ -2222,6 +2223,17 @@
       };
       if(status){status.textContent=exact?t("route_exact"):t("route_fallback");status.classList.remove("loading")}
       renderRouteSummary();renderPassport();renderPlanner();
+
+      if(options.weave!==false && routeLayer && lastRouteGeometryPoints.length>1){
+        pendingAracneMapWeave=true;
+
+        const assistantOpen=$("#assistantModal")?.classList.contains("show");
+        if(!assistantOpen){
+          setTimeout(()=>{
+            if(pendingAracneMapWeave)weaveAracneRoute();
+          },160);
+        }
+      }
     }
 
     function nearest(){
@@ -2280,7 +2292,7 @@
     applyTranslations();
     syncModeUI();
     syncSheetState();
-    drawRoute();
+    drawRoute({weave:false});
     if(didResetGreenProgress)setTimeout(()=>toast(t("progression_reset")),900);
 
     $$(".nav-btn").forEach(b=>b.addEventListener("click",()=>openSheet(b.dataset.sheet)));
@@ -2449,8 +2461,6 @@ window.aracneIntelligenceBridge = {
     renderAll();
 
     await drawRoute();
-
-    pendingAracneMapWeave=!!routeLayer;
 
     const resultText =
       routeAssistantText(info);
