@@ -1,0 +1,149 @@
+{
+  "version": "0.5.0",
+  "purpose": "Regression baseline for Aracne Intelligence. This file is not loaded by the app.",
+  "staticCases": [
+    {
+      "lang": "fr",
+      "input": "Parle-moi de Gallipoli et construis-moi un parcours nature de trois heures.",
+      "expect": {
+        "intents": [
+          "tell",
+          "route"
+        ],
+        "durationHours": 3
+      }
+    },
+    {
+      "lang": "fr",
+      "input": "Propose-moi un trajet nature de 3 heures depuis Lecce.",
+      "expect": {
+        "intents": [
+          "route"
+        ],
+        "durationHours": 3
+      }
+    },
+    {
+      "lang": "fr",
+      "input": "Parle-moi d'Otranto et propose une balade de deux heures et demie.",
+      "expect": {
+        "intents": [
+          "tell",
+          "route"
+        ],
+        "durationHours": 2.5
+      }
+    },
+    {
+      "lang": "it",
+      "input": "Parlami di Gallipoli e costruisci un percorso natura di tre ore.",
+      "expect": {
+        "intents": [
+          "tell",
+          "route"
+        ],
+        "durationHours": 3
+      }
+    },
+    {
+      "lang": "it",
+      "input": "Proponi un viaggio di due ore e mezza da Lecce.",
+      "expect": {
+        "intents": [
+          "route"
+        ],
+        "durationHours": 2.5
+      }
+    },
+    {
+      "lang": "en",
+      "input": "Tell me about Gallipoli and build a three hour nature trip.",
+      "expect": {
+        "intents": [
+          "tell",
+          "route"
+        ],
+        "durationHours": 3
+      }
+    },
+    {
+      "lang": "en",
+      "input": "Plan a two hours and a half trip from Lecce.",
+      "expect": {
+        "intents": [
+          "route"
+        ],
+        "durationHours": 2.5
+      }
+    },
+    {
+      "lang": "es",
+      "input": "Háblame de Gallipoli y crea una ruta de naturaleza de tres horas.",
+      "expect": {
+        "intents": [
+          "tell",
+          "route"
+        ],
+        "durationHours": 3
+      }
+    },
+    {
+      "lang": "es",
+      "input": "Construye un trayecto de dos horas y media desde Otranto.",
+      "expect": {
+        "intents": [
+          "route"
+        ],
+        "durationHours": 2.5
+      }
+    }
+  ],
+  "contextSequences": [
+    {
+      "lang": "fr",
+      "turns": [
+        "Parle-moi d'Otranto.",
+        "Et autour ?",
+        "Fais-moi un parcours de trois heures.",
+        "Plus nature.",
+        "Fais-le en deux heures.",
+        "Plus court."
+      ]
+    },
+    {
+      "lang": "it",
+      "turns": [
+        "Parlami di Otranto.",
+        "E intorno?",
+        "Fammi un percorso di tre ore.",
+        "Più natura."
+      ]
+    },
+    {
+      "lang": "en",
+      "turns": [
+        "Tell me about Otranto.",
+        "And around?",
+        "Make a three hour route.",
+        "More nature."
+      ]
+    },
+    {
+      "lang": "es",
+      "turns": [
+        "Háblame de Otranto.",
+        "¿Y alrededor?",
+        "Haz una ruta de tres horas.",
+        "Más naturaleza."
+      ]
+    }
+  ],
+  "clarificationCases": [
+    {
+      "input": "Fais un parcours de 3 heures Gallipoli Lecce.",
+      "expectClarification": "route_origin",
+      "reply": "Gallipoli",
+      "expectRouteOrigin": "gallipoli"
+    }
+  ]
+}
