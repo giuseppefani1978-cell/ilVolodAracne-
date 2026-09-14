@@ -836,7 +836,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.5.0"></script>
+  <script src="./aracne-intelligence.js?v=0.5.1"></script>
 
   <script>
   (() => {
@@ -1676,8 +1676,9 @@
       const maxStops=hours!==null?(hours<=2?2:hours<=5?3:4):3;
 
       let selected=[...mentioned];
+      const exactPlaceSequence=!!request.exactPlaceSequence;
 
-      if(selected.length<maxStops){
+      if(!exactPlaceSequence && selected.length<maxStops){
         const origin=selected[0]||null;
         let candidates=poiData.filter(p=>
           Number.isFinite(Number(p.lat))
