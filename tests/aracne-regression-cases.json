@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.5.1",
   "purpose": "Regression baseline for Aracne Intelligence. This file is not loaded by the app.",
   "staticCases": [
     {
@@ -144,6 +144,97 @@
       "expectClarification": "route_origin",
       "reply": "Gallipoli",
       "expectRouteOrigin": "gallipoli"
+    }
+  ],
+  "clauseCases": [
+    {
+      "lang": "fr",
+      "input": "qu'est-ce qu'il y a à voir Gallipoli et est-ce que tu peux me créer un parcours entre Gallipoli et Lecce",
+      "expect": {
+        "intents": [
+          "see_place",
+          "route"
+        ],
+        "seePlaceIds": [
+          "gallipoli"
+        ],
+        "routePlaceIds": [
+          "gallipoli",
+          "lecce"
+        ],
+        "exactPlaceSequence": true,
+        "estimatedDurationHours": 1
+      }
+    },
+    {
+      "lang": "fr",
+      "input": "Parle-moi de Gallipoli, qu'est-ce qu'il y a à voir à Gallipoli, et après crée-moi un parcours entre Gallipoli et Lecce.",
+      "expect": {
+        "intents": [
+          "tell",
+          "see_place",
+          "route"
+        ],
+        "tellPlaceIds": [
+          "gallipoli"
+        ],
+        "seePlaceIds": [
+          "gallipoli"
+        ],
+        "routePlaceIds": [
+          "gallipoli",
+          "lecce"
+        ],
+        "exactPlaceSequence": true
+      }
+    },
+    {
+      "lang": "it",
+      "input": "Dimmi cosa vedere a Gallipoli e poi crea un percorso tra Gallipoli e Lecce.",
+      "expect": {
+        "intents": [
+          "tell",
+          "see_place",
+          "route"
+        ],
+        "routePlaceIds": [
+          "gallipoli",
+          "lecce"
+        ],
+        "exactPlaceSequence": true
+      }
+    },
+    {
+      "lang": "en",
+      "input": "Tell me what to see in Gallipoli and then create a route between Gallipoli and Lecce.",
+      "expect": {
+        "intents": [
+          "tell",
+          "see_place",
+          "route"
+        ],
+        "routePlaceIds": [
+          "gallipoli",
+          "lecce"
+        ],
+        "exactPlaceSequence": true
+      }
+    },
+    {
+      "lang": "es",
+      "input": "Dime qué ver en Gallipoli y luego crea una ruta entre Gallipoli y Lecce.",
+      "expect": {
+        "intents": [
+          "tell",
+          "see_place",
+          "route"
+        ],
+        "routePlaceIds": [
+          "gallipoli",
+          "lecce"
+        ],
+        "exactPlaceSequence": true
+      }
     }
   ]
 }
