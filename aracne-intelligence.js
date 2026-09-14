@@ -749,7 +749,7 @@
       food:["plus gastronomie","plus de saveurs","plus cuisine"],
       origin:["en partant de","au depart de","a partir de","depuis"],
       include:["avec","en incluant","en passant par","via"],
-      contextPlace:["la bas","ce lieu","cet endroit","sur place","la"]
+      contextPlace:["la bas","ce lieu","cet endroit","sur place"]
     },
     en:{
       nearby:["and around","around there","nearby","near there","what is around"],
@@ -802,7 +802,9 @@
       lastIntents:[...sessionState.lastIntents],
       lastRoute:sessionState.lastRoute
         ? {
-            placeIds:[...(sessionState.lastRoute.placeIds||[])],
+            placeIds:[...(sessionState.lastRoute.originPlaceIds||sessionState.lastRoute.placeIds||[])],
+            originPlaceIds:[...(sessionState.lastRoute.originPlaceIds||sessionState.lastRoute.placeIds||[])],
+            selectedPlaceIds:[...(sessionState.lastRoute.selectedPlaceIds||[])],
             durationHours:sessionState.lastRoute.durationHours,
             themes:[...(sessionState.lastRoute.themes||[])],
             mode:sessionState.lastRoute.mode||null
@@ -1128,6 +1130,22 @@
 
     if(themeModifier)themes=[themeModifier];
 
+    const routeIsFollowup=
+      !!sessionState.lastRoute
+      &&
+      (
+        routeFollowupPos>=0
+        || shorter
+        || longer
+        || !!themeModifier
+        || hasAny(n,ctx.contextPlace)
+        || (
+          routeNounPos<0
+          && routeVerbPos<0
+          && (durationHours!=null || !!mode)
+        )
+      );
+
     if(durationHours==null && sessionState.lastRoute?.durationHours!=null) {
       if(shorter)durationHours=Math.max(1,Number(sessionState.lastRoute.durationHours)-1);
       if(longer)durationHours=Math.min(12,Number(sessionState.lastRoute.durationHours)+1);
@@ -1149,18 +1167,9 @@
       (routeVerbPos>=0 && routeContext)
       ||
       (
-        sessionState.lastRoute
+        routeIsFollowup
         &&
         routeContext
-        &&
-        (
-          routeFollowupPos>=0
-          || shorter
-          || longer
-          || !!themeModifier
-          || durationHours!=null
-          || mode
-        )
       )
     ) {
       const positions=[routeNounPos,routeVerbPos,routeFollowupPos].filter(x=>x>=0);
@@ -1180,14 +1189,26 @@
         (
           cues.some(x=>x.name==="route")
           &&
-          !!sessionState.lastRoute
+          (
+            !!sessionState.lastRoute
+            ||
+            sessionState.lastPlaceIds.length>0
+          )
         )
       );
 
     if(needsRememberedPlace) {
       const ids=
-        cues.some(x=>x.name==="route") && sessionState.lastRoute?.placeIds?.length
-          ? sessionState.lastRoute.placeIds
+        cues.some(x=>x.name==="route") && sessionState.lastRoute
+          ? (
+              sessionState.lastRoute.originPlaceIds?.length
+                ? sessionState.lastRoute.originPlaceIds
+                : (
+                    sessionState.lastRoute.placeIds?.length
+                      ? sessionState.lastRoute.placeIds
+                      : sessionState.lastPlaceIds
+                  )
+            )
           : sessionState.lastPlaceIds;
 
       places=placesByIds(ids);
@@ -1219,22 +1240,32 @@
       durationHours,
       themes,
       mode,
-      contextUsed:needsRememberedPlace || !!themeModifier || shorter || longer || routeFollowupPos>=0,
+      contextUsed:needsRememberedPlace || routeIsFollowup || !!themeModifier || shorter || longer || routeFollowupPos>=0,
       modifiers:{shorter,longer,theme:themeModifier},
       clarification:null
     };
 
     analysis.targets=assignTargets(n,cues,places);
 
-    // Context fallback for follow-up routes: inherit the last route's origin/places.
+    // Context fallback for route origin: reuse the previous origin, or the last discussed place.
     if(
       analysis.intents.includes("route")
       &&
       !(analysis.targets.route?.length)
-      &&
-      sessionState.lastRoute?.placeIds?.length
     ) {
-      analysis.targets.route=placesByIds(sessionState.lastRoute.placeIds);
+      const rememberedRouteIds=
+        sessionState.lastRoute?.originPlaceIds?.length
+          ? sessionState.lastRoute.originPlaceIds
+          : (sessionState.lastRoute?.placeIds||[]);
+
+      const rememberedIds=
+        rememberedRouteIds.length
+          ? rememberedRouteIds
+          : sessionState.lastPlaceIds;
+
+      if(rememberedIds.length) {
+        analysis.targets.route=placesByIds(rememberedIds);
+      }
     }
 
     // Context fallback for "and around?".
@@ -1248,8 +1279,9 @@
       analysis.targets.near_place=placesByIds(sessionState.lastPlaceIds);
     }
 
-    // Inherit route settings unless the user explicitly changes them.
-    if(analysis.intents.includes("route") && sessionState.lastRoute) {
+    // Inherit route settings only for a genuine contextual follow-up.
+    // A new explicit route request must start clean.
+    if(analysis.intents.includes("route") && routeIsFollowup && sessionState.lastRoute) {
       if(durationHours==null && sessionState.lastRoute.durationHours!=null) {
         analysis.durationHours=sessionState.lastRoute.durationHours;
       }
@@ -1346,13 +1378,23 @@
     }
 
     if(analysis.intents.includes("route")) {
-      const routePlaces=
+      const originPlaces=
+        analysis.targets?.route?.length
+          ? analysis.targets.route
+          : placesByIds(sessionState.lastPlaceIds);
+
+      const selectedPlaces=
         routeInfo?.selected?.length
           ? routeInfo.selected
-          : (analysis.targets?.route||[]);
+          : originPlaces;
+
+      const originPlaceIds=originPlaces.map(place=>place.id).filter(Boolean);
+      const selectedPlaceIds=selectedPlaces.map(place=>place.id).filter(Boolean);
 
       sessionState.lastRoute={
-        placeIds:routePlaces.map(place=>place.id).filter(Boolean),
+        placeIds:[...originPlaceIds],
+        originPlaceIds:[...originPlaceIds],
+        selectedPlaceIds:[...selectedPlaceIds],
         durationHours:
           routeInfo?.hours!=null
             ? routeInfo.hours
@@ -1361,8 +1403,10 @@
         mode:routeInfo?.detectedMode||analysis.mode||null
       };
 
-      if(sessionState.lastRoute.placeIds.length) {
-        sessionState.lastPlaceIds=[sessionState.lastRoute.placeIds[0]];
+      if(originPlaceIds.length) {
+        sessionState.lastPlaceIds=[originPlaceIds[0]];
+      } else if(selectedPlaceIds.length) {
+        sessionState.lastPlaceIds=[selectedPlaceIds[0]];
       }
     }
 
