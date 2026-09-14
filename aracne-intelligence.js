@@ -797,6 +797,7 @@
     sessionState.lastIntents=[];
     sessionState.lastRoute=null;
     sessionState.pendingClarification=null;
+    try{updateContextIndicator();}catch(error){}
     return getContext();
   }
 
@@ -1817,6 +1818,7 @@
       let routeInfo=null;
 
       if(analysis.clarification) {
+        sessionState.language=analysis.language||sessionState.language;
         sessionState.pendingClarification={
           type:analysis.clarification.type,
           placeIds:[...(analysis.clarification.placeIds||[])],
@@ -2115,6 +2117,8 @@
     } catch (error) {}
 
 
+    updateContextIndicator({thinking:true});
+
     const result =
       await execute(
         text
@@ -2141,6 +2145,8 @@
       );
     }
 
+
+    updateContextIndicator();
 
     return result;
   }
@@ -2229,6 +2235,84 @@
   /* =========================================
      BOUTON
      ========================================= */
+
+  function contextThemeLabel(theme,language) {
+    const labels={
+      it:{nature:"Natura",sea:"Mare",culture:"Cultura",food:"Sapori",sunset:"Tramonto"},
+      fr:{nature:"Nature",sea:"Mer",culture:"Culture",food:"Saveurs",sunset:"Coucher de soleil"},
+      en:{nature:"Nature",sea:"Sea",culture:"Culture",food:"Food",sunset:"Sunset"},
+      es:{nature:"Naturaleza",sea:"Mar",culture:"Cultura",food:"Sabores",sunset:"Atardecer"}
+    };
+    return labels[language]?.[theme]||theme;
+  }
+
+  function ensureContextIndicator() {
+    const body=document.querySelector(".assistant-body");
+    if(!body)return null;
+
+    let indicator=document.getElementById("aracneContextIndicator");
+    if(indicator)return indicator;
+
+    indicator=document.createElement("div");
+    indicator.id="aracneContextIndicator";
+    indicator.style.cssText=
+      "display:none;"
+      +"margin:0 0 10px;"
+      +"padding:8px 11px;"
+      +"border-radius:999px;"
+      +"width:max-content;"
+      +"max-width:100%;"
+      +"background:rgba(138,35,135,.08);"
+      +"border:1px solid rgba(138,35,135,.14);"
+      +"font-size:.78rem;"
+      +"line-height:1.25;"
+      +"white-space:nowrap;"
+      +"overflow:hidden;"
+      +"text-overflow:ellipsis;"
+      +"transition:opacity .2s ease,transform .2s ease;";
+
+    const status=document.getElementById("assistantStatus");
+    body.insertBefore(indicator,status||body.firstChild);
+    return indicator;
+  }
+
+  function updateContextIndicator(options={}) {
+    const indicator=ensureContextIndicator();
+    if(!indicator)return;
+
+    if(options.thinking) {
+      indicator.textContent="🕸️ "+tr("thinking");
+      indicator.style.display="block";
+      indicator.style.opacity="0.7";
+      indicator.style.transform="translateY(1px)";
+      return;
+    }
+
+    const context=getContext();
+    const route=context.lastRoute;
+    const ids=route?.originPlaceIds?.length
+      ? route.originPlaceIds
+      : context.lastPlaceIds;
+    const places=placesByIds(ids||[]);
+    const parts=[];
+
+    if(places.length)parts.push(places.slice(0,2).map(placeName).join(" → "));
+    if(route?.durationHours!=null)parts.push(route.durationHours+" h");
+    if(route?.themes?.length)parts.push(route.themes.slice(0,2).map(t=>contextThemeLabel(t,lang())).join(" · "));
+    if(route?.mode)parts.push((MODE_LABELS[lang()]||MODE_LABELS.it)[route.mode]||route.mode);
+
+    if(!parts.length) {
+      indicator.style.display="none";
+      indicator.textContent="";
+      return;
+    }
+
+    indicator.textContent="🕸️ "+parts.join(" · ");
+    indicator.style.display="block";
+    indicator.style.opacity="1";
+    indicator.style.transform="translateY(0)";
+  }
+
 
   function updateUI() {
 
@@ -2387,6 +2471,9 @@
     ensureButton();
 
     injectScopeHint();
+
+    ensureContextIndicator();
+    updateContextIndicator();
 
 
     document
