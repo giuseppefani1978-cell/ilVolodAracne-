@@ -1109,7 +1109,9 @@
     let routeMarkers=[];
     let aracneWeaveMarker=null;
     let aracneWeaveFrame=null;
+    let aracneThreadLayer=null;
     let pendingAracneMapWeave=false;
+    let lastRouteGeometryPoints=[];
     let poiMarkers={};
     let userMarker=null;
     let lastRouteStats={distance:0,duration:0,carbon:0,carbonMin:0,carbonMax:0,legs:[],exact:true};
@@ -2028,12 +2030,15 @@
 
     function completeMission(id){openMissionValidation(id);}
 
-    function flattenRouteLatLngs(value,out=[]){
-      if(!Array.isArray(value))return out;
-      value.forEach(item=>{
-        if(Array.isArray(item))flattenRouteLatLngs(item,out);
-        else if(item&&Number.isFinite(Number(item.lat))&&Number.isFinite(Number(item.lng)))out.push(item);
-      });
+    function compactRoutePoints(points,maxPoints=180){
+      if(!Array.isArray(points)||points.length<=maxPoints)return points||[];
+      const out=[];
+      const last=points.length-1;
+      for(let i=0;i<maxPoints;i++){
+        const idx=Math.round((i/(maxPoints-1))*last);
+        const point=points[idx];
+        if(!out.length||out[out.length-1][0]!==point[0]||out[out.length-1][1]!==point[1])out.push(point);
+      }
       return out;
     }
 
@@ -2046,85 +2051,33 @@
         try{map.removeLayer(aracneWeaveMarker);}catch(e){}
         aracneWeaveMarker=null;
       }
+      if(aracneThreadLayer){
+        try{map.removeLayer(aracneThreadLayer);}catch(e){}
+        aracneThreadLayer=null;
+      }
       if(routeLayer){
-        try{
-          routeLayer.eachLayer(layer=>{
-            const el=layer.getElement?.();
-            if(!el)return;
-            el.classList.remove("aracne-thread-weaving");
-            el.style.strokeDasharray="";
-            el.style.strokeDashoffset="";
-            el.style.transition="";
-          });
-        }catch(e){}
+        try{routeLayer.setStyle({opacity:.9});}catch(e){}
       }
     }
 
     function weaveAracneRoute(){
       pendingAracneMapWeave=false;
-      if(!routeLayer)return;
-
       stopAracneMapWeave();
 
-      const routePoints=[];
-      const paths=[];
+      const points=compactRoutePoints(lastRouteGeometryPoints,180);
+      if(!routeLayer||points.length<2)return;
 
-      try{
-        routeLayer.eachLayer(layer=>{
-          const latlngs=flattenRouteLatLngs(layer.getLatLngs?.()||[]);
-          if(latlngs.length>1)routePoints.push(...latlngs);
+      try{routeLayer.setStyle({opacity:.18});}catch(e){}
 
-          const el=layer.getElement?.();
-          if(el&&typeof el.getTotalLength==="function")paths.push(el);
-        });
-      }catch(e){
-        console.warn("Aracne visual thread",e);
-        return;
-      }
-
-      if(routePoints.length<2)return;
-
-      paths.forEach(path=>{
-        try{
-          const length=Math.max(1,path.getTotalLength());
-          path.classList.add("aracne-thread-weaving");
-          path.style.strokeDasharray=String(length)+" "+String(length);
-          path.style.strokeDashoffset=String(length);
-
-          if(typeof path.animate==="function"){
-            const animation=path.animate(
-              [{strokeDashoffset:String(length),opacity:.42},{strokeDashoffset:"0",opacity:.98}],
-              {duration:2600,easing:"cubic-bezier(.22,.7,.22,1)",fill:"forwards"}
-            );
-            animation.onfinish=()=>{
-              path.style.strokeDasharray="";
-              path.style.strokeDashoffset="";
-              path.classList.remove("aracne-thread-weaving");
-            };
-          }else{
-            requestAnimationFrame(()=>{
-              path.style.transition="stroke-dashoffset 2.6s cubic-bezier(.22,.7,.22,1)";
-              path.style.strokeDashoffset="0";
-              setTimeout(()=>{
-                path.style.transition="";
-                path.style.strokeDasharray="";
-                path.style.strokeDashoffset="";
-                path.classList.remove("aracne-thread-weaving");
-              },2750);
-            });
-          }
-        }catch(e){}
-      });
-
-      const segments=[];
-      let total=0;
-      for(let i=1;i<routePoints.length;i++){
-        const a=routePoints[i-1],b=routePoints[i];
-        const d=Math.max(.0001,haversine(a.lat,a.lng,b.lat,b.lng));
-        segments.push({a,b,start:total,length:d});
-        total+=d;
-      }
-      if(!segments.length||total<=0)return;
+      const threadColor="#C12684";
+      aracneThreadLayer=L.polyline([points[0]],{
+        color:threadColor,
+        weight:7,
+        opacity:.98,
+        lineCap:"round",
+        lineJoin:"round",
+        interactive:false
+      }).addTo(map);
 
       const spiderIcon=L.divIcon({
         className:"",
@@ -2133,50 +2086,70 @@
         iconAnchor:[17,17]
       });
 
-      aracneWeaveMarker=L.marker(
-        [routePoints[0].lat,routePoints[0].lng],
-        {icon:spiderIcon,interactive:false,zIndexOffset:1200}
-      ).addTo(map);
+      aracneWeaveMarker=L.marker(points[0],{
+        icon:spiderIcon,
+        interactive:false,
+        zIndexOffset:1400
+      }).addTo(map);
 
-      const duration=2600;
+      const distances=[0];
+      let total=0;
+      for(let i=1;i<points.length;i++){
+        total+=Math.max(.0001,haversine(points[i-1][0],points[i-1][1],points[i][0],points[i][1]));
+        distances.push(total);
+      }
+      if(total<=0){stopAracneMapWeave();return;}
+
+      const duration=2900;
       const started=performance.now();
 
       const tick=now=>{
         const progress=Math.min(1,(now-started)/duration);
-        const eased=1-Math.pow(1-progress,2.4);
+        const eased=1-Math.pow(1-progress,2.1);
         const target=eased*total;
 
-        let segment=segments[segments.length-1];
-        for(const candidate of segments){
-          if(target<=candidate.start+candidate.length){
-            segment=candidate;
-            break;
-          }
-        }
+        let i=1;
+        while(i<distances.length&&distances[i]<target)i++;
+        i=Math.min(i,points.length-1);
 
-        const local=Math.max(0,Math.min(1,(target-segment.start)/segment.length));
-        const lat=segment.a.lat+(segment.b.lat-segment.a.lat)*local;
-        const lng=segment.a.lng+(segment.b.lng-segment.a.lng)*local;
+        const a=points[i-1],b=points[i];
+        const segStart=distances[i-1];
+        const segLength=Math.max(.0001,distances[i]-segStart);
+        const local=Math.max(0,Math.min(1,(target-segStart)/segLength));
+        const current=[
+          a[0]+(b[0]-a[0])*local,
+          a[1]+(b[1]-a[1])*local
+        ];
 
-        if(aracneWeaveMarker)aracneWeaveMarker.setLatLng([lat,lng]);
+        const visible=points.slice(0,i);
+        visible.push(current);
+        if(aracneThreadLayer)aracneThreadLayer.setLatLngs(visible);
+        if(aracneWeaveMarker)aracneWeaveMarker.setLatLng(current);
 
         if(progress<1){
           aracneWeaveFrame=requestAnimationFrame(tick);
-        }else{
-          aracneWeaveFrame=null;
-          setTimeout(()=>{
-            if(aracneWeaveMarker){
-              try{map.removeLayer(aracneWeaveMarker);}catch(e){}
-              aracneWeaveMarker=null;
-            }
-          },650);
+          return;
         }
+
+        aracneWeaveFrame=null;
+        try{routeLayer.setStyle({opacity:.9});}catch(e){}
+        if(aracneThreadLayer){
+          try{map.removeLayer(aracneThreadLayer);}catch(e){}
+          aracneThreadLayer=null;
+        }
+        setTimeout(()=>{
+          if(aracneWeaveMarker){
+            try{map.removeLayer(aracneWeaveMarker);}catch(e){}
+            aracneWeaveMarker=null;
+          }
+        },550);
       };
 
       aracneWeaveFrame=requestAnimationFrame(tick);
     }
     async function drawRoute(){
       stopAracneMapWeave();
+      lastRouteGeometryPoints=[];
       if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
       routeMarkers.forEach(m=>map.removeLayer(m));routeMarkers=[];
       waypoints.forEach((p,i)=>{
@@ -2230,6 +2203,10 @@
       if(routeLayer){map.removeLayer(routeLayer)}
       const routeColor=mode==="driving"?"#E94057":mode==="cycling"?"#24a66a":"#2878e8";
       routeLayer=L.geoJSON(r.geometry,{style:{color:routeColor,weight:6,opacity:.9,lineCap:"round",lineJoin:"round"}}).addTo(map);
+      lastRouteGeometryPoints=(r.geometry?.coordinates||[])
+        .filter(point=>Array.isArray(point)&&point.length>=2)
+        .map(point=>[Number(point[1]),Number(point[0])])
+        .filter(point=>Number.isFinite(point[0])&&Number.isFinite(point[1]));
       map.fitBounds(routeLayer.getBounds(),{padding:[80,80]});
       const km=r.distance/1000;
       // Demo range for direct travel emissions: scooter-like lower bound to car-like upper bound.
@@ -2479,22 +2456,16 @@ window.aracneIntelligenceBridge = {
       routeAssistantText(info);
 
 
-    if (!options.keepAssistantOpen) {
-      setTimeout(
-        () => {
-
-          closeModal(
-            "assistantModal"
-          );
-
-          openSheet(
-            "routes"
-          );
-
-        },
-        900
-      );
-    }
+    setTimeout(
+      () => {
+        if ($("#assistantModal")?.classList.contains("show")) {
+          closeModal("assistantModal");
+        } else if (pendingAracneMapWeave) {
+          weaveAracneRoute();
+        }
+      },
+      options.keepAssistantOpen ? 1400 : 900
+    );
 
 
     return {
