@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.3.0";
+  const VERSION = "0.4.0";
 
   const LANGS = [
     "it",
@@ -19,6 +19,7 @@
 
   let bridge = null;
   let currentLanguage = "it";
+  let activeRequestLanguage = null;
   let askButton = null;
 
 
@@ -347,18 +348,23 @@
      LANGUE
      ========================================= */
 
+  function normalizeLanguageCode(value) {
+    const code=String(value||"").toLowerCase().slice(0,2);
+    return LANGS.includes(code) ? code : null;
+  }
+
   function lang() {
-
-    const detected =
-      bridge?.getVoiceLanguage?.()
+    return (
+      normalizeLanguageCode(activeRequestLanguage)
       ||
-      bridge?.getLanguage?.()
+      normalizeLanguageCode(bridge?.getVoiceLanguage?.())
       ||
-      currentLanguage;
-
-    return LANGS.includes(detected)
-      ? detected
-      : "it";
+      normalizeLanguageCode(bridge?.getLanguage?.())
+      ||
+      normalizeLanguageCode(currentLanguage)
+      ||
+      "it"
+    );
   }
 
 
@@ -396,7 +402,12 @@
       )
 
       .replace(
-        /[^a-z0-9\s-]/g,
+        /[-–—]/g,
+        " "
+      )
+
+      .replace(
+        /[^a-z0-9\s]/g,
         " "
       )
 
@@ -677,79 +688,263 @@
 
 
   /* =========================================
-     COMPREHENSION
+     COMPREHENSION v0.4
+     Multi-intent, multilingual, deterministic.
+     No external AI / no network.
      ========================================= */
 
-  function isCapabilities(text) {
+  const SECTION_LABELS = {
+    it:{about:"Su",nearby:"Nei dintorni",route:"Percorso proposto",action:"Azione",compare:"Confronto",stops:"Tappe",duration:"Durata",mode:"Mezzo"},
+    fr:{about:"À propos de",nearby:"Autour",route:"Parcours proposé",action:"Action",compare:"Comparaison",stops:"Étapes",duration:"Durée",mode:"Transport"},
+    en:{about:"About",nearby:"Nearby",route:"Suggested route",action:"Action",compare:"Comparison",stops:"Stops",duration:"Duration",mode:"Transport"},
+    es:{about:"Sobre",nearby:"Alrededores",route:"Ruta propuesta",action:"Acción",compare:"Comparación",stops:"Etapas",duration:"Duración",mode:"Transporte"}
+  };
 
-    return /\b(que peux tu faire|qu est ce que tu fais|comment ca marche|cosa puoi fare|cosa sai fare|what can you do|what do you do|que puedes hacer|como funciona)\b/
-      .test(
-        normalize(text)
-      );
+  const MODE_LABELS = {
+    it:{driving:"auto / scooter",cycling:"bici",walking:"a piedi"},
+    fr:{driving:"voiture / scooter",cycling:"vélo",walking:"à pied"},
+    en:{driving:"car / scooter",cycling:"bike",walking:"walking"},
+    es:{driving:"coche / scooter",cycling:"bici",walking:"a pie"}
+  };
+
+  const NUMBER_WORDS = {
+    it:{uno:1,una:1,un:1,due:2,tre:3,quattro:4,cinque:5,sei:6,sette:7,otto:8,nove:9,dieci:10,undici:11,dodici:12},
+    fr:{un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,sept:7,huit:8,neuf:9,dix:10,onze:11,douze:12},
+    en:{one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12},
+    es:{un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12}
+  };
+
+  const LEXICON = {
+    it:{
+      scope:["cosa puoi fare","cosa sai fare","come funziona","come puoi aiutarmi"],
+      tell:["parlami di","parlami","raccontami","spiegami","dimmi di","descrivimi","cosa sai di"],
+      routeNouns:["percorso","tragitto","itinerario","giro","passeggiata","camminata","escursione","tour","viaggio"],
+      routeVerbs:["crea","creami","costruisci","proponi","prepara","organizza","fammi","suggerisci","consigliami","pianifica"],
+      nearbyMe:["vicino a me","intorno a me","nei miei dintorni"],
+      nearbyPlace:["vicino a","intorno a","nei dintorni di","nei pressi di","cosa c e vicino a","cosa vedere vicino a"],
+      add:["aggiungi","aggiungere","inserisci","inserire","metti","includi","includere"],
+      open:["apri","mostra","fammi vedere","visualizza"],
+      compare:["confronta","confronto","differenza tra","meglio tra"],
+      themes:{nature:["natura","naturale","parco","bosco","verde"],sea:["mare","spiaggia","baia","costa"],culture:["cultura","storia","arte","chiesa","castello","museo"],food:["cibo","cucina","sapori","gastronomia","prodotto locale"],sunset:["tramonto"]},
+      modes:{cycling:["bici","bicicletta","ciclismo"],walking:["a piedi","camminare","camminata"],driving:["auto","macchina","scooter","moto"]}
+    },
+    fr:{
+      scope:["que peux tu faire","qu est ce que tu fais","comment ca marche","comment peux tu m aider"],
+      tell:["parle moi de","parle moi","raconte moi","explique moi","dis moi","decris moi","presente moi","que sais tu de"],
+      routeNouns:["parcours","trajet","itineraire","circuit","balade","promenade","excursion","tour","trip","voyage"],
+      routeVerbs:["cree","creer","construis","construire","propose","proposer","prepare","preparer","organise","organiser","fais","faire","planifie","planifier","suggere","suggerer","conseille moi"],
+      nearbyMe:["autour de moi","pres de moi","a proximite de moi","dans les environs"],
+      nearbyPlace:["autour de","pres de","a proximite de","aux alentours de","dans les environs de","qu est ce qu il y a autour de","que voir pres de"],
+      add:["ajoute","ajouter","mets","mettre","insere","inserer","inclus","inclure"],
+      open:["ouvre","ouvrir","montre","montre moi","affiche","fais moi voir"],
+      compare:["compare","comparaison","difference entre","lequel choisir entre"],
+      themes:{nature:["nature","naturel","plein air","parc","foret","vert"],sea:["mer","plage","baie","cote"],culture:["culture","histoire","art","eglise","chateau","musee"],food:["saveurs","gastronomie","cuisine","produit local","manger"],sunset:["coucher de soleil","sunset"]},
+      modes:{cycling:["velo","bicyclette","bike"],walking:["a pied","marche","marcher"],driving:["voiture","auto","scooter","moto"]}
+    },
+    en:{
+      scope:["what can you do","what do you do","how does this work","how can you help me"],
+      tell:["tell me about","tell me","talk to me about","describe","explain","what do you know about","introduce me to"],
+      routeNouns:["route","trip","itinerary","journey","tour","walk","walking tour","excursion","trail","circuit"],
+      routeVerbs:["create","build","make","plan","suggest","propose","prepare","organize","organise","recommend"],
+      nearbyMe:["near me","around me","close to me","in my area"],
+      nearbyPlace:["near","around","close to","nearby","what is around","what s around","what can i see near"],
+      add:["add","include","insert","put"],
+      open:["open","show","show me","display"],
+      compare:["compare","comparison","difference between","which is better"],
+      themes:{nature:["nature","natural","outdoors","park","forest","green"],sea:["sea","beach","bay","coast"],culture:["culture","history","art","church","castle","museum"],food:["food","flavours","flavors","cuisine","local food","gastronomy"],sunset:["sunset"]},
+      modes:{cycling:["bike","bicycle","cycling"],walking:["walk","walking","on foot"],driving:["car","driving","scooter","motorbike","motorcycle"]}
+    },
+    es:{
+      scope:["que puedes hacer","que sabes hacer","como funciona","como puedes ayudarme"],
+      tell:["hablame de","hablame","cuentame","explicame","dime","describeme","presentame","que sabes de"],
+      routeNouns:["ruta","trayecto","recorrido","itinerario","circuito","paseo","excursion","tour","trip","viaje"],
+      routeVerbs:["crea","crear","construye","construir","propon","propone","proponer","prepara","organiza","organizar","haz","hacer","planifica","sugiere","recomienda"],
+      nearbyMe:["cerca de mi","a mi alrededor","en mis alrededores"],
+      nearbyPlace:["cerca de","alrededor de","en los alrededores de","proximo a","que hay cerca de","que ver cerca de"],
+      add:["anade","anadir","agrega","agregar","incluye","incluir","inserta"],
+      open:["abre","abrir","muestra","muestrame","ensena"],
+      compare:["compara","comparacion","diferencia entre","cual elegir entre"],
+      themes:{nature:["naturaleza","natural","parque","bosque","verde"],sea:["mar","playa","bahia","costa"],culture:["cultura","historia","arte","iglesia","castillo","museo"],food:["comida","sabores","gastronomia","cocina","producto local"],sunset:["atardecer","puesta de sol"]},
+      modes:{cycling:["bici","bicicleta","ciclismo"],walking:["a pie","caminar","paseo"],driving:["coche","auto","scooter","moto"]}
+    }
+  };
+
+  function earliestMatch(text, phrases) {
+    let best=-1;
+    for(const raw of phrases||[]) {
+      const p=normalize(raw);
+      if(!p)continue;
+      const i=text.indexOf(p);
+      if(i>=0 && (best<0 || i<best))best=i;
+    }
+    return best;
   }
 
-
-  function isNearMe(text) {
-
-    return /\b(autour de moi|pres de moi|a proximite de moi|vicino a me|intorno a me|near me|around me|cerca de mi|a mi alrededor)\b/
-      .test(
-        normalize(text)
-      );
+  function hasAny(text, phrases) {
+    return earliestMatch(text,phrases)>=0;
   }
 
+  function detectTextLanguage(text) {
+    const n=normalize(text);
+    if(!n)return null;
+    const scores={it:0,fr:0,en:0,es:0};
 
-  function isNearbyPlace(text) {
+    for(const code of LANGS) {
+      const l=LEXICON[code];
+      const groups=[l.scope,l.tell,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare];
+      for(const group of groups) {
+        for(const raw of group||[]) {
+          const p=normalize(raw);
+          if(p && n.includes(p))scores[code]+=p.includes(" ")?3:1;
+        }
+      }
+    }
 
-    return /\b(autour de|pres de|a proximite de|vicino a|intorno a|near|around|close to|cerca de|alrededor de)\b/
-      .test(
-        normalize(text)
-      );
+    let best=null,bestScore=0,second=0;
+    for(const code of LANGS) {
+      const score=scores[code];
+      if(score>bestScore){second=bestScore;bestScore=score;best=code;}
+      else if(score>second)second=score;
+    }
+
+    return bestScore>=2 && bestScore>second ? best : null;
   }
 
-
-  function isRoute(text) {
-
-    const n =
-      normalize(text);
-
-
-    return (
-
-      /\b(percorso|itinerario|route|itineraire|itinerary|ruta)\b/
-        .test(n)
-
-      &&
-
-      /\b(crea|creami|prepara|fammi|fai|costruisci|cree|creer|prepare|fais|create|build|make|plan|haz)\b/
-        .test(n)
-    );
+  function replaceNumberWords(text, language) {
+    let n=normalize(text);
+    const map=NUMBER_WORDS[language]||{};
+    for(const [word,value] of Object.entries(map)) {
+      n=n.replace(new RegExp("\\b"+word+"\\b","g"),String(value));
+    }
+    return n;
   }
 
+  function parseDurationHours(text, language) {
+    const n=replaceNumberWords(text,language);
 
-  function isAdd(text) {
+    if(/\b(mezza giornata|demi journee|half day|medio dia)\b/.test(n))return 4;
+    if(/\b(giornata intera|journee entiere|full day|dia entero)\b/.test(n))return 8;
 
-    return /\b(aggiungi|aggiungere|inserisci|ajoute|ajouter|mets|add|include|anade|añade|agrega)\b/
-      .test(
-        normalize(text)
-      );
+    let m=n.match(/\b(\d+(?:[\.,]\d+)?)\s*(?:h|ore|ora|heures?|heure|hours?|hour|horas?|hora)\b/);
+    if(m) {
+      let hours=parseFloat(m[1].replace(",","."));
+      if(/\b(et demie|e mezza|and a half|y media)\b/.test(n))hours+=0.5;
+      return hours;
+    }
+
+    m=n.match(/\b(\d+(?:[\.,]\d+)?)\s*(?:min|mins|minutes?|minuti|minutos?)\b/);
+    if(m)return parseFloat(m[1].replace(",","."))/60;
+
+    return null;
   }
 
-
-  function isOpen(text) {
-
-    return /\b(apri|mostra|fammi vedere|ouvre|montre|affiche|open|show|abre|muestra)\b/
-      .test(
-        normalize(text)
-      );
+  function detectThemes(text, language) {
+    const n=normalize(text), l=LEXICON[language]||LEXICON.it, out=[];
+    for(const [theme,phrases] of Object.entries(l.themes||{})) {
+      if(hasAny(n,phrases))out.push(theme);
+    }
+    return out;
   }
 
+  function detectMode(text, language) {
+    const n=normalize(text), l=LEXICON[language]||LEXICON.it;
+    for(const mode of ["cycling","walking","driving"]) {
+      if(hasAny(n,l.modes?.[mode]||[]))return mode;
+    }
+    return null;
+  }
 
-  function isCompare(text) {
+  function buildBridgeText(text, analysis) {
+    let output=normalize(text);
+    if(analysis.durationHours!=null)output+=" "+analysis.durationHours+" h";
+    for(const theme of analysis.themes||[])output+=" "+theme;
+    if(analysis.mode)output+=" "+analysis.mode;
+    return output;
+  }
 
-    return /\b(compare|compara|confronta|difference|differenza|différence|entre|between)\b/
-      .test(
-        normalize(text)
-      );
+  function analyze(text) {
+    const n=normalize(text);
+    const places=getPlaces(text);
+    const language=detectTextLanguage(text)||normalizeLanguageCode(bridge?.getVoiceLanguage?.())||normalizeLanguageCode(bridge?.getLanguage?.())||"it";
+    const l=LEXICON[language]||LEXICON.it;
+    const durationHours=parseDurationHours(text,language);
+    const themes=detectThemes(text,language);
+    const mode=detectMode(text,language);
+
+    const cues=[];
+    const addIntent=(name,pos,score=1)=>{
+      if(pos<0)return;
+      const existing=cues.find(x=>x.name===name);
+      if(existing){existing.score=Math.max(existing.score,score);existing.pos=Math.min(existing.pos,pos);return;}
+      cues.push({name,pos,score});
+    };
+
+    addIntent("scope",earliestMatch(n,l.scope),9);
+    addIntent("tell",earliestMatch(n,l.tell),8);
+    addIntent("near_me",earliestMatch(n,l.nearbyMe),9);
+    addIntent("near_place",earliestMatch(n,l.nearbyPlace),8);
+    addIntent("add",earliestMatch(n,l.add),8);
+    addIntent("open",earliestMatch(n,l.open),7);
+    addIntent("compare",earliestMatch(n,l.compare),8);
+
+    const routeNounPos=earliestMatch(n,l.routeNouns);
+    const routeVerbPos=earliestMatch(n,l.routeVerbs);
+    const routeContext=durationHours!=null || themes.length || places.length || mode;
+
+    if(
+      (routeNounPos>=0 && (routeVerbPos>=0 || routeContext))
+      ||
+      (routeVerbPos>=0 && routeContext)
+    ) {
+      const positions=[routeNounPos,routeVerbPos].filter(x=>x>=0);
+      addIntent("route",positions.length?Math.min(...positions):0,9);
+    }
+
+    // A named place with no explicit action is an informational request.
+    if(!cues.length && places.length)addIntent("tell",0,4);
+
+    // If the request asks to compare, comparison replaces generic tell for the same places.
+    if(cues.some(x=>x.name==="compare")) {
+      const i=cues.findIndex(x=>x.name==="tell");
+      if(i>=0)cues.splice(i,1);
+    }
+
+    // Scope is standalone unless it is the only request.
+    if(cues.length>1) {
+      const i=cues.findIndex(x=>x.name==="scope");
+      if(i>=0)cues.splice(i,1);
+    }
+
+    // Canonical response/action order: information first, route last.
+    const order={tell:10,compare:15,near_me:20,near_place:20,add:30,open:35,route:40,scope:50};
+    cues.sort((a,b)=>(order[a.name]||99)-(order[b.name]||99)||a.pos-b.pos);
+
+    const analysis={
+      language,
+      normalized:n,
+      places,
+      intents:cues.map(x=>x.name),
+      cues,
+      durationHours,
+      themes,
+      mode
+    };
+
+    analysis.bridgeText=buildBridgeText(text,analysis);
+    return analysis;
+  }
+
+  function formatRouteResult(info, language) {
+    const labels=SECTION_LABELS[language]||SECTION_LABELS.it;
+    const modes=MODE_LABELS[language]||MODE_LABELS.it;
+    const lines=[];
+    const selected=info?.selected||[];
+
+    if(selected.length)lines.push(labels.stops+": "+selected.map(placeName).join(" → "));
+    if(info?.hours!=null)lines.push(labels.duration+": "+info.hours+" h");
+    if(info?.detectedMode)lines.push(labels.mode+": "+(modes[info.detectedMode]||info.detectedMode));
+
+    return lines.join("\n");
   }
 
 
@@ -1059,361 +1254,132 @@
     text
   ) {
 
-    text =
-      String(
-        text || ""
-      ).trim();
+    text=String(text||"").trim();
 
-
-    if (!text) {
-
+    if(!text) {
       return {
-        ok: false,
-        intent: "empty",
-        text: tr("empty")
+        ok:false,
+        intent:"empty",
+        intents:["empty"],
+        language:lang(),
+        text:tr("empty")
       };
     }
 
+    const analysis=analyze(text);
+    const previousLanguage=activeRequestLanguage;
+    activeRequestLanguage=analysis.language;
 
-    const places =
-      getPlaces(text);
+    try {
+      const labels=SECTION_LABELS[analysis.language]||SECTION_LABELS.it;
+      const sections=[];
+      const actions=[];
+      let ok=true;
 
+      if(analysis.intents.includes("scope")) {
+        return {
+          ok:true,
+          intent:"scope",
+          intents:["scope"],
+          language:analysis.language,
+          analysis,
+          text:tr("scope")
+        };
+      }
 
-    const appAnswer =
-      appKnowledge(text);
+      const appAnswer=appKnowledge(text);
+      if(appAnswer && !analysis.intents.some(x=>["route","add","open","near_me","near_place"].includes(x))) {
+        sections.push(appAnswer);
+      }
 
+      if(analysis.intents.includes("compare") && analysis.places.length>=2) {
+        sections.push(labels.compare+"\n"+multiAnswer(analysis.places));
+      } else if(analysis.intents.includes("tell") && analysis.places.length) {
+        if(analysis.places.length===1) {
+          const place=analysis.places[0];
+          sections.push(labels.about+" "+placeName(place)+"\n"+enrichPlace(place));
+        } else {
+          sections.push(multiAnswer(analysis.places));
+        }
+      }
 
-    /*
-     * Que peux-tu faire ?
-     */
+      if(analysis.intents.includes("near_me")) {
+        await bridge?.nearMe?.();
+        sections.push(labels.nearby+"\n"+tr("nearMe"));
+        actions.push("near_me");
+      }
 
-    if (
-      isCapabilities(text)
-    ) {
+      if(analysis.intents.includes("near_place") && analysis.places.length) {
+        const origin=analysis.places[0];
+        const data=nearbyFrom(origin);
+        sections.push(labels.nearby+"\n"+formatNearby(origin,data));
+        actions.push("near_place");
+      }
 
-      return {
-        ok: true,
-        intent: "scope",
-        text: tr("scope")
-      };
-    }
+      if(analysis.intents.includes("add") && !analysis.intents.includes("route")) {
+        if(!analysis.places.length) {
+          sections.push(tr("noPlace"));
+          ok=false;
+        } else {
+          for(const place of analysis.places.slice(0,4)) {
+            await bridge?.addPlace?.(place.id,place);
+          }
+          sections.push(labels.action+"\n"+tr("add",analysis.places.slice(0,4).map(placeName).join(", ")));
+          actions.push("add");
+        }
+      }
 
+      if(analysis.intents.includes("open") && analysis.places.length) {
+        await bridge?.openPlace?.(analysis.places[0].id,analysis.places[0]);
+        if(!analysis.intents.includes("tell")) {
+          sections.push(labels.action+"\n"+tr("open",placeName(analysis.places[0])));
+        }
+        actions.push("open");
+      }
 
-    /*
-     * Questions sur HIRUNDU
-     */
-
-    if (appAnswer) {
-
-      return {
-        ok: true,
-        intent: "app_knowledge",
-        text: appAnswer
-      };
-    }
-
-
-    /*
-     * Autour de moi
-     */
-
-    if (
-      isNearMe(text)
-    ) {
-
-      await bridge
-        ?.nearMe
-        ?.();
-
-
-      return {
-        ok: true,
-        intent: "near_me",
-        text: tr("nearMe")
-      };
-    }
-
-
-    /*
-     * Autour d'un POI précis
-     */
-
-    if (
-
-      isNearbyPlace(text)
-
-      &&
-
-      places.length
-
-    ) {
-
-      const origin =
-        places[0];
-
-
-      const data =
-        nearbyFrom(
-          origin
+      // Route is deliberately executed last so informational intentions are composed first.
+      if(analysis.intents.includes("route")) {
+        const result=await bridge?.createRouteFromText?.(
+          analysis.bridgeText,
+          {
+            keepAssistantOpen:analysis.intents.length>1,
+            intents:analysis.intents
+          }
         );
 
-
-      return {
-
-        ok: true,
-
-        intent:
-          "near_place",
-
-        place:
-          origin,
-
-        data,
-
-        text:
-          formatNearby(
-            origin,
-            data
-          )
-      };
-    }
-
-
-    /*
-     * Créer parcours
-     */
-
-    if (
-      isRoute(text)
-    ) {
-
-      const result =
-        await bridge
-          ?.createRouteFromText
-          ?.(text);
-
-
-      if (
-        result?.ok
-      ) {
-
-        return {
-
-          ok: true,
-
-          intent:
-            "route",
-
-          text:
-            result.spokenText
-            ||
-            result.text
-        };
+        if(result?.ok) {
+          const routeText=formatRouteResult(result.info,analysis.language) || result.text || result.spokenText || "";
+          sections.push(labels.route+(routeText?"\n"+routeText:""));
+          actions.push("route");
+        } else {
+          sections.push(labels.route+"\n"+tr("routeFail"));
+          ok=false;
+        }
       }
 
-
-      return {
-
-        ok: false,
-
-        intent:
-          "route",
-
-        text:
-          tr("routeFail")
-      };
-    }
-
-
-    /*
-     * Ajouter un ou plusieurs lieux
-     */
-
-    if (
-      isAdd(text)
-    ) {
-
-      if (
-        !places.length
-      ) {
-
-        return {
-
-          ok: false,
-
-          intent:
-            "add",
-
-          text:
-            tr("noPlace")
-        };
+      if(!sections.length) {
+        if(analysis.places.length>=2)sections.push(multiAnswer(analysis.places));
+        else if(analysis.places.length===1)sections.push(enrichPlace(analysis.places[0]));
+        else {
+          sections.push(tr("unknown"));
+          ok=false;
+        }
       }
 
-
-      /*
-       * Maximum 4 dans une commande
-       */
-
-      for (
-        const place
-        of places.slice(0, 4)
-      ) {
-
-        await bridge
-          ?.addPlace
-          ?.(
-            place.id,
-            place
-          );
-      }
-
-
       return {
-
-        ok: true,
-
-        intent:
-          "add",
-
-        text:
-          tr(
-            "add",
-
-            places
-              .slice(0, 4)
-              .map(placeName)
-              .join(", ")
-          )
+        ok,
+        intent:analysis.intents.length>1?"composed":(analysis.intents[0]||"unknown"),
+        intents:analysis.intents,
+        actions,
+        language:analysis.language,
+        analysis,
+        places:analysis.places,
+        text:sections.filter(Boolean).join("\n\n")
       };
+
+    } finally {
+      activeRequestLanguage=previousLanguage;
     }
-
-
-    /*
-     * Ouvrir
-     */
-
-    if (
-      isOpen(text)
-    ) {
-
-      if (
-        !places.length
-      ) {
-
-        return {
-
-          ok: false,
-
-          intent:
-            "open",
-
-          text:
-            tr("noPlace")
-        };
-      }
-
-
-      await bridge
-        ?.openPlace
-        ?.(
-          places[0].id,
-          places[0]
-        );
-
-
-      return {
-
-        ok: true,
-
-        intent:
-          "open",
-
-        text:
-          tr(
-            "open",
-            placeName(
-              places[0]
-            )
-          )
-      };
-    }
-
-
-    /*
-     * Plusieurs POI dans la question
-     */
-
-    if (
-
-      (
-        isCompare(text)
-        &&
-        places.length >= 2
-      )
-
-      ||
-
-      places.length >= 2
-
-    ) {
-
-      return {
-
-        ok: true,
-
-        intent:
-          "multi",
-
-        places,
-
-        text:
-          multiAnswer(
-            places
-          )
-      };
-    }
-
-
-    /*
-     * Un seul lieu
-     */
-
-    if (
-      places.length === 1
-    ) {
-
-      return {
-
-        ok: true,
-
-        intent:
-          "tell",
-
-        place:
-          places[0],
-
-        text:
-          enrichPlace(
-            places[0]
-          )
-      };
-    }
-
-
-    /*
-     * Question hors périmètre
-     */
-
-    return {
-
-      ok: false,
-
-      intent:
-        "unknown",
-
-      text:
-        tr("unknown")
-    };
   }
 
 
@@ -1448,7 +1414,7 @@
   }
 
 
-  function speak(text) {
+  function speak(text, languageOverride=null) {
 
     if (
 
@@ -1483,8 +1449,13 @@
       );
 
 
+    const speechLanguage=
+      normalizeLanguageCode(languageOverride)
+      ||
+      lang();
+
     utterance.lang =
-      LOCALES[lang()]
+      LOCALES[speechLanguage]
       ||
       LOCALES.it;
 
@@ -1518,7 +1489,7 @@
           )
             .toLowerCase()
             .startsWith(
-              lang()
+              speechLanguage
             )
       );
 
@@ -1582,7 +1553,8 @@
     ) {
 
       speak(
-        result.text
+        result.text,
+        result.language
       );
     }
 
@@ -1908,6 +1880,10 @@
     stopSpeaking,
 
     execute,
+
+    analyze,
+
+    detectLanguage: detectTextLanguage,
 
     status: () => ({
 
