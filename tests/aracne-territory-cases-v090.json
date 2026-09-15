@@ -1,0 +1,91 @@
+{
+  "version": "0.9.0",
+  "purpose": "Territorial Knowledge regression baseline. Not loaded by the app.",
+  "territories": [
+    "lecce",
+    "otranto",
+    "gallipoli",
+    "nardo",
+    "castro",
+    "galatina",
+    "copertino",
+    "manduria",
+    "ostuni"
+  ],
+  "principles": [
+    "A city/territory name is a different entity from a POI.",
+    "A full POI name takes precedence over a territory with the same place name.",
+    "Territory context is remembered for follow-up questions.",
+    "Route execution remains POI-based and is not silently converted to territory routing.",
+    "Territory answers are multilingual and sourced through the Knowledge Base."
+  ],
+  "core": [
+    {
+      "input": "Parle-moi d'Otranto",
+      "expectTerritory": "otranto",
+      "mustPreferTerritoryOverAliasPoi": true
+    },
+    {
+      "input": "Raconte-moi le Castello di Otranto",
+      "expectPoi": "otranto",
+      "mustPreferExactPoi": true
+    },
+    {
+      "input": "Que voir à Nardò ?",
+      "expectTerritory": "nardo"
+    },
+    {
+      "input": "Que voir à Manduria ?",
+      "expectTerritory": "manduria"
+    },
+    {
+      "input": "Que voir à Ostuni ?",
+      "expectTerritory": "ostuni"
+    }
+  ],
+  "followups": [
+    {
+      "turn1": "Parle-moi de Nardò",
+      "turn2": "Et son histoire ?",
+      "expectTerritory": "nardo"
+    },
+    {
+      "turn1": "Parle-moi de Nardò",
+      "turn2": "Et autour ?",
+      "expectTerritory": "nardo"
+    },
+    {
+      "turn1": "Parle-moi d'Ostuni",
+      "turn2": "Et côté nature ?",
+      "expectTerritory": "ostuni"
+    }
+  ],
+  "multilingual": [
+    {
+      "lang": "it",
+      "input": "Qual è la storia di Manduria?",
+      "expectTerritory": "manduria"
+    },
+    {
+      "lang": "en",
+      "input": "Tell me about Ostuni",
+      "expectTerritory": "ostuni"
+    },
+    {
+      "lang": "es",
+      "input": "Que ver en Galatina?",
+      "expectTerritory": "galatina"
+    },
+    {
+      "lang": "fr",
+      "input": "Quelle est l'histoire de Castro ?",
+      "expectTerritory": "castro"
+    }
+  ],
+  "regressions": [
+    "POI Knowledge Engine v0.8 remains active.",
+    "Capability Registry v0.7 remains active.",
+    "Structured app tools v0.6 remain active.",
+    "Exact route parsing remains unchanged."
+  ]
+}
