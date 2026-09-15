@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "purpose": "Full POI + Territorial Knowledge regression baseline. Not loaded by the app.",
+  "coverage": {
+    "poiTotal": 50,
+    "knowledgeEntries": 50,
+    "territories": 19,
+    "sources": 48,
+    "pendingVerification": [
+      "lecce",
+      "scarra",
+      "enea",
+      "ripe",
+      "giurupi"
+    ]
+  },
+  "principles": [
+    "Every HIRUNDU POI has a knowledge record.",
+    "Uncertain inherited POI labels are marked legacy-pending rather than silently corrected or hallucinated.",
+    "Every POI may be linked to one or more territories through territoryIds.",
+    "A full POI name takes precedence over a territory name.",
+    "Territory context is remembered for conversational follow-ups.",
+    "Territory POI lists can be filtered by theme or knowledge aspect.",
+    "Exact route execution remains POI-based and unchanged."
+  ],
+  "territoryReasoning": [
+    {
+      "input": "Que voir à Nardò côté nature ?",
+      "expectTerritory": "nardo",
+      "mustInclude": "Palude del Capitano",
+      "mustNotInclude": "Torre del Fiume"
+    },
+    {
+      "input": "Que voir à Otranto côté histoire ?",
+      "expectTerritory": "otranto",
+      "mustInclude": "Castello di Otranto",
+      "mustNotInclude": "Laghi Alimini"
+    },
+    {
+      "input": "Que voir à Gallipoli côté mer ?",
+      "expectTerritory": "gallipoli",
+      "mustInclude": "Punta della Suina"
+    },
+    {
+      "input": "Que voir à Manduria côté nature ?",
+      "expectTerritory": "manduria",
+      "mustInclude": "Salina dei Monaci"
+    }
+  ],
+  "followups": [
+    {
+      "turn1": "Parle-moi d'Otranto",
+      "turn2": "Et côté nature ?",
+      "expectTerritory": "otranto"
+    }
+  ],
+  "multilingual": [
+    {
+      "lang": "it",
+      "input": "Che cosa vedere a Manduria?",
+      "expect": "Salina dei Monaci"
+    },
+    {
+      "lang": "en",
+      "input": "What to see in Nardò?",
+      "expect": "Porto Selvaggio"
+    },
+    {
+      "lang": "es",
+      "input": "Que ver en Melendugno?",
+      "expect": "Grotta della Poesia"
+    }
+  ],
+  "regressions": [
+    "All 50 full POI names resolve to their own knowledge record.",
+    "Territorial Knowledge v0.9 semantics remain active.",
+    "POI Knowledge Engine v0.8 remains active.",
+    "Capability Registry v0.7 remains active.",
+    "Structured app tools v0.6 remain active.",
+    "Exact route parsing remains unchanged."
+  ],
+  "lastRun": {
+    "structuralIntegrity": "PASS",
+    "functional": "61/61 PASS"
+  }
+}
