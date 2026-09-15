@@ -1,0 +1,147 @@
+{
+  "version": "0.6.0",
+  "purpose": "Structured app-tool regression baseline for Aracne Intelligence. Not loaded by the app.",
+  "french": [
+    {
+      "input": "ouvre mon passeport",
+      "expectTool": "navigate",
+      "args": {
+        "sheet": "passport"
+      }
+    },
+    {
+      "input": "montre mes missions",
+      "expectTool": "navigate",
+      "args": {
+        "sheet": "act"
+      }
+    },
+    {
+      "input": "ouvre mon journal",
+      "expectTool": "journal_open"
+    },
+    {
+      "input": "note que Castro était magnifique",
+      "expectTool": "journal_save"
+    },
+    {
+      "input": "enlève Otranto du parcours",
+      "expectTool": "route_remove",
+      "args": {
+        "placeIds": [
+          "otranto"
+        ]
+      }
+    },
+    {
+      "input": "vide le parcours",
+      "expectTool": "route_clear"
+    },
+    {
+      "input": "mets le parcours à vélo",
+      "expectTool": "route_mode",
+      "args": {
+        "mode": "cycling"
+      }
+    },
+    {
+      "input": "ouvre la mission Eau",
+      "expectTool": "mission_open"
+    },
+    {
+      "input": "ouvre le QR de la mission déchets",
+      "expectTool": "qr_open"
+    },
+    {
+      "input": "combien de points j ai et quel est mon Filo Verde",
+      "expectTool": "status"
+    },
+    {
+      "input": "partage mon parcours",
+      "expectTool": "share",
+      "args": {
+        "scope": "route"
+      }
+    },
+    {
+      "input": "ouvre Google Maps",
+      "expectTool": "maps_open"
+    }
+  ],
+  "composed": [
+    {
+      "input": "Parle-moi de Castro et ouvre mon passeport",
+      "expectIntents": [
+        "tell"
+      ],
+      "expectTellPlace": "castro",
+      "expectTools": [
+        "navigate"
+      ]
+    },
+    {
+      "input": "Parle-moi de Castro, enlève Otranto du parcours et montre mon Filo Verde",
+      "expectIntents": [
+        "tell"
+      ],
+      "expectTellPlace": "castro",
+      "expectTools": [
+        "route_remove",
+        "status"
+      ],
+      "expectRemovedPlace": "otranto"
+    }
+  ],
+  "multilingual": [
+    {
+      "lang": "it",
+      "input": "apri il mio passaporto",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "it",
+      "input": "mostra le mie missioni",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "it",
+      "input": "togli Otranto dal percorso",
+      "expectTool": "route_remove"
+    },
+    {
+      "lang": "en",
+      "input": "open my passport",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "en",
+      "input": "show my missions",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "en",
+      "input": "remove Otranto from route",
+      "expectTool": "route_remove"
+    },
+    {
+      "lang": "es",
+      "input": "abre mi pasaporte",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "es",
+      "input": "muestra mis misiones",
+      "expectTool": "navigate"
+    },
+    {
+      "lang": "es",
+      "input": "quita Otranto de la ruta",
+      "expectTool": "route_remove"
+    }
+  ],
+  "safety": [
+    "Mission completion is never granted by the tool layer; proof remains required.",
+    "QR tool only opens QR validation for missions whose rule supports QR.",
+    "Route mutation tools do not create a new route unless route creation is explicitly requested."
+  ]
+}
