@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.7.0";
+  const VERSION = "0.8.0";
 
   const LANGS = [
     "it",
@@ -862,6 +862,140 @@
     es:{un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12}
   };
 
+  const KNOWLEDGE_ASPECT_RULES = {
+    it:{
+      history:["storia","origine","origini","quando e stato costruito","quando fu costruito","epoca"],
+      myth:["mito","leggenda","tradizione","enea","racconto mitologico"],
+      nature:["natura","biodiversita","fauna","flora","ambiente","geologia","paesaggio"],
+      practical:["si puo visitare","posso visitare","come si visita","accesso","orari","biglietti","prenotazione"],
+      why:["perche si chiama","perche questo nome","origine del nome","significato del nome"],
+      sources:["fonti","fonte","da dove lo sai","come lo sai","quali sono le fonti"]
+    },
+    fr:{
+      history:["histoire","origine","origines","quand a ete construit","quand a ete construite","epoque"],
+      myth:["mythe","legende","tradition","enee","recit mythologique"],
+      nature:["nature","biodiversite","faune","flore","environnement","geologie","paysage"],
+      practical:["est ce qu on peut visiter","peut on visiter","comment visiter","acces","horaires","billets","reservation"],
+      why:["pourquoi ca s appelle","pourquoi ce nom","origine du nom","signification du nom"],
+      sources:["sources","source","d ou tu sais ca","comment tu sais","quelles sont tes sources"]
+    },
+    en:{
+      history:["history","origin","origins","when was it built","period","era"],
+      myth:["myth","legend","tradition","aeneas","mythological story"],
+      nature:["nature","biodiversity","fauna","flora","environment","geology","landscape"],
+      practical:["can i visit","can we visit","how to visit","access","opening hours","tickets","booking"],
+      why:["why is it called","why this name","origin of the name","meaning of the name"],
+      sources:["sources","source","how do you know","where do you know that from","what are your sources"]
+    },
+    es:{
+      history:["historia","origen","origenes","cuando se construyo","epoca"],
+      myth:["mito","leyenda","tradicion","eneas","relato mitologico"],
+      nature:["naturaleza","biodiversidad","fauna","flora","medio ambiente","geologia","paisaje"],
+      practical:["se puede visitar","puedo visitar","como visitar","acceso","horarios","entradas","reserva"],
+      why:["por que se llama","por que este nombre","origen del nombre","significado del nombre"],
+      sources:["fuentes","fuente","como lo sabes","de donde lo sabes","cuales son tus fuentes"]
+    }
+  };
+
+  function allKnowledgeAspectPhrases(language){
+    const pack=KNOWLEDGE_ASPECT_RULES[language]||KNOWLEDGE_ASPECT_RULES.it;
+    return Object.values(pack).flat();
+  }
+
+  function detectKnowledgeAspect(text,language){
+    const n=normalize(text);
+    const pack=KNOWLEDGE_ASPECT_RULES[language]||KNOWLEDGE_ASPECT_RULES.it;
+    for(const aspect of ["sources","practical","myth","history","nature","why"]){
+      if(hasAny(n,pack[aspect]||[]))return aspect;
+    }
+    return null;
+  }
+
+  function knowledgeEntry(place){
+    if(!place?.id)return null;
+    try{
+      const entry=bridge?.getKnowledge?.(place.id);
+      if(entry)return entry;
+    }catch(error){
+      console.warn("[Aracne] getKnowledge",error);
+    }
+    try{
+      return window.AracneKnowledgeBase?.get?.(place.id)||null;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function knowledgeSources(place){
+    if(!place?.id)return [];
+    try{
+      const result=bridge?.getKnowledgeSources?.(place.id);
+      if(Array.isArray(result))return result;
+    }catch(error){}
+    try{
+      return window.AracneKnowledgeBase?.sourcesFor?.(place.id)||[];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function localizedKnowledge(entry,field,language){
+    const value=entry?.[field];
+    if(!value)return null;
+    if(Array.isArray(value))return value;
+    if(typeof value==="string")return value;
+    return value?.[language]||value?.it||value?.en||null;
+  }
+
+  function knowledgeLabels(language){
+    return ({
+      it:{history:"Storia",myth:"Mito e tradizione",nature:"Natura",practical:"Visita",why:"Perché questo nome",sources:"Fonti",highlights:"Da notare"},
+      fr:{history:"Histoire",myth:"Mythe et tradition",nature:"Nature",practical:"Visite",why:"Pourquoi ce nom",sources:"Sources",highlights:"À remarquer"},
+      en:{history:"History",myth:"Myth and tradition",nature:"Nature",practical:"Visit",why:"Why this name",sources:"Sources",highlights:"Look for"},
+      es:{history:"Historia",myth:"Mito y tradición",nature:"Naturaleza",practical:"Visita",why:"Por qué este nombre",sources:"Fuentes",highlights:"Qué observar"}
+    })[language]||{};
+  }
+
+  function formatKnowledgeSources(place,language){
+    const sources=knowledgeSources(place);
+    const labels=knowledgeLabels(language);
+    if(!sources.length)return null;
+    return labels.sources+":\n"+sources.slice(0,4).map(function(source){
+      const label=source.publisher||source.title||source.id;
+      const suffix=(source.title&&source.publisher)?" — "+source.title:"";
+      return "• "+label+suffix;
+    }).join("\n");
+  }
+
+  function formatKnowledgeHighlights(entry,language){
+    const list=localizedKnowledge(entry,"highlights",language);
+    if(!Array.isArray(list)||!list.length)return null;
+    const labels=knowledgeLabels(language);
+    return labels.highlights+":\n"+list.slice(0,5).map(function(item){return "• "+item;}).join("\n");
+  }
+
+  function formatKnowledgePlace(place,aspect,language){
+    const entry=knowledgeEntry(place);
+    if(!entry)return null;
+    const labels=knowledgeLabels(language);
+    if(aspect==="sources")return formatKnowledgeSources(place,language);
+    if(aspect){
+      const value=localizedKnowledge(entry,aspect,language);
+      if(value)return (labels[aspect]||"Info")+":\n"+value;
+    }
+    const summary=localizedKnowledge(entry,"summary",language);
+    const history=localizedKnowledge(entry,"history",language);
+    const lines=[];
+    if(summary)lines.push(summary);
+    if(!aspect&&history&&history!==summary)lines.push(history);
+    return lines.join("\n\n")||null;
+  }
+
+  function whatToSeeKnowledge(place,language){
+    const entry=knowledgeEntry(place);
+    if(!entry)return null;
+    return formatKnowledgeHighlights(entry,language);
+  }
   const LEXICON = {
     it:{
       scope:["cosa puoi fare","cosa sai fare","come funziona","come puoi aiutarmi"],
@@ -1877,7 +2011,7 @@
 
     for(const code of LANGS) {
       const l=LEXICON[code];
-      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare,allToolLanguagePhrases(code),allCapabilityLanguagePhrases(code)];
+      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare,allToolLanguagePhrases(code),allCapabilityLanguagePhrases(code),allKnowledgeAspectPhrases(code)];
       for(const group of groups) {
         for(const raw of group||[]) {
           const p=normalize(raw);
@@ -2102,6 +2236,7 @@
     const l=LEXICON[language]||LEXICON.it;
     const ctx=CONTEXT_RULES[language]||CONTEXT_RULES.it;
     const capabilityQuery=detectCapabilityQuery(text,language);
+    const knowledgeAspect=detectKnowledgeAspect(text,language);
 
     let durationHours=parseDurationHours(text,language);
     let themes=detectThemes(text,language);
@@ -2318,6 +2453,7 @@
       clauses:clauseAnalyses,
       routeExactSequence:false,
       capabilityQuery,
+      knowledgeAspect,
       currentSection:currentSectionId(),
       contextUsed:needsRememberedPlace || routeIsFollowup || !!themeModifier || shorter || longer || routeFollowupPos>=0,
       modifiers:{shorter,longer,theme:themeModifier},
@@ -2620,78 +2756,18 @@
      REPONSE DETAILLEE POI
      ========================================= */
 
-  function enrichPlace(place) {
+  function enrichPlace(place, knowledgeAspect) {
+    const knowledge=formatKnowledgePlace(place,knowledgeAspect||null,lang());
+    if(knowledge)return knowledge;
 
     const output = [];
+    const summary = placeSummary(place);
+    if (summary) output.push(summary);
 
-
-    const summary =
-      placeSummary(place);
-
-
-    if (summary) {
-
-      output.push(summary);
-    }
-
-
-    const pack =
-      I18N[lang()]
-      ||
-      I18N.it;
-
-
-    if (
-
-      place?.cat
-
-      &&
-
-      pack.category
-        ?.[place.cat]
-
-    ) {
-
-      output.push(
-        `${pack.category[place.cat]}.`
-      );
-    }
-
-
-    if (
-      Number.isFinite(
-        Number(place?.mins)
-      )
-    ) {
-
-      output.push(
-        `${pack.mins(
-          Number(place.mins)
-        )}.`
-      );
-    }
-
-
-    if (
-
-      Array.isArray(
-        place?.tags
-      )
-
-      &&
-
-      place.tags.length
-
-    ) {
-
-      output.push(
-        `${place.tags
-          .slice(0, 2)
-          .join(", ")}.`
-      );
-    }
-
-
+    const pack = I18N[lang()] || I18N.it;
+    if (place?.cat && pack.category?.[place.cat]) output.push(pack.category[place.cat]+".");
+    if (Number.isFinite(Number(place?.mins))) output.push(pack.mins(Number(place.mins))+".");
+    if (Array.isArray(place?.tags) && place.tags.length) output.push(place.tags.slice(0,2).join(", ")+".");
     return output.join(" ");
   }
 
@@ -3039,7 +3115,7 @@
       } else if(analysis.intents.includes("tell") && tellPlaces.length) {
         if(tellPlaces.length===1) {
           const place=tellPlaces[0];
-          sections.push(labels.about+" "+placeName(place)+"\n"+enrichPlace(place));
+          sections.push(labels.about+" "+placeName(place)+"\n"+enrichPlace(place,analysis.knowledgeAspect));
         } else {
           sections.push(multiAnswer(tellPlaces));
         }
@@ -3052,7 +3128,10 @@
       if(analysis.intents.includes("see_place") && seePlaces.length) {
         const origin=seePlaces[0];
         const data=nearbyFrom(origin,4);
-        sections.push(labels.see+" · "+placeName(origin)+"\n"+formatNearby(origin,data));
+        const intrinsic=whatToSeeKnowledge(origin,analysis.language);
+        const nearby=formatNearby(origin,data);
+        const body=[intrinsic,nearby].filter(Boolean).join("\n\n");
+        sections.push(labels.see+" · "+placeName(origin)+"\n"+body);
       }
 
       if(analysis.intents.includes("near_me")) {
@@ -3770,6 +3849,15 @@
 
     detectLanguage: detectTextLanguage,
 
+    knowledgeFor: id => {
+      const place=(bridge?.getPlaces?.()||[]).find(item=>item.id===id);
+      return place ? knowledgeEntry(place) : null;
+    },
+
+    knowledgeStats: () => {
+      try{return window.AracneKnowledgeBase?.stats?.()||null;}catch(error){return null;}
+    },
+
     context: getContext,
 
     resetContext,
@@ -3799,7 +3887,10 @@
           ?.()
           ?.length
         ||
-        0
+        0,
+
+      knowledge:
+        (()=>{try{return window.AracneKnowledgeBase?.stats?.()||null;}catch(error){return null;}})()
     })
   };
 
