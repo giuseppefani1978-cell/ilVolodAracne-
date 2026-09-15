@@ -933,7 +933,7 @@
         routes:["apri i percorsi","apri il percorso","mostra il percorso","mostra i percorsi","vai ai percorsi"],
         act:["apri le missioni","mostra le missioni","vai alle missioni","apri agisci","vai ad agisci"],
         mapSheet:["apri la mappa","mostra la mappa","vai alla mappa"],
-        passport:["apri il passaporto","mostra il passaporto","apri il mio viaggio","mostra il mio viaggio"]
+        passport:["apri il passaporto","apri il mio passaporto","mostra il passaporto","mostra il mio passaporto","apri il mio viaggio","mostra il mio viaggio"]
       },
       journalOpen:["apri il diario","mostra il diario","apri le mie note","mostra le mie note"],
       journalSave:["nota che","salva una nota","aggiungi una nota","registra una nota"],
