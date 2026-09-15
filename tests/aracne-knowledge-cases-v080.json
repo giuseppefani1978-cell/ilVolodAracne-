@@ -1,0 +1,81 @@
+{
+  "version": "0.8.0",
+  "purpose": "Knowledge Engine regression baseline. Not loaded by the app.",
+  "knowledgeBase": {
+    "entries": 9,
+    "sources": 9,
+    "principles": [
+      "Curated local knowledge is preferred over the legacy poetic POI text.",
+      "Facts, myths/traditions and dynamic practical information are separated.",
+      "If a requested aspect is not verified, Aracne says so rather than inventing it.",
+      "Legacy POIs without an enriched record continue to use the existing app text."
+    ]
+  },
+  "french": [
+    {
+      "input": "Raconte-moi Otranto",
+      "expect": "enriched default"
+    },
+    {
+      "input": "Quelle est l'histoire d'Otranto ?",
+      "aspect": "history"
+    },
+    {
+      "input": "Pourquoi la Zinzulusa s'appelle comme ça ?",
+      "aspect": "why"
+    },
+    {
+      "input": "Quelle est la légende de Porto Badisco ?",
+      "aspect": "myth"
+    },
+    {
+      "input": "Quelle nature peut-on voir aux Cesine ?",
+      "aspect": "nature"
+    },
+    {
+      "input": "Peut-on visiter la Grotta dei Cervi ?",
+      "aspect": "practical"
+    },
+    {
+      "input": "Quelles sont tes sources pour Copertino ?",
+      "aspect": "sources"
+    },
+    {
+      "input": "Que voir à Galatina ?",
+      "expect": "intrinsic highlights + nearby"
+    }
+  ],
+  "multilingual": [
+    {
+      "lang": "it",
+      "input": "Qual è la storia del Castello di Copertino?",
+      "aspect": "history"
+    },
+    {
+      "lang": "en",
+      "input": "Why is Zinzulusa called that?",
+      "aspect": "why"
+    },
+    {
+      "lang": "es",
+      "input": "Cual es la historia de Otranto?",
+      "aspect": "history"
+    },
+    {
+      "lang": "en",
+      "input": "What are your sources for Otranto?",
+      "aspect": "sources"
+    }
+  ],
+  "honesty": [
+    {
+      "input": "Quelle est la légende du Castello di Copertino ?",
+      "expect": "explicitly state that this aspect is not yet verified"
+    }
+  ],
+  "regressions": [
+    "Capability Registry v0.7 remains active.",
+    "Structured app actions v0.6 remain executable.",
+    "Exact route parsing and route tools remain unchanged."
+  ]
+}
