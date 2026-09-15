@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.8.0";
+  const VERSION = "0.9.0";
 
   const LANGS = [
     "it",
@@ -26,6 +26,7 @@
     turn: 0,
     language: null,
     lastPlaceIds: [],
+    lastTerritoryId: null,
     lastIntents: [],
     lastRoute: null,
     pendingClarification: null
@@ -802,6 +803,7 @@
     sessionState.turn=0;
     sessionState.language=null;
     sessionState.lastPlaceIds=[];
+    sessionState.lastTerritoryId=null;
     sessionState.lastIntents=[];
     sessionState.lastRoute=null;
     sessionState.pendingClarification=null;
@@ -815,6 +817,7 @@
       language:sessionState.language,
       currentSection:currentSectionId(),
       lastPlaceIds:[...sessionState.lastPlaceIds],
+      lastTerritoryId:sessionState.lastTerritoryId,
       lastIntents:[...sessionState.lastIntents],
       lastRoute:sessionState.lastRoute
         ? {
@@ -839,6 +842,125 @@
     const all=bridge?.getPlaces?.()||[];
     const map=new Map(all.map(place=>[place.id,place]));
     return ids.map(id=>map.get(id)).filter(Boolean);
+  }
+
+  function territoryMatches(text,language){
+    try{
+      const direct=bridge?.findTerritories?.(text,language);
+      if(Array.isArray(direct))return direct;
+    }catch(error){
+      console.warn("[Aracne] findTerritories",error);
+    }
+    try{
+      return window.AracneKnowledgeBase?.findTerritories?.(text,language)||[];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function territoryById(id){
+    if(!id)return null;
+    try{
+      const direct=bridge?.getTerritoryKnowledge?.(id);
+      if(direct)return {id,...direct};
+    }catch(error){}
+    try{
+      const entry=window.AracneKnowledgeBase?.getTerritory?.(id);
+      return entry ? {id,...entry} : null;
+    }catch(error){
+      return null;
+    }
+  }
+
+  function territorySources(id){
+    if(!id)return [];
+    try{
+      const direct=bridge?.getTerritorySources?.(id);
+      if(Array.isArray(direct))return direct;
+    }catch(error){}
+    try{
+      return window.AracneKnowledgeBase?.territorySourcesFor?.(id)||[];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function territoryPoiIds(id){
+    if(!id)return [];
+    try{
+      const direct=bridge?.getTerritoryPoiIds?.(id);
+      if(Array.isArray(direct))return direct;
+    }catch(error){}
+    try{
+      return window.AracneKnowledgeBase?.poisForTerritory?.(id)||[];
+    }catch(error){
+      return [];
+    }
+  }
+
+  function territoryName(territory){
+    if(!territory)return "";
+    return territory.name || territory.id || "";
+  }
+
+  function territoryLocalized(territory,field,language){
+    const value=territory?.[field];
+    if(!value)return null;
+    if(Array.isArray(value))return value;
+    if(typeof value==="string")return value;
+    return value?.[language]||value?.it||value?.en||null;
+  }
+
+  function formatTerritorySources(territory,language){
+    const sources=territorySources(territory?.id);
+    const labels=knowledgeLabels(language);
+    if(!sources.length)return noVerifiedAspect("sources",language);
+    return labels.sources+":\n"+sources.slice(0,4).map(function(source){
+      const label=source.publisher||source.title||source.id;
+      const suffix=(source.title&&source.publisher)?" — "+source.title:"";
+      return "• "+label+suffix;
+    }).join("\n");
+  }
+
+  function formatTerritoryKnowledge(territory,aspect,language){
+    if(!territory)return null;
+    const labels=knowledgeLabels(language);
+    if(aspect==="sources")return formatTerritorySources(territory,language);
+    if(aspect){
+      const value=territoryLocalized(territory,aspect,language);
+      if(value)return (labels[aspect]||"Info")+":\n"+value;
+      return noVerifiedAspect(aspect,language);
+    }
+    const summary=territoryLocalized(territory,"summary",language);
+    const history=territoryLocalized(territory,"history",language);
+    return [summary,history].filter(Boolean).join("\n\n")||null;
+  }
+
+  function formatTerritoryHighlights(territory,language){
+    const list=territoryLocalized(territory,"highlights",language);
+    if(!Array.isArray(list)||!list.length)return null;
+    return knowledgeLabels(language).highlights+":\n"+list.slice(0,6).map(function(item){return "• "+item;}).join("\n");
+  }
+
+  function territoryPois(territory){
+    const ids=territoryPoiIds(territory?.id);
+    return placesByIds(ids);
+  }
+
+  function formatTerritoryPoiList(territory,language){
+    const pois=territoryPois(territory).slice(0,8);
+    if(!pois.length)return null;
+    const intro={it:"Luoghi HIRUNDU collegati",fr:"Lieux HIRUNDU liés",en:"Related HIRUNDU places",es:"Lugares HIRUNDU relacionados"}[language]||"HIRUNDU";
+    return intro+":\n"+pois.map(function(place){return "• "+placeName(place);}).join("\n");
+  }
+
+  function exactNamedPlaces(text){
+    try{
+      const result=bridge?.findExactPlaces?.(text);
+      return Array.isArray(result)?result:[];
+    }catch(error){
+      return [];
+    }
   }
 
   const SECTION_LABELS = {
@@ -2248,6 +2370,25 @@
     const ctx=CONTEXT_RULES[language]||CONTEXT_RULES.it;
     const capabilityQuery=detectCapabilityQuery(text,language);
     const knowledgeAspect=detectKnowledgeAspect(text,language);
+    const specificPlaces=exactNamedPlaces(text);
+    let territories=territoryMatches(text,language);
+    if(
+      !territories.length
+      &&
+      knowledgeAspect
+      &&
+      !specificPlaces.length
+      &&
+      !explicitPlaces.length
+      &&
+      sessionState.lastTerritoryId
+    ){
+      const remembered=territoryById(sessionState.lastTerritoryId);
+      if(remembered)territories=[{id:remembered.id,entry:remembered,score:1,remembered:true}];
+    }
+    const primaryTerritory=territories[0]?.entry
+      ? {id:territories[0].id,...territories[0].entry}
+      : (territories[0]?.id ? territoryById(territories[0].id) : null);
 
     let durationHours=parseDurationHours(text,language);
     let themes=detectThemes(text,language);
@@ -2415,8 +2556,9 @@
       places=placesByIds(ids);
     }
 
-    // A named place with no explicit action is informational.
-    if(!cues.length && places.length)addIntent("tell",0,4);
+    // A named place or territory with no explicit action is informational.
+    if(!cues.length && (places.length || primaryTerritory))addIntent("tell",0,4);
+    if(!cues.length && knowledgeAspect && sessionState.lastTerritoryId)addIntent("tell",0,4);
 
     if(cues.some(x=>x.name==="compare")) {
       const i=cues.findIndex(x=>x.name==="tell");
@@ -2455,7 +2597,10 @@
       language,
       normalized:n,
       explicitPlaces,
+      specificPlaces,
       places,
+      territories,
+      territory:primaryTerritory,
       intents:cues.map(x=>x.name),
       cues,
       durationHours,
@@ -2649,7 +2794,7 @@
     }
 
     const placeRequired=cues.some(x=>["tell","see_place","near_place","add","open"].includes(x.name));
-    if(placeRequired && !places.length && !analysis.clarification && !toolRequests.length) {
+    if(placeRequired && !places.length && !analysis.territory && !analysis.clarification && !toolRequests.length) {
       analysis.clarification={
         type:"place",
         placeIds:[],
@@ -2696,6 +2841,7 @@
     sessionState.turn+=1;
     sessionState.language=analysis.language||sessionState.language;
     sessionState.lastIntents=[...(analysis.intents||[])];
+    if(analysis.territory?.id)sessionState.lastTerritoryId=analysis.territory.id;
 
     let focusPlaces=[];
 
@@ -3120,9 +3266,20 @@
 
       const comparePlaces=analysis.targets.compare?.length ? analysis.targets.compare : analysis.places;
       const tellPlaces=analysis.targets.tell?.length ? analysis.targets.tell : analysis.places;
+      const territoryForInfo=
+        analysis.territory
+        &&
+        !(analysis.specificPlaces?.length)
+          ? analysis.territory
+          : null;
 
       if(analysis.intents.includes("compare") && comparePlaces.length>=2) {
         sections.push(labels.compare+"\n"+multiAnswer(comparePlaces));
+      } else if(analysis.intents.includes("tell") && territoryForInfo) {
+        sections.push(
+          labels.about+" "+territoryName(territoryForInfo)+"\n"+
+          formatTerritoryKnowledge(territoryForInfo,analysis.knowledgeAspect,analysis.language)
+        );
       } else if(analysis.intents.includes("tell") && tellPlaces.length) {
         if(tellPlaces.length===1) {
           const place=tellPlaces[0];
@@ -3136,7 +3293,19 @@
         ? analysis.targets.see_place
         : analysis.places;
 
-      if(analysis.intents.includes("see_place") && seePlaces.length) {
+      if(
+        analysis.intents.includes("see_place")
+        &&
+        analysis.territory
+        &&
+        !(analysis.specificPlaces?.length)
+      ) {
+        const body=[
+          formatTerritoryHighlights(analysis.territory,analysis.language),
+          formatTerritoryPoiList(analysis.territory,analysis.language)
+        ].filter(Boolean).join("\n\n");
+        sections.push(labels.see+" · "+territoryName(analysis.territory)+"\n"+body);
+      } else if(analysis.intents.includes("see_place") && seePlaces.length) {
         const origin=seePlaces[0];
         const data=nearbyFrom(origin,4);
         const intrinsic=whatToSeeKnowledge(origin,analysis.language);
@@ -3152,7 +3321,17 @@
       }
 
       const nearbyPlaces=analysis.targets.near_place?.length ? analysis.targets.near_place : analysis.places;
-      if(analysis.intents.includes("near_place") && nearbyPlaces.length) {
+      if(
+        analysis.intents.includes("near_place")
+        &&
+        analysis.territory
+        &&
+        !(analysis.specificPlaces?.length)
+      ) {
+        const linked=formatTerritoryPoiList(analysis.territory,analysis.language);
+        if(linked)sections.push(labels.nearby+" · "+territoryName(analysis.territory)+"\n"+linked);
+        actions.push("near_place");
+      } else if(analysis.intents.includes("near_place") && nearbyPlaces.length) {
         const origin=nearbyPlaces[0];
         const data=nearbyFrom(origin);
         sections.push(labels.nearby+"\n"+formatNearby(origin,data));
@@ -3228,7 +3407,8 @@
       }
 
       if(!sections.length) {
-        if(analysis.places.length>=2)sections.push(multiAnswer(analysis.places));
+        if(analysis.territory && !(analysis.specificPlaces?.length))sections.push(formatTerritoryKnowledge(analysis.territory,analysis.knowledgeAspect,analysis.language));
+        else if(analysis.places.length>=2)sections.push(multiAnswer(analysis.places));
         else if(analysis.places.length===1)sections.push(enrichPlace(analysis.places[0]));
         else if(!(analysis.toolRequests?.length)) {
           sections.push(tr("unknown"));
@@ -3867,6 +4047,15 @@
 
     knowledgeStats: () => {
       try{return window.AracneKnowledgeBase?.stats?.()||null;}catch(error){return null;}
+    },
+
+    territoriesFor: text => {
+      const language=detectTextLanguage(text)||lang();
+      return territoryMatches(text,language);
+    },
+
+    territoryForPoi: id => {
+      try{return window.AracneKnowledgeBase?.territoryForPoi?.(id)||null;}catch(error){return null;}
     },
 
     context: getContext,
