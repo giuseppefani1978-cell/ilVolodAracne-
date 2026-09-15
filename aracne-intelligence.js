@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.6.0";
+  const VERSION = "0.7.0";
 
   const LANGS = [
     "it",
@@ -922,7 +922,544 @@
 
 
   /* =========================================
-     STRUCTURED APP TOOLS v0.6
+     CAPABILITY REGISTRY v0.7
+     Mirrors the five bottom tabs of HIRUNDU.
+     ========================================= */
+
+  const CAPABILITY_REGISTRY = {
+    "discover": {
+      "icon": "🧭",
+      "labels": {
+        "it": "Scopri",
+        "fr": "Découvrir",
+        "en": "Discover",
+        "es": "Descubrir"
+      },
+      "aliases": {
+        "it": [
+          "scopri",
+          "scoprire"
+        ],
+        "fr": [
+          "decouvrir",
+          "decouverte"
+        ],
+        "en": [
+          "discover",
+          "discovery"
+        ],
+        "es": [
+          "descubrir",
+          "descubre"
+        ]
+      },
+      "actions": {
+        "it": [
+          "conoscere un luogo e cosa vedere",
+          "scoprire cosa c’è vicino a te o a un luogo",
+          "ricevere suggerimenti per mare, natura, cultura o sapori",
+          "aprire un POI o aggiungerlo al percorso"
+        ],
+        "fr": [
+          "découvrir un lieu et ce qu’il y a à voir",
+          "chercher autour de toi ou autour d’un lieu",
+          "obtenir des suggestions mer, nature, culture ou saveurs",
+          "ouvrir un POI ou l’ajouter au parcours"
+        ],
+        "en": [
+          "learn about a place and what to see",
+          "find what is near you or near a place",
+          "get sea, nature, culture or food suggestions",
+          "open a POI or add it to the route"
+        ],
+        "es": [
+          "conocer un lugar y qué ver",
+          "buscar cerca de ti o alrededor de un lugar",
+          "recibir sugerencias de mar, naturaleza, cultura o sabores",
+          "abrir un POI o añadirlo a la ruta"
+        ]
+      },
+      "examples": {
+        "it": "Cosa c’è intorno a Otranto?",
+        "fr": "Qu’est-ce qu’il y a autour d’Otranto ?",
+        "en": "What is around Otranto?",
+        "es": "¿Qué hay alrededor de Otranto?"
+      },
+      "tools": [
+        "open",
+        "near_me",
+        "near_place",
+        "add",
+        "navigate:discover"
+      ]
+    },
+    "routes": {
+      "icon": "🧵",
+      "labels": {
+        "it": "Percorsi",
+        "fr": "Parcours",
+        "en": "Routes",
+        "es": "Rutas"
+      },
+      "aliases": {
+        "it": [
+          "percorsi",
+          "percorso",
+          "itinerario"
+        ],
+        "fr": [
+          "parcours",
+          "itineraire",
+          "itineraires"
+        ],
+        "en": [
+          "routes",
+          "route",
+          "itinerary"
+        ],
+        "es": [
+          "rutas",
+          "ruta",
+          "itinerario"
+        ]
+      },
+      "actions": {
+        "it": [
+          "creare un percorso da luoghi, tempo, tema o mezzo",
+          "aggiungere, togliere o riordinare tappe",
+          "cambiare tra auto/scooter, bici e cammino",
+          "aprire il percorso in Maps o condividerlo"
+        ],
+        "fr": [
+          "créer un parcours avec lieux, durée, thème ou transport",
+          "ajouter, retirer ou réordonner des étapes",
+          "passer voiture/scooter, vélo ou marche",
+          "ouvrir le parcours dans Maps ou le partager"
+        ],
+        "en": [
+          "create a route from places, time, theme or transport",
+          "add, remove or reorder stops",
+          "switch between car/scooter, bike and walking",
+          "open the route in Maps or share it"
+        ],
+        "es": [
+          "crear una ruta con lugares, duración, tema o transporte",
+          "añadir, quitar o reordenar etapas",
+          "cambiar entre coche/scooter, bici y caminar",
+          "abrir la ruta en Maps o compartirla"
+        ]
+      },
+      "examples": {
+        "it": "Togli Otranto dal percorso e passa alla bici.",
+        "fr": "Enlève Otranto du parcours et passe à vélo.",
+        "en": "Remove Otranto from the route and switch to bike.",
+        "es": "Quita Otranto de la ruta y cambia a bici."
+      },
+      "tools": [
+        "route",
+        "route_remove",
+        "route_clear",
+        "route_mode",
+        "maps_open",
+        "share:route",
+        "navigate:routes"
+      ]
+    },
+    "act": {
+      "icon": "🌿",
+      "labels": {
+        "it": "Agisci",
+        "fr": "Agir",
+        "en": "Act",
+        "es": "Actuar"
+      },
+      "aliases": {
+        "it": [
+          "agisci",
+          "missioni",
+          "azioni verdi",
+          "azioni sostenibili"
+        ],
+        "fr": [
+          "agir",
+          "missions",
+          "actions vertes",
+          "actions green",
+          "actions durables"
+        ],
+        "en": [
+          "act",
+          "missions",
+          "green actions",
+          "sustainable actions"
+        ],
+        "es": [
+          "actuar",
+          "misiones",
+          "acciones verdes",
+          "acciones sostenibles"
+        ]
+      },
+      "actions": {
+        "it": [
+          "vedere e aprire le missioni sostenibili",
+          "capire come validare con foto, QR o percorso",
+          "consultare Filo Verde e Aracne Points",
+          "condividere missioni, punti e Filo Verde"
+        ],
+        "fr": [
+          "voir et ouvrir les missions durables",
+          "comprendre les validations photo, QR ou parcours",
+          "consulter le Filo Verde et les Aracne Points",
+          "partager missions, points et Filo Verde"
+        ],
+        "en": [
+          "view and open sustainable missions",
+          "understand photo, QR or route validation",
+          "check Filo Verde and Aracne Points",
+          "share missions, points and Filo Verde"
+        ],
+        "es": [
+          "ver y abrir las misiones sostenibles",
+          "entender la validación por foto, QR o ruta",
+          "consultar Filo Verde y Aracne Points",
+          "compartir misiones, puntos y Filo Verde"
+        ]
+      },
+      "examples": {
+        "it": "Mostra le mie missioni e dimmi quanti punti ho.",
+        "fr": "Montre mes missions et dis-moi combien de points j’ai.",
+        "en": "Show my missions and tell me how many points I have.",
+        "es": "Muestra mis misiones y dime cuántos puntos tengo."
+      },
+      "tools": [
+        "mission_open",
+        "qr_open",
+        "status",
+        "share:act",
+        "navigate:act"
+      ]
+    },
+    "mapSheet": {
+      "icon": "🗺️",
+      "labels": {
+        "it": "Mappa",
+        "fr": "Carte",
+        "en": "Map",
+        "es": "Mapa"
+      },
+      "aliases": {
+        "it": [
+          "mappa",
+          "cartina"
+        ],
+        "fr": [
+          "carte",
+          "map"
+        ],
+        "en": [
+          "map"
+        ],
+        "es": [
+          "mapa"
+        ]
+      },
+      "actions": {
+        "it": [
+          "aprire la mappa e centrare un luogo",
+          "mostrare un POI sulla mappa",
+          "cercare i luoghi più vicini alla tua posizione",
+          "esplorare i luoghi per mare, natura, cultura e sapori"
+        ],
+        "fr": [
+          "ouvrir la carte et centrer un lieu",
+          "afficher un POI sur la carte",
+          "chercher les lieux proches de ta position",
+          "explorer mer, nature, culture et saveurs"
+        ],
+        "en": [
+          "open the map and focus a place",
+          "show a POI on the map",
+          "find places nearest to your position",
+          "explore sea, nature, culture and food"
+        ],
+        "es": [
+          "abrir el mapa y centrar un lugar",
+          "mostrar un POI en el mapa",
+          "buscar lugares cerca de tu posición",
+          "explorar mar, naturaleza, cultura y sabores"
+        ]
+      },
+      "examples": {
+        "it": "Apri la mappa e mostrami Otranto.",
+        "fr": "Ouvre la carte et montre-moi Otranto.",
+        "en": "Open the map and show me Otranto.",
+        "es": "Abre el mapa y muéstrame Otranto."
+      },
+      "tools": [
+        "navigate:mapSheet",
+        "open",
+        "near_me"
+      ]
+    },
+    "passport": {
+      "icon": "🕷️",
+      "labels": {
+        "it": "Viaggio",
+        "fr": "Voyage",
+        "en": "Trip",
+        "es": "Viaje"
+      },
+      "aliases": {
+        "it": [
+          "viaggio",
+          "passaporto",
+          "diario",
+          "badge"
+        ],
+        "fr": [
+          "voyage",
+          "passeport",
+          "journal",
+          "badges"
+        ],
+        "en": [
+          "trip",
+          "passport",
+          "journal",
+          "badges"
+        ],
+        "es": [
+          "viaje",
+          "pasaporte",
+          "diario",
+          "insignias"
+        ]
+      },
+      "actions": {
+        "it": [
+          "aprire il Passaporto Aracne e vedere i badge",
+          "consultare impatto, Filo Verde e punti",
+          "leggere o salvare note nel Diario di Aracne",
+          "condividere viaggio, passaporto o note"
+        ],
+        "fr": [
+          "ouvrir le Passeport Aracne et voir les badges",
+          "consulter impact, Filo Verde et points",
+          "lire ou enregistrer des notes dans le Journal d’Aracne",
+          "partager voyage, passeport ou notes"
+        ],
+        "en": [
+          "open the Aracne Passport and view badges",
+          "check impact, Filo Verde and points",
+          "read or save notes in the Aracne Journal",
+          "share the trip, passport or notes"
+        ],
+        "es": [
+          "abrir el Pasaporte Aracne y ver las insignias",
+          "consultar impacto, Filo Verde y puntos",
+          "leer o guardar notas en el Diario de Aracne",
+          "compartir viaje, pasaporte o notas"
+        ]
+      },
+      "examples": {
+        "it": "Nota che Castro al tramonto era bellissima e apri il mio passaporto.",
+        "fr": "Note que Castro au coucher du soleil était magnifique et ouvre mon passeport.",
+        "en": "Note that Castro at sunset was beautiful and open my passport.",
+        "es": "Anota que Castro al atardecer era precioso y abre mi pasaporte."
+      },
+      "tools": [
+        "journal_open",
+        "journal_save",
+        "status",
+        "share:trip",
+        "share:journal",
+        "navigate:passport"
+      ]
+    }
+  };
+
+  const CAPABILITY_RULES = {
+    "it": {
+      "general": [
+        "cosa puoi fare",
+        "cosa sai fare",
+        "come puoi aiutarmi",
+        "quali sono le tue possibilita",
+        "cosa posso fare",
+        "che cosa posso fare"
+      ],
+      "here": [
+        "cosa posso fare qui",
+        "che cosa posso fare qui",
+        "cosa puoi fare qui"
+      ],
+      "actions": [
+        "posso fare delle azioni",
+        "quali azioni posso fare",
+        "che azioni posso fare",
+        "quali azioni",
+        "azioni che posso fare"
+      ]
+    },
+    "fr": {
+      "general": [
+        "que peux tu faire",
+        "qu est ce que tu peux faire",
+        "comment peux tu m aider",
+        "quelles sont tes possibilites",
+        "qu est ce que je peux faire",
+        "que puis je faire"
+      ],
+      "here": [
+        "que puis je faire ici",
+        "qu est ce que je peux faire ici",
+        "que peux tu faire ici"
+      ],
+      "actions": [
+        "est ce que je peux faire des actions",
+        "quelles actions je peux faire",
+        "quelles actions puis je faire",
+        "quelles actions",
+        "actions que je peux faire"
+      ]
+    },
+    "en": {
+      "general": [
+        "what can you do",
+        "how can you help me",
+        "what are your capabilities",
+        "what can i do"
+      ],
+      "here": [
+        "what can i do here",
+        "what can you do here"
+      ],
+      "actions": [
+        "can i do actions",
+        "what actions can i do",
+        "which actions can i do",
+        "what actions"
+      ]
+    },
+    "es": {
+      "general": [
+        "que puedes hacer",
+        "como puedes ayudarme",
+        "cuales son tus posibilidades",
+        "que puedo hacer"
+      ],
+      "here": [
+        "que puedo hacer aqui",
+        "que puedes hacer aqui"
+      ],
+      "actions": [
+        "puedo hacer acciones",
+        "que acciones puedo hacer",
+        "cuales acciones puedo hacer",
+        "que acciones"
+      ]
+    }
+  };
+
+  function currentSectionId() {
+    const id=bridge?.getCurrentSection?.();
+    return CAPABILITY_REGISTRY[id] ? id : null;
+  }
+
+  function capabilityLabel(sectionId, language) {
+    const entry=CAPABILITY_REGISTRY[sectionId];
+    return entry?.labels?.[language] || entry?.labels?.it || sectionId;
+  }
+
+  function detectCapabilitySection(text, language) {
+    const n=normalize(text);
+    for (const [sectionId, entry] of Object.entries(CAPABILITY_REGISTRY)) {
+      const aliases=entry.aliases?.[language] || entry.aliases?.it || [];
+      if (hasAny(n, aliases)) return sectionId;
+    }
+    return null;
+  }
+
+  function detectCapabilityQuery(text, language) {
+    const n=normalize(text);
+    const rules=CAPABILITY_RULES[language] || CAPABILITY_RULES.it;
+    const explicitSection=detectCapabilitySection(text, language);
+    const currentSection=currentSectionId();
+
+    if (hasAny(n, rules.actions || [])) {
+      if (explicitSection==="act") return {type:"section", section:"act", reason:"explicit_actions"};
+      if (currentSection==="act" && !explicitSection) return {type:"section", section:"act", reason:"context_actions"};
+      return {type:"ambiguous_actions", section:null, currentSection, reason:"generic_actions"};
+    }
+
+    if (hasAny(n, rules.here || [])) {
+      return currentSection ? {type:"section", section:currentSection, reason:"here"} : {type:"overview", section:null, reason:"here_without_section"};
+    }
+
+    if (explicitSection && hasAny(n, rules.general || [])) return {type:"section", section:explicitSection, reason:"explicit_section"};
+    if (hasAny(n, rules.general || [])) return {type:"overview", section:null, reason:"general"};
+    return null;
+  }
+
+  function formatCapabilityOverview(language) {
+    const intro={
+      it:"HIRUNDU è organizzata in 5 spazi. Puoi parlare con Aracne in modo naturale:",
+      fr:"HIRUNDU est organisé en 5 espaces. Tu peux parler naturellement à ARACNE :",
+      en:"HIRUNDU is organised into 5 areas. You can speak naturally to ARACNE:",
+      es:"HIRUNDU está organizado en 5 espacios. Puedes hablar con ARACNE de forma natural:"
+    }[language] || "";
+    const lines=[intro];
+    for (const sectionId of ["discover","routes","act","mapSheet","passport"]) {
+      const entry=CAPABILITY_REGISTRY[sectionId];
+      const first=(entry.actions?.[language] || entry.actions?.it || [])[0] || "";
+      lines.push(entry.icon+" "+capabilityLabel(sectionId,language)+" — "+first+".");
+    }
+    const tail={
+      it:"Puoi anche combinare più richieste nella stessa frase. Per esempio: «Parlami di Castro, togli Otranto dal percorso e apri il mio passaporto.»",
+      fr:"Tu peux aussi combiner plusieurs demandes dans la même phrase. Par exemple : « Parle-moi de Castro, enlève Otranto du parcours et ouvre mon passeport. »",
+      en:"You can also combine several requests in one sentence. For example: “Tell me about Castro, remove Otranto from my route and open my passport.”",
+      es:"También puedes combinar varias peticiones en una frase. Por ejemplo: «Háblame de Castro, quita Otranto de la ruta y abre mi pasaporte.»"
+    }[language];
+    if (tail) lines.push("",tail);
+    return lines.join("\n");
+  }
+
+  function formatSectionCapabilities(sectionId, language) {
+    const entry=CAPABILITY_REGISTRY[sectionId];
+    if (!entry) return formatCapabilityOverview(language);
+    const intro={
+      it:"In "+capabilityLabel(sectionId,language)+" posso aiutarti a:",
+      fr:"Dans "+capabilityLabel(sectionId,language)+", je peux t’aider à :",
+      en:"In "+capabilityLabel(sectionId,language)+", I can help you:",
+      es:"En "+capabilityLabel(sectionId,language)+", puedo ayudarte a:"
+    }[language];
+    const lines=[entry.icon+" "+intro];
+    for (const action of (entry.actions?.[language] || entry.actions?.it || [])) lines.push("• "+action);
+    const example=entry.examples?.[language] || entry.examples?.it;
+    if (example) {
+      const prefix={it:"Esempio",fr:"Exemple",en:"Example",es:"Ejemplo"}[language] || "Example";
+      lines.push("",prefix+" : « "+example+" »");
+    }
+    return lines.join("\n");
+  }
+
+  function formatActionsAmbiguity(language) {
+    return {
+      it:"Quando dici «azioni», intendi le azioni sostenibili nella sezione Agisci, oppure le azioni che Aracne può eseguire in tutta l’app?",
+      fr:"Quand tu dis « actions », tu parles des actions durables dans l’onglet Agir, ou des actions qu’ARACNE peut effectuer dans toute l’app ?",
+      en:"When you say “actions”, do you mean the sustainable actions in the Act tab, or the actions ARACNE can perform across the whole app?",
+      es:"Cuando dices «acciones», ¿te refieres a las acciones sostenibles de la pestaña Actuar o a las acciones que ARACNE puede realizar en toda la app?"
+    }[language];
+  }
+
+  function capabilitySuggestions(sectionId, language) {
+    const entry=CAPABILITY_REGISTRY[sectionId];
+    if (!entry) return [];
+    return [entry.examples?.[language] || entry.examples?.it].filter(Boolean);
+  }
+  /* =========================================
+     STRUCTURED APP TOOLS v0.7
      The language engine decides WHAT; HIRUNDU bridge decides HOW.
      ========================================= */
 
@@ -1501,6 +2038,7 @@
 
     const l=LEXICON[language]||LEXICON.it;
     const ctx=CONTEXT_RULES[language]||CONTEXT_RULES.it;
+    const capabilityQuery=detectCapabilityQuery(text,language);
 
     let durationHours=parseDurationHours(text,language);
     let themes=detectThemes(text,language);
@@ -1549,6 +2087,7 @@
     };
 
     addIntent("scope",earliestMatch(n,l.scope),9);
+    if(capabilityQuery)addIntent("scope",0,10);
     addIntent("tell",earliestMatch(n,l.tell),8);
     addIntent("see_place",earliestMatch(n,l.see),8);
     addIntent("near_me",earliestMatch(n,l.nearbyMe),9);
@@ -1708,6 +2247,8 @@
       mode,
       clauses:clauseAnalyses,
       routeExactSequence:false,
+      capabilityQuery,
+      currentSection:currentSectionId(),
       contextUsed:needsRememberedPlace || routeIsFollowup || !!themeModifier || shorter || longer || routeFollowupPos>=0,
       modifiers:{shorter,longer,theme:themeModifier},
       clarification:null
@@ -2354,6 +2895,44 @@
           analysis,
           context:getContext(),
           text:analysis.clarification.text
+        };
+      }
+
+      if(
+        analysis.capabilityQuery
+        &&
+        analysis.intents.every(intent=>intent==="scope")
+        &&
+        !(analysis.toolRequests?.length)
+      ) {
+        if(analysis.capabilityQuery.type==="ambiguous_actions") {
+          return {
+            ok:false,
+            intent:"clarify_capability",
+            intents:["scope"],
+            language:analysis.language,
+            analysis,
+            capability:analysis.capabilityQuery,
+            context:getContext(),
+            text:formatActionsAmbiguity(analysis.language)
+          };
+        }
+
+        const sectionId=analysis.capabilityQuery.section;
+        const capabilityText=sectionId
+          ? formatSectionCapabilities(sectionId,analysis.language)
+          : formatCapabilityOverview(analysis.language);
+
+        return {
+          ok:true,
+          intent:sectionId?"capabilities_section":"capabilities_overview",
+          intents:["scope"],
+          language:analysis.language,
+          analysis,
+          capability:analysis.capabilityQuery,
+          suggestions:sectionId?capabilitySuggestions(sectionId,analysis.language):[],
+          context:getContext(),
+          text:capabilityText
         };
       }
 
@@ -3096,6 +3675,16 @@
     detectTools: text => {
       const language=detectTextLanguage(text)||lang();
       return detectToolRequests(text,language,getPlaces(text));
+    },
+
+    capabilities: () => ({
+      currentSection:currentSectionId(),
+      sections:Object.keys(CAPABILITY_REGISTRY)
+    }),
+
+    detectCapabilities: text => {
+      const language=detectTextLanguage(text)||lang();
+      return detectCapabilityQuery(text,language);
     },
 
     detectLanguage: detectTextLanguage,
