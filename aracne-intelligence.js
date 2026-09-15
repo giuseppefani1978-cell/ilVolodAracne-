@@ -2289,6 +2289,13 @@
       }
     }
 
+    // A capability/help question is meta-conversation, not an app command.
+    // It must never create a route or trigger a tool merely because the
+    // sentence mentions a tab such as "Parcours".
+    if(capabilityQuery) {
+      cues.splice(0,cues.length,{name:"scope",pos:0,score:10});
+    }
+
     cues.sort((a,b)=>(order[a.name]||99)-(order[b.name]||99)||a.pos-b.pos);
 
     const analysis={
@@ -2326,7 +2333,7 @@
       }
     }
 
-    const toolRequests=detectToolRequests(text,language,places);
+    const toolRequests=capabilityQuery ? [] : detectToolRequests(text,language,places);
 
     // Structured tool positions act as clause boundaries for conversational
     // intents. This prevents a later tool target from leaking into an earlier
