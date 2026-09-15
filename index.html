@@ -1466,7 +1466,7 @@
       box.classList.toggle("listening",state==="listening");
       txt.textContent=state==="listening"?t("assistant_listening"):state==="unsupported"?t("assistant_unsupported"):t("assistant_ready");
     }
-    function syncVoiceLangButtons(){ $(".voice-lang").forEach(b=>b.classList.toggle("active",b.dataset.voiceLang===voiceLang)); }
+    function syncVoiceLangButtons(){ document.querySelectorAll(".voice-lang").forEach(b=>b.classList.toggle("active",b.dataset.voiceLang===voiceLang)); }
 
     function playAracneCue(kind="open"){
       try{
