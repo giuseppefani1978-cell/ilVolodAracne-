@@ -2372,10 +2372,17 @@
     const knowledgeAspect=detectKnowledgeAspect(text,language);
     const specificPlaces=exactNamedPlaces(text);
     let territories=territoryMatches(text,language);
+    const territoryFollowup=
+      !!knowledgeAspect
+      ||
+      hasAny(n,ctx.nearby||[])
+      ||
+      hasAny(n,ctx.contextPlace||[]);
+
     if(
       !territories.length
       &&
-      knowledgeAspect
+      territoryFollowup
       &&
       !specificPlaces.length
       &&
@@ -2818,6 +2825,8 @@
       contextOnlyRequest
       &&
       !sessionState.lastPlaceIds.length
+      &&
+      !sessionState.lastTerritoryId
       &&
       !sessionState.lastRoute
       &&
