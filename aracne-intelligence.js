@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.5.1";
+  const VERSION = "0.6.0";
 
   const LANGS = [
     "it",
@@ -52,7 +52,7 @@
         "Scrivi o detta prima una domanda.",
 
       scope:
-        "Aracne conosce i luoghi e i percorsi presenti nell’app. Può raccontarti un luogo, cercare cosa c’è vicino, aggiungere tappe e creare itinerari. Non è ancora un assistente generalista su Internet.",
+        "Aracne conosce i luoghi, i percorsi e le principali funzioni dell’app. Può raccontarti un luogo, creare o modificare itinerari, aprire mappa, missioni, passaporto e diario, mostrare Filo Verde e punti, preparare QR e condivisioni. Non è ancora un assistente generalista su Internet.",
 
       unknown:
         "Posso aiutarti soprattutto con i luoghi presenti nell’app, ciò che c’è vicino, i percorsi e le funzioni di HIRUNDU. Prova per esempio: «Cosa c’è vicino a Otranto?», «Raccontami Porto Badisco» o «Creami un percorso natura di 3 ore».",
@@ -111,7 +111,7 @@
         "Écris ou dicte d’abord une question.",
 
       scope:
-        "Aracne connaît les lieux et les parcours présents dans l’app. Elle peut raconter un lieu, chercher ce qu’il y a autour, ajouter des étapes et créer des itinéraires. Ce n’est pas encore un assistant généraliste connecté à Internet.",
+        "Aracne connaît les lieux, les parcours et les principales fonctions de l’app. Elle peut raconter un lieu, créer ou modifier un itinéraire, ouvrir la carte, les missions, le passeport et le journal, montrer le Filo Verde et les points, préparer le QR et le partage. Ce n’est pas encore un assistant généraliste connecté à Internet.",
 
       unknown:
         "Je peux surtout t’aider avec les lieux présents dans l’app, ce qu’il y a autour, les parcours et les fonctions de HIRUNDU. Essaie par exemple : « Qu’est-ce qu’il y a autour d’Otranto ? », « Raconte-moi Porto Badisco » ou « Crée-moi un parcours nature de 3 heures ».",
@@ -170,7 +170,7 @@
         "Type or dictate a question first.",
 
       scope:
-        "Aracne knows the places and routes contained in the app. It can describe a place, find what is nearby, add stops and create itineraries. It is not yet a general Internet assistant.",
+        "Aracne knows the places, routes and main app functions. It can describe places, create or modify routes, open the map, missions, passport and journal, show Filo Verde and points, and prepare QR or sharing actions. It is not yet a general Internet assistant.",
 
       unknown:
         "I can mainly help with places already in the app, nearby discoveries, routes and HIRUNDU features. Try: “What is near Otranto?”, “Tell me about Porto Badisco”, or “Create a 3-hour nature route”.",
@@ -229,7 +229,7 @@
         "Escribe o dicta primero una pregunta.",
 
       scope:
-        "Aracne conoce los lugares y recorridos presentes en la app. Puede describir un lugar, buscar qué hay cerca, añadir etapas y crear itinerarios. Todavía no es un asistente generalista conectado a Internet.",
+        "Aracne conoce los lugares, las rutas y las principales funciones de la app. Puede describir lugares, crear o modificar rutas, abrir el mapa, las misiones, el pasaporte y el diario, mostrar Filo Verde y puntos, y preparar QR o acciones para compartir. Todavía no es un asistente generalista conectado a Internet.",
 
       unknown:
         "Puedo ayudarte sobre todo con los lugares presentes en la app, lo que hay cerca, las rutas y las funciones de HIRUNDU. Prueba: «¿Qué hay cerca de Otranto?», «Cuéntame Porto Badisco» o «Crea una ruta de naturaleza de 3 horas».",
@@ -920,6 +920,320 @@
     }
   };
 
+
+  /* =========================================
+     STRUCTURED APP TOOLS v0.6
+     The language engine decides WHAT; HIRUNDU bridge decides HOW.
+     ========================================= */
+
+  const TOOL_RULES = {
+    it:{
+      navigate:{
+        discover:["apri scopri","vai a scopri","torna a scopri"],
+        routes:["apri i percorsi","apri il percorso","mostra il percorso","mostra i percorsi","vai ai percorsi"],
+        act:["apri le missioni","mostra le missioni","vai alle missioni","apri agisci","vai ad agisci"],
+        mapSheet:["apri la mappa","mostra la mappa","vai alla mappa"],
+        passport:["apri il passaporto","mostra il passaporto","apri il mio viaggio","mostra il mio viaggio"]
+      },
+      journalOpen:["apri il diario","mostra il diario","apri le mie note","mostra le mie note"],
+      journalSave:["nota che","salva una nota","aggiungi una nota","registra una nota"],
+      routeRemove:["rimuovi","togli","elimina dal percorso","rimuovi dal percorso"],
+      routeClear:["svuota il percorso","cancella il percorso","elimina tutte le tappe","azzera il percorso"],
+      routeMode:{
+        walking:["metti il percorso a piedi","passa a piedi","usa il percorso a piedi"],
+        cycling:["metti il percorso in bici","passa alla bici","usa la bici per il percorso"],
+        driving:["metti il percorso in auto","passa all auto","usa auto per il percorso","usa lo scooter per il percorso"]
+      },
+      missionsOpen:["mostra le missioni","apri le missioni"],
+      missionOpen:["apri la missione","mostra la missione","vai alla missione"],
+      qrOpen:["apri il qr","mostra il qr","qr della missione","scansiona il qr"],
+      status:["quanti punti","i miei punti","mostra i punti","filo verde","il mio filo verde","punteggio filo verde"],
+      share:{
+        route:["condividi il percorso","condividi il mio percorso"],
+        act:["condividi le missioni","condividi i punti","condividi il filo verde"],
+        trip:["condividi il viaggio","condividi il passaporto"],
+        journal:["condividi le note","condividi il diario"]
+      },
+      maps:["apri google maps","apri maps","lancia google maps","naviga con google maps"]
+    },
+    fr:{
+      navigate:{
+        discover:["ouvre decouvrir","va dans decouvrir","retourne a decouvrir"],
+        routes:["ouvre les parcours","ouvre le parcours","montre mon parcours","montre mes parcours","va dans parcours"],
+        act:["ouvre les missions","montre les missions","va dans les missions","ouvre agir","va dans agir"],
+        mapSheet:["ouvre la carte","montre la carte","va sur la carte","affiche la carte"],
+        passport:["ouvre mon passeport","montre mon passeport","ouvre mon voyage","montre mon voyage"]
+      },
+      journalOpen:["ouvre mon journal","montre mon journal","ouvre mes notes","montre mes notes"],
+      journalSave:["note que","sauvegarde une note","ajoute une note","enregistre une note"],
+      routeRemove:["retire","enleve","supprime du parcours","retire du parcours"],
+      routeClear:["vide le parcours","efface le parcours","supprime toutes les etapes","reinitialise le parcours"],
+      routeMode:{
+        walking:["mets le parcours a pied","passe a pied","fais le parcours a pied"],
+        cycling:["mets le parcours a velo","passe en velo","fais le parcours a velo"],
+        driving:["mets le parcours en voiture","passe en voiture","fais le parcours en voiture","passe en scooter"]
+      },
+      missionsOpen:["montre les missions","ouvre les missions"],
+      missionOpen:["ouvre la mission","montre la mission","va sur la mission"],
+      qrOpen:["ouvre le qr","montre le qr","qr de la mission","scanne le qr"],
+      status:["combien de points","mes points","montre mes points","filo verde","mon filo verde","score filo verde"],
+      share:{
+        route:["partage le parcours","partage mon parcours"],
+        act:["partage les missions","partage mes points","partage le filo verde"],
+        trip:["partage mon voyage","partage mon passeport"],
+        journal:["partage mes notes","partage mon journal"]
+      },
+      maps:["ouvre google maps","ouvre maps","lance google maps","navigue avec google maps"]
+    },
+    en:{
+      navigate:{
+        discover:["open discover","go to discover","back to discover"],
+        routes:["open routes","open my route","show my route","show routes","go to routes"],
+        act:["open missions","show missions","go to missions","open act"],
+        mapSheet:["open the map","show the map","go to the map"],
+        passport:["open my passport","show my passport","open my trip","show my trip"]
+      },
+      journalOpen:["open my journal","show my journal","open my notes","show my notes"],
+      journalSave:["note that","save a note","add a note","record a note"],
+      routeRemove:["remove","remove from route","delete from route","take out"],
+      routeClear:["clear the route","empty the route","remove all stops","reset the route"],
+      routeMode:{
+        walking:["set the route to walking","switch to walking","make the route walking"],
+        cycling:["set the route to cycling","switch to bike","make the route cycling"],
+        driving:["set the route to driving","switch to car","make the route driving","switch to scooter"]
+      },
+      missionsOpen:["show missions","open missions"],
+      missionOpen:["open the mission","show the mission","go to the mission"],
+      qrOpen:["open the qr","show the qr","mission qr","scan the qr"],
+      status:["how many points","my points","show my points","filo verde","my filo verde","filo verde score"],
+      share:{
+        route:["share the route","share my route"],
+        act:["share missions","share my points","share filo verde"],
+        trip:["share my trip","share my passport"],
+        journal:["share my notes","share my journal"]
+      },
+      maps:["open google maps","open maps","launch google maps","navigate with google maps"]
+    },
+    es:{
+      navigate:{
+        discover:["abre descubrir","ve a descubrir","vuelve a descubrir"],
+        routes:["abre las rutas","abre mi ruta","muestra mi ruta","muestra las rutas","ve a rutas"],
+        act:["abre las misiones","muestra las misiones","ve a las misiones","abre actuar"],
+        mapSheet:["abre el mapa","muestra el mapa","ve al mapa"],
+        passport:["abre mi pasaporte","muestra mi pasaporte","abre mi viaje","muestra mi viaje"]
+      },
+      journalOpen:["abre mi diario","muestra mi diario","abre mis notas","muestra mis notas"],
+      journalSave:["anota que","guarda una nota","anade una nota","registra una nota"],
+      routeRemove:["quita","elimina de la ruta","quita de la ruta","borra de la ruta"],
+      routeClear:["vacia la ruta","borra la ruta","elimina todas las etapas","reinicia la ruta"],
+      routeMode:{
+        walking:["pon la ruta a pie","cambia a pie","haz la ruta a pie"],
+        cycling:["pon la ruta en bici","cambia a bici","haz la ruta en bici"],
+        driving:["pon la ruta en coche","cambia a coche","haz la ruta en coche","cambia a scooter"]
+      },
+      missionsOpen:["muestra las misiones","abre las misiones"],
+      missionOpen:["abre la mision","muestra la mision","ve a la mision"],
+      qrOpen:["abre el qr","muestra el qr","qr de la mision","escanea el qr"],
+      status:["cuantos puntos","mis puntos","muestra mis puntos","filo verde","mi filo verde","puntuacion filo verde"],
+      share:{
+        route:["comparte la ruta","comparte mi ruta"],
+        act:["comparte las misiones","comparte mis puntos","comparte filo verde"],
+        trip:["comparte mi viaje","comparte mi pasaporte"],
+        journal:["comparte mis notas","comparte mi diario"]
+      },
+      maps:["abre google maps","abre maps","lanza google maps","navega con google maps"]
+    }
+  };
+
+  const TOOL_TEXT = {
+    it:{
+      navigate:"Apro la sezione richiesta.",
+      journalSaved:"Nota salvata nel Diario di Aracne.",
+      routeRemoved:names=>"Ho rimosso dal percorso: "+names+".",
+      routeCleared:"Ho svuotato il percorso.",
+      routeMode:mode=>"Ho impostato il percorso su "+mode+".",
+      missionOpened:"Apro la missione.",
+      qrOpened:"Apro la verifica QR della missione.",
+      missionRequired:"Dimmi quale missione vuoi aprire o verificare con QR.",
+      shared:"Preparo la condivisione.",
+      maps:"Apro il percorso in Google Maps.",
+      status:data=>"Filo Verde: "+data.greenScore+"/100 · Aracne Points: "+data.points+" · Missioni oggi: "+data.claimsToday+"/"+data.missionsTotal+".",
+      toolFail:"Non sono riuscita a completare questa azione."
+    },
+    fr:{
+      navigate:"J’ouvre la section demandée.",
+      journalSaved:"Note enregistrée dans le Journal d’Aracne.",
+      routeRemoved:names=>"J’ai retiré du parcours : "+names+".",
+      routeCleared:"J’ai vidé le parcours.",
+      routeMode:mode=>"J’ai réglé le parcours sur "+mode+".",
+      missionOpened:"J’ouvre la mission.",
+      qrOpened:"J’ouvre la validation QR de la mission.",
+      missionRequired:"Dis-moi quelle mission tu veux ouvrir ou valider par QR.",
+      shared:"Je prépare le partage.",
+      maps:"J’ouvre le parcours dans Google Maps.",
+      status:data=>"Filo Verde : "+data.greenScore+"/100 · Aracne Points : "+data.points+" · Missions aujourd’hui : "+data.claimsToday+"/"+data.missionsTotal+".",
+      toolFail:"Je n’ai pas pu terminer cette action."
+    },
+    en:{
+      navigate:"I’m opening the requested section.",
+      journalSaved:"Note saved in the Aracne Journal.",
+      routeRemoved:names=>"I removed from the route: "+names+".",
+      routeCleared:"I cleared the route.",
+      routeMode:mode=>"I set the route to "+mode+".",
+      missionOpened:"I’m opening the mission.",
+      qrOpened:"I’m opening the mission QR validation.",
+      missionRequired:"Tell me which mission you want to open or validate by QR.",
+      shared:"I’m preparing the share action.",
+      maps:"I’m opening the route in Google Maps.",
+      status:data=>"Filo Verde: "+data.greenScore+"/100 · Aracne Points: "+data.points+" · Missions today: "+data.claimsToday+"/"+data.missionsTotal+".",
+      toolFail:"I couldn’t complete that action."
+    },
+    es:{
+      navigate:"Abro la sección solicitada.",
+      journalSaved:"Nota guardada en el Diario de Aracne.",
+      routeRemoved:names=>"He quitado de la ruta: "+names+".",
+      routeCleared:"He vaciado la ruta.",
+      routeMode:mode=>"He configurado la ruta en "+mode+".",
+      missionOpened:"Abro la misión.",
+      qrOpened:"Abro la validación QR de la misión.",
+      missionRequired:"Dime qué misión quieres abrir o validar por QR.",
+      shared:"Preparo la acción para compartir.",
+      maps:"Abro la ruta en Google Maps.",
+      status:data=>"Filo Verde: "+data.greenScore+"/100 · Aracne Points: "+data.points+" · Misiones hoy: "+data.claimsToday+"/"+data.missionsTotal+".",
+      toolFail:"No he podido completar esta acción."
+    }
+  };
+
+  function toolText(language,key,...args){
+    const pack=TOOL_TEXT[language]||TOOL_TEXT.it;
+    const value=pack[key];
+    return typeof value==="function" ? value(...args) : value;
+  }
+
+  function allToolLanguagePhrases(language){
+    const r=TOOL_RULES[language]||TOOL_RULES.it;
+    const out=[];
+    Object.values(r.navigate||{}).forEach(list=>out.push(...list));
+    out.push(...(r.journalOpen||[]),...(r.journalSave||[]),...(r.routeRemove||[]),...(r.routeClear||[]));
+    Object.values(r.routeMode||{}).forEach(list=>out.push(...list));
+    out.push(...(r.missionsOpen||[]),...(r.missionOpen||[]),...(r.qrOpen||[]),...(r.status||[]),...(r.maps||[]));
+    Object.values(r.share||{}).forEach(list=>out.push(...list));
+    return out;
+  }
+
+  function extractJournalNote(text,language){
+    let value=String(text||"").trim();
+    const patterns={
+      it:/^\s*(?:nota che|salva una nota|aggiungi una nota|registra una nota)\s*[:\-]?\s*/i,
+      fr:/^\s*(?:note que|sauvegarde une note|ajoute une note|enregistre une note)\s*[:\-]?\s*/i,
+      en:/^\s*(?:note that|save a note|add a note|record a note)\s*[:\-]?\s*/i,
+      es:/^\s*(?:anota que|guarda una nota|añade una nota|anade una nota|registra una nota)\s*[:\-]?\s*/i
+    };
+    value=value.replace(patterns[language]||patterns.it,"").trim();
+    return value;
+  }
+
+  function detectToolRequests(text,language,places=[]){
+    const n=normalize(text);
+    const r=TOOL_RULES[language]||TOOL_RULES.it;
+    const requests=[];
+    const add=(name,args,pos)=>{
+      if(pos<0)return;
+      const key=name+":"+JSON.stringify(args||{});
+      if(requests.some(x=>x.key===key))return;
+      requests.push({name,args:args||{},pos,key});
+    };
+
+    for(const [sheet,phrases] of Object.entries(r.navigate||{})){
+      const pos=earliestMatch(n,phrases);
+      if(pos>=0)add("navigate",{sheet},pos);
+    }
+
+    let pos=earliestMatch(n,r.journalOpen||[]);
+    if(pos>=0)add("journal_open",{},pos);
+
+    pos=earliestMatch(n,r.journalSave||[]);
+    if(pos>=0){
+      const note=extractJournalNote(text,language);
+      if(note)add("journal_save",{text:note},pos);
+    }
+
+    pos=earliestMatch(n,r.routeClear||[]);
+    if(pos>=0)add("route_clear",{},pos);
+
+    pos=earliestMatch(n,r.routeRemove||[]);
+    if(pos>=0 && places.length){
+      add("route_remove",{placeIds:places.map(p=>p.id).filter(Boolean)},pos);
+    }
+
+    for(const [mode,phrases] of Object.entries(r.routeMode||{})){
+      const modePos=earliestMatch(n,phrases);
+      if(modePos>=0)add("route_mode",{mode},modePos);
+    }
+
+    pos=earliestMatch(n,r.missionsOpen||[]);
+    if(pos>=0)add("navigate",{sheet:"act"},pos);
+
+    pos=earliestMatch(n,r.missionOpen||[]);
+    if(pos>=0)add("mission_open",{query:text},pos);
+
+    pos=earliestMatch(n,r.qrOpen||[]);
+    if(pos>=0)add("qr_open",{query:text},pos);
+
+    pos=earliestMatch(n,r.status||[]);
+    if(pos>=0)add("status",{},pos);
+
+    for(const [scope,phrases] of Object.entries(r.share||{})){
+      const sharePos=earliestMatch(n,phrases);
+      if(sharePos>=0)add("share",{scope},sharePos);
+    }
+
+    pos=earliestMatch(n,r.maps||[]);
+    if(pos>=0)add("maps_open",{},pos);
+
+    return requests
+      .sort((a,b)=>a.pos-b.pos)
+      .map(({key,...request})=>request);
+  }
+
+  async function executeToolRequest(request,analysis){
+    if(!request||!bridge?.runTool)return {ok:false};
+
+    try{
+      const result=await bridge.runTool(
+        request.name,
+        request.args||{},
+        {
+          language:analysis.language,
+          composite:(analysis.intents.length+(analysis.toolRequests?.length||0))>1
+        }
+      );
+
+      const data=result?.data||{};
+
+      if(!result?.ok){
+        if(result?.code==="mission_required")return {ok:false,text:toolText(analysis.language,"missionRequired")};
+        return {ok:false,text:result?.text||toolText(analysis.language,"toolFail")};
+      }
+
+      if(request.name==="status")return {ok:true,text:toolText(analysis.language,"status",data)};
+      if(request.name==="journal_save")return {ok:true,text:toolText(analysis.language,"journalSaved")};
+      if(request.name==="route_remove")return {ok:true,text:toolText(analysis.language,"routeRemoved",(data.names||[]).join(", "))};
+      if(request.name==="route_clear")return {ok:true,text:toolText(analysis.language,"routeCleared")};
+      if(request.name==="route_mode")return {ok:true,text:toolText(analysis.language,"routeMode",data.modeLabel||request.args.mode)};
+      if(request.name==="mission_open")return {ok:true,text:toolText(analysis.language,"missionOpened")};
+      if(request.name==="qr_open")return {ok:true,text:toolText(analysis.language,"qrOpened")};
+      if(request.name==="share")return {ok:true,text:toolText(analysis.language,"shared")};
+      if(request.name==="maps_open")return {ok:true,text:toolText(analysis.language,"maps")};
+      if(request.name==="navigate"||request.name==="journal_open")return {ok:true,text:toolText(analysis.language,"navigate")};
+
+      return {ok:true,text:result?.text||""};
+    }catch(error){
+      console.warn("[Aracne tool]",request.name,error);
+      return {ok:false,text:toolText(analysis.language,"toolFail")};
+    }
+  }
+
   function earliestMatch(text, phrases) {
     let best=-1;
 
@@ -958,7 +1272,7 @@
 
     for(const code of LANGS) {
       const l=LEXICON[code];
-      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare];
+      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare,allToolLanguagePhrases(code)];
       for(const group of groups) {
         for(const raw of group||[]) {
           const p=normalize(raw);
@@ -1537,6 +1851,7 @@
       };
     }
 
+    analysis.toolRequests=detectToolRequests(text,language,analysis.places);
     analysis.bridgeText=buildBridgeText(text,analysis);
     return analysis;
   }
@@ -1977,7 +2292,7 @@
       }
 
       const appAnswer=appKnowledge(text);
-      if(appAnswer && !analysis.intents.some(x=>["route","add","open","near_me","near_place"].includes(x))) {
+      if(appAnswer && !(analysis.toolRequests?.length) && !analysis.intents.some(x=>["route","add","open","near_me","near_place"].includes(x))) {
         sections.push(appAnswer);
       }
 
@@ -2075,10 +2390,22 @@
         }
       }
 
+      if(analysis.toolRequests?.length) {
+        for(const request of analysis.toolRequests) {
+          // Route creation already applies its requested mode directly.
+          if(request.name==="route_mode" && analysis.intents.includes("route"))continue;
+
+          const result=await executeToolRequest(request,analysis);
+          if(result?.text)sections.push(labels.action+"\n"+result.text);
+          if(result?.ok)actions.push("tool:"+request.name);
+          else ok=false;
+        }
+      }
+
       if(!sections.length) {
         if(analysis.places.length>=2)sections.push(multiAnswer(analysis.places));
         else if(analysis.places.length===1)sections.push(enrichPlace(analysis.places[0]));
-        else {
+        else if(!(analysis.toolRequests?.length)) {
           sections.push(tr("unknown"));
           ok=false;
         }
@@ -2088,7 +2415,7 @@
 
       return {
         ok,
-        intent:analysis.intents.length>1?"composed":(analysis.intents[0]||"unknown"),
+        intent:(analysis.intents.length+(analysis.toolRequests?.length||0))>1?"composed":(analysis.intents[0]||(analysis.toolRequests?.[0]?.name)||"unknown"),
         intents:analysis.intents,
         actions,
         language:analysis.language,
@@ -2688,6 +3015,11 @@
     execute,
 
     analyze,
+
+    detectTools: text => {
+      const language=detectTextLanguage(text)||lang();
+      return detectToolRequests(text,language,getPlaces(text));
+    },
 
     detectLanguage: detectTextLanguage,
 
