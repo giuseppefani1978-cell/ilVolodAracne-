@@ -1,0 +1,143 @@
+{
+  "version": "0.7.0",
+  "purpose": "Capability Registry regression baseline. Not loaded by the app.",
+  "architecture": {
+    "tabs": [
+      "discover",
+      "routes",
+      "act",
+      "mapSheet",
+      "passport"
+    ],
+    "principle": "Capability/help questions are meta-conversation and must not execute app tools."
+  },
+  "overview": [
+    {
+      "lang": "fr",
+      "input": "Que peux-tu faire ?",
+      "expectIntent": "capabilities_overview"
+    },
+    {
+      "lang": "it",
+      "input": "Cosa puoi fare?",
+      "expectIntent": "capabilities_overview"
+    },
+    {
+      "lang": "en",
+      "input": "What can you do?",
+      "expectIntent": "capabilities_overview"
+    },
+    {
+      "lang": "es",
+      "input": "¿Qué puedes hacer?",
+      "expectIntent": "capabilities_overview"
+    },
+    {
+      "lang": "fr",
+      "input": "Comment ça marche ?",
+      "expectIntent": "capabilities_overview"
+    }
+  ],
+  "contextual": [
+    {
+      "lang": "fr",
+      "section": "discover",
+      "input": "Que puis-je faire ici ?",
+      "expectSection": "discover"
+    },
+    {
+      "lang": "fr",
+      "section": "routes",
+      "input": "Que puis-je faire ici ?",
+      "expectSection": "routes"
+    },
+    {
+      "lang": "fr",
+      "section": "act",
+      "input": "Que puis-je faire ici ?",
+      "expectSection": "act"
+    },
+    {
+      "lang": "fr",
+      "section": "mapSheet",
+      "input": "Que puis-je faire ici ?",
+      "expectSection": "mapSheet"
+    },
+    {
+      "lang": "fr",
+      "section": "passport",
+      "input": "Que puis-je faire ici ?",
+      "expectSection": "passport"
+    }
+  ],
+  "explicitSections": [
+    {
+      "lang": "fr",
+      "input": "Que puis-je faire dans Parcours ?",
+      "expectSection": "routes",
+      "mustNotExecute": "route"
+    },
+    {
+      "lang": "fr",
+      "input": "Que puis-je faire dans Agir ?",
+      "expectSection": "act"
+    },
+    {
+      "lang": "fr",
+      "input": "Que puis-je faire dans la Carte ?",
+      "expectSection": "mapSheet"
+    },
+    {
+      "lang": "fr",
+      "input": "Que puis-je faire dans Voyage ?",
+      "expectSection": "passport"
+    },
+    {
+      "lang": "it",
+      "input": "Cosa posso fare in Percorsi?",
+      "expectSection": "routes"
+    },
+    {
+      "lang": "en",
+      "input": "What can I do in Act?",
+      "expectSection": "act"
+    },
+    {
+      "lang": "es",
+      "input": "Que puedo hacer en Mapa?",
+      "expectSection": "mapSheet"
+    }
+  ],
+  "ambiguity": [
+    {
+      "lang": "fr",
+      "section": "discover",
+      "input": "Est-ce que je peux faire des actions ?",
+      "expectIntent": "clarify_capability",
+      "clarification": "actions durables in Agir vs actions across whole app"
+    },
+    {
+      "lang": "fr",
+      "followup": "Les actions green",
+      "expectSection": "act"
+    },
+    {
+      "lang": "fr",
+      "followup": "Dans toute l'app",
+      "expectIntent": "capabilities_overview"
+    },
+    {
+      "lang": "fr",
+      "section": "act",
+      "input": "Quelles actions je peux faire ?",
+      "expectSection": "act",
+      "note": "Inside Agir, generic actions resolve to sustainable actions without clarification."
+    }
+  ],
+  "invariants": [
+    "Explicit v0.6 commands such as open passport, remove a route stop, share route and show Filo Verde remain executable actions.",
+    "Capability questions never create routes or run tools.",
+    "analyze() does not consume pending capability clarification.",
+    "Question language remains independent from app language."
+  ]
+}
