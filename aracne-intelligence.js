@@ -1027,25 +1027,25 @@
       "actions": {
         "it": [
           "creare un percorso da luoghi, tempo, tema o mezzo",
-          "aggiungere, togliere o riordinare tappe",
+          "aggiungere o togliere tappe dal percorso",
           "cambiare tra auto/scooter, bici e cammino",
           "aprire il percorso in Maps o condividerlo"
         ],
         "fr": [
           "créer un parcours avec lieux, durée, thème ou transport",
-          "ajouter, retirer ou réordonner des étapes",
+          "ajouter ou retirer des étapes du parcours",
           "passer voiture/scooter, vélo ou marche",
           "ouvrir le parcours dans Maps ou le partager"
         ],
         "en": [
           "create a route from places, time, theme or transport",
-          "add, remove or reorder stops",
+          "add or remove stops from the route",
           "switch between car/scooter, bike and walking",
           "open the route in Maps or share it"
         ],
         "es": [
           "crear una ruta con lugares, duración, tema o transporte",
-          "añadir, quitar o reordenar etapas",
+          "añadir o quitar etapas de la ruta",
           "cambiar entre coche/scooter, bici y caminar",
           "abrir la ruta en Maps o compartirla"
         ]
@@ -1288,7 +1288,9 @@
         "come puoi aiutarmi",
         "quali sono le tue possibilita",
         "cosa posso fare",
-        "che cosa posso fare"
+        "che cosa posso fare",
+        "come funziona",
+        "come funziona aracne"
       ],
       "here": [
         "cosa posso fare qui",
@@ -1318,7 +1320,10 @@
         "comment peux tu m aider",
         "quelles sont tes possibilites",
         "qu est ce que je peux faire",
-        "que puis je faire"
+        "que puis je faire",
+        "comment ca marche",
+        "comment fonctionne aracne",
+        "comment utiliser aracne"
       ],
       "here": [
         "que puis je faire ici",
@@ -1347,7 +1352,9 @@
         "what can you do",
         "how can you help me",
         "what are your capabilities",
-        "what can i do"
+        "what can i do",
+        "how does this work",
+        "how does aracne work"
       ],
       "here": [
         "what can i do here",
@@ -1373,7 +1380,9 @@
         "que puedes hacer",
         "como puedes ayudarme",
         "cuales son tus posibilidades",
-        "que puedo hacer"
+        "que puedo hacer",
+        "como funciona",
+        "como funciona aracne"
       ],
       "here": [
         "que puedo hacer aqui",
