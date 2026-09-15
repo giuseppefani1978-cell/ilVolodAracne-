@@ -813,6 +813,7 @@
     return {
       turn:sessionState.turn,
       language:sessionState.language,
+      currentSection:currentSectionId(),
       lastPlaceIds:[...sessionState.lastPlaceIds],
       lastIntents:[...sessionState.lastIntents],
       lastRoute:sessionState.lastRoute
@@ -1299,7 +1300,15 @@
         "quali azioni posso fare",
         "che azioni posso fare",
         "quali azioni",
-        "azioni che posso fare"
+        "azioni che posso fare",
+        "azioni verdi",
+        "azioni sostenibili"
+      ],
+      "wholeApp": [
+        "in tutta l app",
+        "tutta l app",
+        "globalmente",
+        "ovunque nell app"
       ]
     },
     "fr": {
@@ -1321,7 +1330,16 @@
         "quelles actions je peux faire",
         "quelles actions puis je faire",
         "quelles actions",
-        "actions que je peux faire"
+        "actions que je peux faire",
+        "actions green",
+        "actions vertes",
+        "actions durables"
+      ],
+      "wholeApp": [
+        "dans toute l app",
+        "toute l app",
+        "globalement",
+        "partout dans l app"
       ]
     },
     "en": {
@@ -1339,7 +1357,15 @@
         "can i do actions",
         "what actions can i do",
         "which actions can i do",
-        "what actions"
+        "what actions",
+        "green actions",
+        "sustainable actions"
+      ],
+      "wholeApp": [
+        "across the whole app",
+        "whole app",
+        "everywhere in the app",
+        "globally"
       ]
     },
     "es": {
@@ -1357,10 +1383,28 @@
         "puedo hacer acciones",
         "que acciones puedo hacer",
         "cuales acciones puedo hacer",
-        "que acciones"
+        "que acciones",
+        "acciones verdes",
+        "acciones sostenibles"
+      ],
+      "wholeApp": [
+        "en toda la app",
+        "toda la app",
+        "globalmente",
+        "en cualquier parte de la app"
       ]
     }
   };
+
+  function allCapabilityLanguagePhrases(language) {
+    const rules=CAPABILITY_RULES[language] || CAPABILITY_RULES.it;
+    return [
+      ...(rules.general || []),
+      ...(rules.here || []),
+      ...(rules.actions || []),
+      ...(rules.wholeApp || [])
+    ];
+  }
 
   function currentSectionId() {
     const id=bridge?.getCurrentSection?.();
@@ -1386,6 +1430,18 @@
     const rules=CAPABILITY_RULES[language] || CAPABILITY_RULES.it;
     const explicitSection=detectCapabilitySection(text, language);
     const currentSection=currentSectionId();
+    const pendingCapability=sessionState.pendingClarification?.type==="capability_actions";
+
+    if(pendingCapability) {
+      if(explicitSection==="act" || hasAny(n,rules.actions||[])) {
+        sessionState.pendingClarification=null;
+        return {type:"section",section:"act",reason:"capability_followup_act"};
+      }
+      if(hasAny(n,rules.wholeApp||[]) || hasAny(n,rules.general||[])) {
+        sessionState.pendingClarification=null;
+        return {type:"overview",section:null,reason:"capability_followup_app"};
+      }
+    }
 
     if (hasAny(n, rules.actions || [])) {
       if (explicitSection==="act") return {type:"section", section:"act", reason:"explicit_actions"};
@@ -1814,7 +1870,7 @@
 
     for(const code of LANGS) {
       const l=LEXICON[code];
-      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare,allToolLanguagePhrases(code)];
+      const groups=[l.scope,l.tell,l.see,l.routeNouns,l.routeVerbs,l.nearbyMe,l.nearbyPlace,l.add,l.open,l.compare,allToolLanguagePhrases(code),allCapabilityLanguagePhrases(code)];
       for(const group of groups) {
         for(const raw of group||[]) {
           const p=normalize(raw);
@@ -2906,6 +2962,12 @@
         !(analysis.toolRequests?.length)
       ) {
         if(analysis.capabilityQuery.type==="ambiguous_actions") {
+          sessionState.language=analysis.language||sessionState.language;
+          sessionState.pendingClarification={
+            type:"capability_actions",
+            placeIds:[],
+            language:analysis.language
+          };
           return {
             ok:false,
             intent:"clarify_capability",
@@ -3414,6 +3476,8 @@
       : context.lastPlaceIds;
     const places=placesByIds(ids||[]);
     const parts=[];
+    const sectionId=currentSectionId();
+    if(sectionId)parts.push(capabilityLabel(sectionId,lang()));
 
     if(places.length)parts.push(places.slice(0,2).map(placeName).join(" → "));
     if(route?.durationHours!=null)parts.push(route.durationHours+" h");
