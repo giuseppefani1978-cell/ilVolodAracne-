@@ -791,7 +791,7 @@
         <button class="modal-close" data-modal-close="assistantModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="assistant-body">
-        <p class="assistant-intro" data-i18n="assistant_intro">Chiedile informazioni sui luoghi, cosa c’è vicino, di aggiungere tappe o creare un percorso. Puoi anche continuare a salvare note, creare caption e suggerire hashtag.</p>
+        <p class="assistant-intro" data-i18n="assistant_intro">Chiedile informazioni sui luoghi, percorsi, missioni, Filo Verde, diario, passaporto, QR e funzioni dell’app. Può anche eseguire azioni come aprire sezioni, modificare il percorso e preparare condivisioni.</p>
 
         <div class="assistant-label" data-i18n="assistant_voice_lang">Lingua della voce</div>
         <div class="assistant-lang-row" id="assistantLangRow">
@@ -848,7 +848,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-intelligence.js?v=0.5.1"></script>
+  <script src="./aracne-intelligence.js?v=0.6.0"></script>
 
   <script>
   (() => {
@@ -1101,6 +1101,7 @@
     let recognition = null;
     let isListening = false;
     let voiceKeepListening = false;
+    let aracneAudioCtx = null;
     let assistantResultText = "";
     let selectedMood="mix";
     let filter="all";
@@ -1465,10 +1466,43 @@
       box.classList.toggle("listening",state==="listening");
       txt.textContent=state==="listening"?t("assistant_listening"):state==="unsupported"?t("assistant_unsupported"):t("assistant_ready");
     }
-    function syncVoiceLangButtons(){ $$(".voice-lang").forEach(b=>b.classList.toggle("active",b.dataset.voiceLang===voiceLang)); }
+    function syncVoiceLangButtons(){ $(".voice-lang").forEach(b=>b.classList.toggle("active",b.dataset.voiceLang===voiceLang)); }
+
+    function playAracneCue(kind="open"){
+      try{
+        const AudioCtx=window.AudioContext||window.webkitAudioContext;
+        if(!AudioCtx)return;
+        if(!aracneAudioCtx)aracneAudioCtx=new AudioCtx();
+
+        const ctx=aracneAudioCtx;
+        if(ctx.state==="suspended")ctx.resume().catch(()=>{});
+
+        const now=ctx.currentTime;
+        const osc=ctx.createOscillator();
+        const gain=ctx.createGain();
+
+        osc.type="sine";
+        const start=kind==="close"?650:470;
+        const end=kind==="close"?390:760;
+
+        osc.frequency.setValueAtTime(start,now);
+        osc.frequency.exponentialRampToValueAtTime(end,now+.105);
+
+        gain.gain.setValueAtTime(.0001,now);
+        gain.gain.exponentialRampToValueAtTime(.055,now+.012);
+        gain.gain.exponentialRampToValueAtTime(.0001,now+.14);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now+.145);
+      }catch(e){}
+    }
+
     function openAssistant(){
       stopVoiceRecognition(); voiceLang=lang; syncVoiceLangButtons(); setAssistantStatus("ready");
       $("#assistantResult")?.classList.remove("show"); $("#assistantModal").classList.add("show");
+      playAracneCue("open");
       setTimeout(()=>$("#assistantTranscript")?.focus(),120);
     }
     async function requestMicrophonePermission(){
@@ -1764,8 +1798,7 @@
     }
 
     function openJournalNotes(){
-      stopVoiceRecognition();
-      $("#assistantModal")?.classList.remove("show");
+      closeModal("assistantModal");
       openSheet("passport");
       setTimeout(()=>$("#journalSectionTitle")?.scrollIntoView({behavior:"smooth",block:"start"}),180);
     }
@@ -2006,8 +2039,10 @@
     function openStory(){$("#storyModal").classList.add("show");}
     function closeModal(id){
       if(id==="assistantModal"){
+        const wasOpen=$("#"+id)?.classList.contains("show");
         stopVoiceRecognition();
         $("#"+id)?.classList.remove("show");
+        if(wasOpen)playAracneCue("close");
         if(pendingAracneMapWeave)setTimeout(weaveAracneRoute,140);
         return;
       }
@@ -2377,6 +2412,169 @@
    ARACNE INTELLIGENCE ↔ HIRUNDU
    ========================================= */
 
+function aracneMissionFromQuery(query=""){
+  const n=normalizeAssistantText(query);
+  if(!n)return null;
+
+  const aliases={
+    water:["water","acqua","eau","agua","borraccia","gourde","bottle"],
+    waste:["waste","rifiuti","dechets","dechets","residuos","empreintes","footprints"],
+    local:["local","sapori","saveurs","flavours","sabores","prodotto","produit","product","producto"],
+    light:["light","leggero","leger","lightly","ligero","bici","velo","bike","walking","marche","cammino"]
+  };
+
+  for(const mission of missions){
+    const title=normalizeAssistantText(mission.title?.[lang]||mission.title?.it||"");
+    if(title&&n.includes(title))return mission;
+
+    const terms=aliases[mission.id]||[];
+    if(terms.some(term=>n.includes(normalizeAssistantText(term))))return mission;
+  }
+
+  return null;
+}
+
+function saveJournalText(text,noteLang=voiceLang){
+  const value=String(text||"").trim();
+  if(!value)return false;
+
+  journalNotes.unshift({
+    id:Date.now(),
+    text:value,
+    lang:noteLang||lang,
+    ts:new Date().toISOString()
+  });
+
+  journalNotes=journalNotes.slice(0,50);
+  saveState();
+  renderJournal();
+  return true;
+}
+
+function scheduleAracneUiAction(fn,composite=false){
+  setTimeout(()=>{
+    if($("#assistantModal")?.classList.contains("show"))closeModal("assistantModal");
+    setTimeout(()=>{
+      try{fn();}catch(e){console.warn("Aracne UI action",e);}
+    },90);
+  },composite?1250:700);
+}
+
+async function runAracneTool(name,args={},context={}){
+  const composite=!!context.composite;
+
+  if(name==="navigate"){
+    const allowed=new Set(["discover","routes","act","mapSheet","passport"]);
+    if(!allowed.has(args.sheet))return {ok:false,code:"bad_sheet"};
+
+    scheduleAracneUiAction(()=>openSheet(args.sheet),composite);
+    return {ok:true,data:{sheet:args.sheet}};
+  }
+
+  if(name==="journal_open"){
+    scheduleAracneUiAction(openJournalNotes,composite);
+    return {ok:true,data:{}};
+  }
+
+  if(name==="journal_save"){
+    const ok=saveJournalText(args.text,context.language||voiceLang);
+    return {ok,data:{text:args.text||""}};
+  }
+
+  if(name==="route_remove"){
+    const ids=Array.isArray(args.placeIds)?args.placeIds:[];
+    const removed=waypoints.filter(p=>ids.includes(p.id));
+    if(!removed.length)return {ok:false,code:"not_in_route"};
+
+    waypoints=waypoints.filter(p=>!ids.includes(p.id));
+    saveState();
+    renderAll();
+    await drawRoute();
+
+    return {ok:true,data:{names:removed.map(p=>p.name)}};
+  }
+
+  if(name==="route_clear"){
+    waypoints=[];
+    saveState();
+    renderAll();
+    await drawRoute();
+    return {ok:true,data:{}};
+  }
+
+  if(name==="route_mode"){
+    if(!["driving","cycling","walking"].includes(args.mode))return {ok:false,code:"bad_mode"};
+    mode=args.mode;
+    saveState();
+    syncModeUI();
+    await drawRoute();
+    return {ok:true,data:{mode,modeLabel:modeLabel()}};
+  }
+
+  if(name==="mission_open"){
+    const mission=aracneMissionFromQuery(args.query||"");
+    if(!mission)return {ok:false,code:"mission_required"};
+
+    scheduleAracneUiAction(()=>openMissionValidation(mission.id),composite);
+    return {ok:true,data:{missionId:mission.id}};
+  }
+
+  if(name==="qr_open"){
+    const mission=aracneMissionFromQuery(args.query||"");
+    if(mission)activeMissionId=mission.id;
+    if(!activeMissionId)return {ok:false,code:"mission_required"};
+
+    const rule=missionRules[activeMissionId];
+    if(!rule?.methods?.includes("qr")){
+      const messages={
+        it:"Questa missione non usa una prova QR.",
+        fr:"Cette mission n’utilise pas de validation QR.",
+        en:"This mission does not use QR validation.",
+        es:"Esta misión no utiliza validación QR."
+      };
+      return {ok:false,code:"qr_not_supported",text:messages[context.language||lang]||messages.it};
+    }
+
+    scheduleAracneUiAction(openQrValidation,composite);
+    return {ok:true,data:{missionId:activeMissionId}};
+  }
+
+  if(name==="status"){
+    return {
+      ok:true,
+      data:{
+        points,
+        greenScore:greenScore(),
+        claimsToday:claimsToday().length,
+        missionsTotal:missions.length,
+        routeStops:waypoints.length
+      }
+    };
+  }
+
+  if(name==="share"){
+    const scope=args.scope||"route";
+
+    if(scope==="journal"){
+      setTimeout(()=>shareJournalNotes(),250);
+      return {ok:true,data:{scope}};
+    }
+
+    if(!["route","act","trip"].includes(scope))return {ok:false,code:"bad_scope"};
+    setTimeout(()=>shareNative(scope),250);
+    return {ok:true,data:{scope}};
+  }
+
+  if(name==="maps_open"){
+    if(!mapsUrl())return {ok:false,code:"empty_route"};
+    scheduleAracneUiAction(openMaps,composite);
+    return {ok:true,data:{}};
+  }
+
+  return {ok:false,code:"unknown_tool"};
+}
+
+
 window.aracneIntelligenceBridge = {
 
   getLanguage: () => lang,
@@ -2490,6 +2688,11 @@ window.aracneIntelligenceBridge = {
       spokenText:
         resultText
     };
+  },
+
+
+  runTool: async (name, args, context) => {
+    return runAracneTool(name,args,context);
   },
 
 
