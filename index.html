@@ -847,8 +847,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <script src="./aracne-knowledge.js?v=0.8.0"></script>
-  <script src="./aracne-intelligence.js?v=0.8.0"></script>
+  <script src="./aracne-knowledge.js?v=0.9.0"></script>
+  <script src="./aracne-intelligence.js?v=0.9.0"></script>
 
   <script>
   (() => {
@@ -2595,6 +2595,30 @@ window.aracneIntelligenceBridge = {
 
   getKnowledgeSources: id => {
     return window.AracneKnowledgeBase?.sourcesFor?.(id) || [];
+  },
+
+  findTerritories: (text, language) => {
+    return window.AracneKnowledgeBase?.findTerritories?.(text, language) || [];
+  },
+
+  getTerritoryKnowledge: id => {
+    return window.AracneKnowledgeBase?.getTerritory?.(id) || null;
+  },
+
+  getTerritorySources: id => {
+    return window.AracneKnowledgeBase?.territorySourcesFor?.(id) || [];
+  },
+
+  getTerritoryPoiIds: id => {
+    return window.AracneKnowledgeBase?.poisForTerritory?.(id) || [];
+  },
+
+  findExactPlaces: text => {
+    const n=normalizeAssistantText(text);
+    return poiData.filter(place=>{
+      const full=normalizeAssistantText(place.name);
+      return full.length>5 && n.includes(full);
+    });
   },
 
   // Reserved for the future local-business knowledge base.
