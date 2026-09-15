@@ -1814,8 +1814,21 @@
       };
     }
 
-    const placeRequired=analysis.intents.some(x=>["tell","see_place","near_place","add","open"].includes(x));
-    if(placeRequired && !analysis.places.length && !analysis.clarification) {
+    const toolRequests=detectToolRequests(text,language,places);
+
+    // App-level commands such as "open passport" take precedence over the
+    // generic POI "open" verb. Avoid asking "which place?" in that case.
+    if(
+      toolRequests.length
+      &&
+      !places.length
+    ) {
+      const openIndex=cues.findIndex(cue=>cue.name==="open");
+      if(openIndex>=0)cues.splice(openIndex,1);
+    }
+
+    const placeRequired=cues.some(x=>["tell","see_place","near_place","add","open"].includes(x.name));
+    if(placeRequired && !places.length && !analysis.clarification && !toolRequests.length) {
       analysis.clarification={
         type:"place",
         placeIds:[],
@@ -1851,7 +1864,8 @@
       };
     }
 
-    analysis.toolRequests=detectToolRequests(text,language,analysis.places);
+    analysis.intents=cues.map(x=>x.name);
+    analysis.toolRequests=toolRequests;
     analysis.bridgeText=buildBridgeText(text,analysis);
     return analysis;
   }
