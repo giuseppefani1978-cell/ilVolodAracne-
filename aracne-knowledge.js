@@ -714,7 +714,8 @@
             "Porta Rudiae",
             "calles y palacios del centro barroco"
           ]
-        }
+        },
+        "name": "Lecce"
       },
       "otranto": {
         "id": "otranto",
@@ -802,7 +803,8 @@
             "Punta Palascia",
             "Baia dei Turchi y Alimini"
           ]
-        }
+        },
+        "name": "Otranto"
       },
       "gallipoli": {
         "id": "gallipoli",
@@ -878,7 +880,8 @@
             "casco antiguo y puerto",
             "Punta della Suina y costa jónica"
           ]
-        }
+        },
+        "name": "Gallipoli"
       },
       "nardo": {
         "id": "nardo",
@@ -959,7 +962,8 @@
             "Torre dell’Alto y Torre Uluzzo",
             "Santa Maria al Bagno y Santa Caterina"
           ]
-        }
+        },
+        "name": "Nardò"
       },
       "castro": {
         "id": "castro",
@@ -1041,7 +1045,8 @@
             "Castro Marina",
             "Grotta Zinzulusa"
           ]
-        }
+        },
+        "name": "Castro"
       },
       "galatina": {
         "id": "galatina",
@@ -1114,7 +1119,8 @@
             "palacios y balcones históricos",
             "tradición del pasticciotto"
           ]
-        }
+        },
+        "name": "Galatina"
       },
       "copertino": {
         "id": "copertino",
@@ -1183,7 +1189,8 @@
             "Monasterio de Santa Chiara",
             "puertas y plazas históricas"
           ]
-        }
+        },
+        "name": "Copertino"
       },
       "manduria": {
         "id": "manduria",
@@ -1257,7 +1264,8 @@
             "Museo de la Civilización del Vino Primitivo",
             "Salina dei Monaci y Torre Colimena"
           ]
-        }
+        },
+        "name": "Manduria"
       },
       "ostuni": {
         "id": "ostuni",
@@ -1339,7 +1347,8 @@
             "llanura de los olivos",
             "costa y núcleos costeros de Ostuni"
           ]
-        }
+        },
+        "name": "Ostuni"
       }
     }
   };
