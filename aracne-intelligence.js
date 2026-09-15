@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.0";
+  const VERSION = "1.1.1";
 
   const LANGS = [
     "it",
@@ -815,7 +815,7 @@
   }
 
   function activePendingClarification() {
-    const pending=activePendingClarification();
+    const pending=sessionState.pendingClarification;
     if(!pending)return null;
 
     const createdTurn=Number(pending.createdTurn||0);
@@ -915,7 +915,6 @@
   }
 
   function recordConversationTurn(userText,analysis,meta={}) {
-    sessionState.turn+=1;
     sessionState.language=analysis?.language||sessionState.language;
 
     const entityRefs=conversationEntityRefs(analysis);
@@ -3036,7 +3035,7 @@
     return analysis;
   }
 
-  function rememberTurn(analysis, routeInfo=null) {
+  function rememberTurn(userText, analysis, routeInfo=null) {
     sessionState.pendingClarification=null;
     sessionState.turn+=1;
     sessionState.language=analysis.language||sessionState.language;
@@ -3059,6 +3058,8 @@
       sessionState.lastPlaceIds=analysis.places.map(place=>place.id).filter(Boolean);
     }
 
+    let routeSelectedPlaceIds=[];
+
     if(analysis.intents.includes("route")) {
       const originPlaces=
         analysis.targets?.route?.length
@@ -3072,6 +3073,7 @@
 
       const originPlaceIds=originPlaces.map(place=>place.id).filter(Boolean);
       const selectedPlaceIds=selectedPlaces.map(place=>place.id).filter(Boolean);
+      routeSelectedPlaceIds=[...selectedPlaceIds];
 
       sessionState.lastRoute={
         placeIds:[...originPlaceIds],
@@ -3091,6 +3093,15 @@
         sessionState.lastPlaceIds=[selectedPlaceIds[0]];
       }
     }
+
+    recordConversationTurn(userText,analysis,{
+      resultType:analysis.intents.includes("route")?"route":"answer",
+      resultPoiIds:routeSelectedPlaceIds.length
+        ? routeSelectedPlaceIds
+        : [...(sessionState.lastPlaceIds||[])],
+      resultTerritoryId:analysis.territory?.id||sessionState.lastTerritoryId||null,
+      resultIntent:analysis.intents?.[0]||null
+    });
 
     return getContext();
   }
@@ -3386,7 +3397,8 @@
           durationHours:analysis.durationHours,
           themes:[...(analysis.themes||[])],
           mode:analysis.mode||null,
-          language:analysis.language
+          language:analysis.language,
+          createdTurn:sessionState.turn
         };
 
         return {
@@ -3416,7 +3428,8 @@
           sessionState.pendingClarification={
             type:"capability_actions",
             placeIds:[],
-            language:analysis.language
+            language:analysis.language,
+            createdTurn:sessionState.turn
           };
           return {
             ok:false,
@@ -3622,7 +3635,7 @@
         }
       }
 
-      const context=rememberTurn(analysis,routeInfo);
+      const context=rememberTurn(text,analysis,routeInfo);
 
       return {
         ok,
@@ -3809,6 +3822,13 @@
     }
 
 
+    try {
+      bridge?.saveAnswer?.(result);
+    } catch (error) {
+      console.warn("[Aracne] saveAnswer",error);
+    }
+
+
     if (
       options.speak !== false
     ) {
@@ -3817,6 +3837,15 @@
         result.text,
         result.language
       );
+    }
+
+
+    if (options.reveal !== false) {
+      try {
+        bridge?.afterAnswer?.(result);
+      } catch (error) {
+        console.warn("[Aracne] afterAnswer",error);
+      }
     }
 
 
