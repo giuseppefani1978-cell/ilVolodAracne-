@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.9.0";
+  const VERSION = "1.0.0";
 
   const LANGS = [
     "it",
@@ -947,10 +947,73 @@
     return placesByIds(ids);
   }
 
-  function formatTerritoryPoiList(territory,language){
-    const pois=territoryPois(territory).slice(0,8);
-    if(!pois.length)return null;
-    const intro={it:"Luoghi HIRUNDU collegati",fr:"Lieux HIRUNDU liés",en:"Related HIRUNDU places",es:"Lugares HIRUNDU relacionados"}[language]||"HIRUNDU";
+  function territoryFilterTokens(themes=[],aspect=null){
+    const tokens=new Set();
+
+    for(const theme of themes||[]){
+      if(theme==="nature")["nature","wetland","biodiversity","birdlife","woodland","protected-area","landscape","geology","park"].forEach(x=>tokens.add(x));
+      if(theme==="sea")["sea","coast","beach","bay","cove","island","sea-cave","sea-stacks","adriatic","ionian"].forEach(x=>tokens.add(x));
+      if(theme==="culture")["culture","history","archaeology","prehistory","castle","fortification","religious","architecture","coastal-tower","medieval","renaissance","baroque"].forEach(x=>tokens.add(x));
+      if(theme==="food")["food","wine","gastronomy","rural-history"].forEach(x=>tokens.add(x));
+      if(theme==="sunset")["sunset","tramonto"].forEach(x=>tokens.add(x));
+    }
+
+    if(aspect==="history")["history","archaeology","prehistory","castle","fortification","religious","architecture","coastal-tower","medieval","renaissance","baroque"].forEach(x=>tokens.add(x));
+    if(aspect==="nature")["nature","wetland","biodiversity","birdlife","woodland","protected-area","landscape","geology","sea","coast","beach","bay","cove","island","sea-cave"].forEach(x=>tokens.add(x));
+    if(aspect==="myth")["myth","legend"].forEach(x=>tokens.add(x));
+
+    return tokens;
+  }
+
+  function territoryPoiMatches(place,themes=[],aspect=null){
+    const entry=knowledgeEntry(place);
+    const tokens=territoryFilterTokens(themes,aspect);
+    if(!tokens.size)return true;
+
+    const entryThemes=new Set((entry?.themes||[]).map(normalize));
+    const tags=new Set((place?.tags||[]).map(normalize));
+    const cat=normalize(place?.cat||"");
+
+    if(themes.includes("nature") && ["nature","sea"].includes(cat))return true;
+    if(themes.includes("sea") && cat==="sea")return true;
+    if(themes.includes("culture") && cat==="culture")return true;
+    if(themes.includes("food") && cat==="food")return true;
+    if(themes.includes("sunset") && (tags.has("tramonto")||tags.has("sunset")))return true;
+
+    if(aspect==="history" && (cat==="culture" || !!entry?.history))return true;
+    if(aspect==="nature" && (["nature","sea"].includes(cat) || !!entry?.nature))return true;
+    if(aspect==="myth" && !!entry?.myth)return true;
+
+    for(const token of tokens){
+      if(entryThemes.has(normalize(token)) || tags.has(normalize(token)))return true;
+    }
+
+    return false;
+  }
+
+  function formatTerritoryPoiList(territory,language,options={}){
+    const themes=Array.isArray(options.themes)?options.themes:[];
+    const aspect=options.aspect||null;
+    const filtered=territoryPois(territory).filter(place=>territoryPoiMatches(place,themes,aspect));
+    const pois=filtered.slice(0,8);
+
+    if(!pois.length){
+      if(themes.length || ["history","nature","myth"].includes(aspect)){
+        return ({
+          it:"Non ho ancora un POI HIRUNDU collegato che corrisponda esattamente a questo filtro.",
+          fr:"Je n’ai pas encore de POI HIRUNDU lié qui corresponde exactement à ce filtre.",
+          en:"I do not yet have a linked HIRUNDU POI that exactly matches this filter.",
+          es:"Todavía no tengo un POI HIRUNDU vinculado que coincida exactamente con este filtro."
+        })[language]||null;
+      }
+      return null;
+    }
+
+    const filteredLabel=(themes.length || ["history","nature","myth"].includes(aspect));
+    const intro=filteredLabel
+      ? ({it:"Selezione HIRUNDU",fr:"Sélection HIRUNDU",en:"HIRUNDU selection",es:"Selección HIRUNDU"}[language]||"HIRUNDU")
+      : ({it:"Luoghi HIRUNDU collegati",fr:"Lieux HIRUNDU liés",en:"Related HIRUNDU places",es:"Lugares HIRUNDU relacionados"}[language]||"HIRUNDU");
+
     return intro+":\n"+pois.map(function(place){return "• "+placeName(place);}).join("\n");
   }
 
@@ -3311,7 +3374,10 @@
       ) {
         const body=[
           formatTerritoryHighlights(analysis.territory,analysis.language),
-          formatTerritoryPoiList(analysis.territory,analysis.language)
+          formatTerritoryPoiList(analysis.territory,analysis.language,{
+            themes:analysis.themes,
+            aspect:analysis.knowledgeAspect
+          })
         ].filter(Boolean).join("\n\n");
         sections.push(labels.see+" · "+territoryName(analysis.territory)+"\n"+body);
       } else if(analysis.intents.includes("see_place") && seePlaces.length) {
@@ -3337,7 +3403,10 @@
         &&
         !(analysis.specificPlaces?.length)
       ) {
-        const linked=formatTerritoryPoiList(analysis.territory,analysis.language);
+        const linked=formatTerritoryPoiList(analysis.territory,analysis.language,{
+          themes:analysis.themes,
+          aspect:analysis.knowledgeAspect
+        });
         if(linked)sections.push(labels.nearby+" · "+territoryName(analysis.territory)+"\n"+linked);
         actions.push("near_place");
       } else if(analysis.intents.includes("near_place") && nearbyPlaces.length) {
@@ -4065,6 +4134,10 @@
 
     territoryForPoi: id => {
       try{return window.AracneKnowledgeBase?.territoryForPoi?.(id)||null;}catch(error){return null;}
+    },
+
+    knowledgeQuality: id => {
+      try{return window.AracneKnowledgeBase?.quality?.(id)||null;}catch(error){return null;}
     },
 
     context: getContext,
