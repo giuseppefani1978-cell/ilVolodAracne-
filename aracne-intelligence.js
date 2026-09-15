@@ -1817,14 +1817,24 @@
     const toolRequests=detectToolRequests(text,language,places);
 
     // App-level commands such as "open passport" take precedence over the
-    // generic POI "open" verb. Avoid asking "which place?" in that case.
+    // generic POI "open" verb when that verb has no POI target of its own.
     if(
       toolRequests.length
       &&
-      !places.length
+      !(analysis.targets?.open?.length)
     ) {
       const openIndex=cues.findIndex(cue=>cue.name==="open");
       if(openIndex>=0)cues.splice(openIndex,1);
+    }
+
+    // Route mutation tools must not accidentally trigger route creation just
+    // because the sentence also contains the noun "route/parcours".
+    const mutatesRoute=toolRequests.some(request=>
+      ["route_remove","route_clear","route_mode"].includes(request.name)
+    );
+    if(mutatesRoute && routeVerbPos<0) {
+      const routeIndex=cues.findIndex(cue=>cue.name==="route");
+      if(routeIndex>=0)cues.splice(routeIndex,1);
     }
 
     const placeRequired=cues.some(x=>["tell","see_place","near_place","add","open"].includes(x.name));
