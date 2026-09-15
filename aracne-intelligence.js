@@ -868,7 +868,7 @@
       myth:["mito","leggenda","tradizione","enea","racconto mitologico"],
       nature:["natura","biodiversita","fauna","flora","ambiente","geologia","paesaggio"],
       practical:["si puo visitare","posso visitare","come si visita","accesso","orari","biglietti","prenotazione"],
-      why:["perche si chiama","perche questo nome","origine del nome","significato del nome"],
+      why:["perche si chiama","si chiama","perche questo nome","origine del nome","significato del nome"],
       sources:["fonti","fonte","da dove lo sai","come lo sai","quali sono le fonti"]
     },
     fr:{
@@ -876,7 +876,7 @@
       myth:["mythe","legende","tradition","enee","recit mythologique"],
       nature:["nature","biodiversite","faune","flore","environnement","geologie","paysage"],
       practical:["est ce qu on peut visiter","peut on visiter","comment visiter","acces","horaires","billets","reservation"],
-      why:["pourquoi ca s appelle","pourquoi ce nom","origine du nom","signification du nom"],
+      why:["pourquoi ca s appelle","s appelle","pourquoi ce nom","origine du nom","signification du nom"],
       sources:["sources","source","d ou tu sais ca","comment tu sais","quelles sont tes sources"]
     },
     en:{
@@ -884,7 +884,7 @@
       myth:["myth","legend","tradition","aeneas","mythological story"],
       nature:["nature","biodiversity","fauna","flora","environment","geology","landscape"],
       practical:["can i visit","can we visit","how to visit","access","opening hours","tickets","booking"],
-      why:["why is it called","why this name","origin of the name","meaning of the name"],
+      why:["why is it called","called that","called this","why this name","origin of the name","meaning of the name"],
       sources:["sources","source","how do you know","where do you know that from","what are your sources"]
     },
     es:{
@@ -892,7 +892,7 @@
       myth:["mito","leyenda","tradicion","eneas","relato mitologico"],
       nature:["naturaleza","biodiversidad","fauna","flora","medio ambiente","geologia","paisaje"],
       practical:["se puede visitar","puedo visitar","como visitar","acceso","horarios","entradas","reserva"],
-      why:["por que se llama","por que este nombre","origen del nombre","significado del nombre"],
+      why:["por que se llama","se llama","por que este nombre","origen del nombre","significado del nombre"],
       sources:["fuentes","fuente","como lo sabes","de donde lo sabes","cuales son tus fuentes"]
     }
   };
@@ -956,10 +956,20 @@
     })[language]||{};
   }
 
+  function noVerifiedAspect(aspect,language){
+    const labels=knowledgeLabels(language);
+    const name=labels[aspect]||aspect;
+    return ({
+      it:"Non ho ancora una scheda locale verificata per questo aspetto ("+name+"). Posso però usare le informazioni generali già curate sul luogo.",
+      fr:"Je n’ai pas encore de fiche locale vérifiée pour cet aspect ("+name+"). Je peux toutefois utiliser les informations générales déjà vérifiées sur ce lieu.",
+      en:"I do not yet have a verified local record for this aspect ("+name+"). I can still use the general curated information for this place.",
+      es:"Todavía no tengo una ficha local verificada para este aspecto ("+name+"). Aun así puedo utilizar la información general ya verificada sobre este lugar."
+    })[language];
+  }
   function formatKnowledgeSources(place,language){
     const sources=knowledgeSources(place);
     const labels=knowledgeLabels(language);
-    if(!sources.length)return null;
+    if(!sources.length)return noVerifiedAspect("sources",language);
     return labels.sources+":\n"+sources.slice(0,4).map(function(source){
       const label=source.publisher||source.title||source.id;
       const suffix=(source.title&&source.publisher)?" — "+source.title:"";
@@ -982,6 +992,7 @@
     if(aspect){
       const value=localizedKnowledge(entry,aspect,language);
       if(value)return (labels[aspect]||"Info")+":\n"+value;
+      return noVerifiedAspect(aspect,language);
     }
     const summary=localizedKnowledge(entry,"summary",language);
     const history=localizedKnowledge(entry,"history",language);
