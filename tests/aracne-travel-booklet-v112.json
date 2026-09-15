@@ -1,0 +1,44 @@
+{
+  "version": "1.1.2",
+  "purpose": "Protect the travel-booklet memory and acquisition footer in all sharing flows.",
+  "cases": [
+    {
+      "id": "aracne-answers-persist-in-booklet",
+      "expect": [
+        "Aracne answers are automatically saved in the local travel booklet",
+        "saved entries retain language, timestamp and available territory/POI/route context",
+        "closing the assistant does not remove the saved answer"
+      ]
+    },
+    {
+      "id": "mixed-booklet-entries",
+      "expect": [
+        "the booklet can contain Aracne answers and user notes",
+        "entry count uses generic entry wording rather than note-only wording"
+      ]
+    },
+    {
+      "id": "share-footer-route-trip-booklet",
+      "expect": [
+        "route shares contain the app open/install footer",
+        "trip shares contain the app open/install footer",
+        "booklet shares contain the app open/install footer"
+      ]
+    },
+    {
+      "id": "share-footer-assistant-and-photo",
+      "expect": [
+        "assistant answer shares contain the app open/install footer",
+        "photo shares contain the app open/install footer",
+        "mission photo shares contain the app open/install footer"
+      ]
+    },
+    {
+      "id": "public-url-is-dynamic",
+      "expect": [
+        "the share footer uses the current public app URL or canonical URL",
+        "no fake App Store or Google Play URL is claimed"
+      ]
+    }
+  ]
+}
