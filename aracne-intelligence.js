@@ -944,7 +944,7 @@
         cycling:["metti il percorso in bici","passa alla bici","usa la bici per il percorso"],
         driving:["metti il percorso in auto","passa all auto","usa auto per il percorso","usa lo scooter per il percorso"]
       },
-      missionsOpen:["mostra le missioni","apri le missioni"],
+      missionsOpen:["mostra le missioni","mostra le mie missioni","apri le missioni","apri le mie missioni"],
       missionOpen:["apri la missione","mostra la missione","vai alla missione"],
       qrOpen:["apri il qr","mostra il qr","qr della missione","scansiona il qr"],
       status:["quanti punti","i miei punti","mostra i punti","filo verde","il mio filo verde","punteggio filo verde"],
@@ -973,7 +973,7 @@
         cycling:["mets le parcours a velo","passe en velo","fais le parcours a velo"],
         driving:["mets le parcours en voiture","passe en voiture","fais le parcours en voiture","passe en scooter"]
       },
-      missionsOpen:["montre les missions","ouvre les missions"],
+      missionsOpen:["montre les missions","montre mes missions","ouvre les missions","ouvre mes missions"],
       missionOpen:["ouvre la mission","montre la mission","va sur la mission"],
       qrOpen:["ouvre le qr","montre le qr","qr de la mission","scanne le qr"],
       status:["combien de points","mes points","montre mes points","filo verde","mon filo verde","score filo verde"],
@@ -1002,7 +1002,7 @@
         cycling:["set the route to cycling","switch to bike","make the route cycling"],
         driving:["set the route to driving","switch to car","make the route driving","switch to scooter"]
       },
-      missionsOpen:["show missions","open missions"],
+      missionsOpen:["show missions","show my missions","open missions","open my missions"],
       missionOpen:["open the mission","show the mission","go to the mission"],
       qrOpen:["open the qr","show the qr","mission qr","scan the qr"],
       status:["how many points","my points","show my points","filo verde","my filo verde","filo verde score"],
@@ -1031,7 +1031,7 @@
         cycling:["pon la ruta en bici","cambia a bici","haz la ruta en bici"],
         driving:["pon la ruta en coche","cambia a coche","haz la ruta en coche","cambia a scooter"]
       },
-      missionsOpen:["muestra las misiones","abre las misiones"],
+      missionsOpen:["muestra las misiones","muestra mis misiones","abre las misiones","abre mis misiones"],
       missionOpen:["abre la mision","muestra la mision","ve a la mision"],
       qrOpen:["abre el qr","muestra el qr","qr de la mision","escanea el qr"],
       status:["cuantos puntos","mis puntos","muestra mis puntos","filo verde","mi filo verde","puntuacion filo verde"],
@@ -1163,7 +1163,12 @@
 
     pos=earliestMatch(n,r.routeRemove||[]);
     if(pos>=0 && places.length){
-      add("route_remove",{placeIds:places.map(p=>p.id).filter(Boolean)},pos);
+      const afterCommand=places.filter(place=>{
+        const placePos=findPlacePosition(n,place);
+        return placePos>=pos;
+      });
+      const targets=afterCommand.length?afterCommand:places;
+      add("route_remove",{placeIds:targets.map(p=>p.id).filter(Boolean)},pos);
     }
 
     for(const [mode,phrases] of Object.entries(r.routeMode||{})){
@@ -1724,6 +1729,53 @@
       }
     }
 
+    const toolRequests=detectToolRequests(text,language,places);
+
+    // App navigation/modal tools take precedence over the generic POI "open"
+    // intent when there is no explicit POI target for that open clause.
+    const appUiTool=toolRequests.some(request=>
+      ["navigate","journal_open","mission_open","qr_open","maps_open"].includes(request.name)
+    );
+    if(appUiTool && !(analysis.targets?.open?.length)) {
+      const openIndex=cues.findIndex(cue=>cue.name==="open");
+      if(openIndex>=0)cues.splice(openIndex,1);
+    }
+
+    // Commands that operate on the CURRENT route must not be reinterpreted
+    // as requests to CREATE a new route merely because they contain
+    // "route / parcours / percorso / ruta".
+    const routeUtility=toolRequests.some(request=>
+      ["route_remove","route_clear","route_mode","maps_open"].includes(request.name)
+      ||
+      (request.name==="share" && request.args?.scope==="route")
+      ||
+      (request.name==="navigate" && request.args?.sheet==="routes")
+    );
+    if(routeUtility && routeVerbPos<0) {
+      const routeIndex=cues.findIndex(cue=>cue.name==="route");
+      if(routeIndex>=0)cues.splice(routeIndex,1);
+    }
+
+    // "Mets le parcours à vélo" uses "mets", which is also an old synonym
+    // for adding a POI. The structured mode tool wins.
+    if(toolRequests.some(request=>request.name==="route_mode")) {
+      const addIndex=cues.findIndex(cue=>cue.name==="add");
+      if(addIndex>=0)cues.splice(addIndex,1);
+    }
+
+    // A journal command mentioning a place should save the note, not
+    // automatically turn into "tell me about that place".
+    if(
+      toolRequests.some(request=>request.name==="journal_save")
+      &&
+      earliestMatch(n,l.tell)<0
+    ) {
+      const tellIndex=cues.findIndex(cue=>cue.name==="tell");
+      if(tellIndex>=0)cues.splice(tellIndex,1);
+    }
+
+    analysis.intents=cues.map(x=>x.name);
+
     if(resolvedPending?.places?.length) {
       analysis.targets.route=[...resolvedPending.places];
       analysis.resolvedClarification=resolvedPending.type;
@@ -1812,29 +1864,6 @@
         placeIds:routeTargets.map(place=>place.id),
         text:contextText(language,"clarifyOrigin",routeTargets.slice(0,3).map(placeName))
       };
-    }
-
-    const toolRequests=detectToolRequests(text,language,places);
-
-    // App-level commands such as "open passport" take precedence over the
-    // generic POI "open" verb when that verb has no POI target of its own.
-    if(
-      toolRequests.length
-      &&
-      !(analysis.targets?.open?.length)
-    ) {
-      const openIndex=cues.findIndex(cue=>cue.name==="open");
-      if(openIndex>=0)cues.splice(openIndex,1);
-    }
-
-    // Route mutation tools must not accidentally trigger route creation just
-    // because the sentence also contains the noun "route/parcours".
-    const mutatesRoute=toolRequests.some(request=>
-      ["route_remove","route_clear","route_mode"].includes(request.name)
-    );
-    if(mutatesRoute && routeVerbPos<0) {
-      const routeIndex=cues.findIndex(cue=>cue.name==="route");
-      if(routeIndex>=0)cues.splice(routeIndex,1);
     }
 
     const placeRequired=cues.some(x=>["tell","see_place","near_place","add","open"].includes(x.name));
