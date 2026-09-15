@@ -947,7 +947,7 @@
       missionsOpen:["mostra le missioni","mostra le mie missioni","apri le missioni","apri le mie missioni"],
       missionOpen:["apri la missione","mostra la missione","vai alla missione"],
       qrOpen:["apri il qr","mostra il qr","qr della missione","scansiona il qr"],
-      status:["quanti punti","i miei punti","mostra i punti","filo verde","il mio filo verde","punteggio filo verde"],
+      status:["quanti punti","i miei punti","mostra i punti","mostra il mio filo verde","filo verde","il mio filo verde","punteggio filo verde"],
       share:{
         route:["condividi il percorso","condividi il mio percorso"],
         act:["condividi le missioni","condividi i punti","condividi il filo verde"],
@@ -976,7 +976,7 @@
       missionsOpen:["montre les missions","montre mes missions","ouvre les missions","ouvre mes missions"],
       missionOpen:["ouvre la mission","montre la mission","va sur la mission"],
       qrOpen:["ouvre le qr","montre le qr","qr de la mission","scanne le qr"],
-      status:["combien de points","mes points","montre mes points","filo verde","mon filo verde","score filo verde"],
+      status:["combien de points","mes points","montre mes points","montre mon filo verde","quel est mon filo verde","filo verde","mon filo verde","score filo verde"],
       share:{
         route:["partage le parcours","partage mon parcours"],
         act:["partage les missions","partage mes points","partage le filo verde"],
@@ -1005,7 +1005,7 @@
       missionsOpen:["show missions","show my missions","open missions","open my missions"],
       missionOpen:["open the mission","show the mission","go to the mission"],
       qrOpen:["open the qr","show the qr","mission qr","scan the qr"],
-      status:["how many points","my points","show my points","filo verde","my filo verde","filo verde score"],
+      status:["how many points","my points","show my points","show my filo verde","filo verde","my filo verde","filo verde score"],
       share:{
         route:["share the route","share my route"],
         act:["share missions","share my points","share filo verde"],
@@ -1034,7 +1034,7 @@
       missionsOpen:["muestra las misiones","muestra mis misiones","abre las misiones","abre mis misiones"],
       missionOpen:["abre la mision","muestra la mision","ve a la mision"],
       qrOpen:["abre el qr","muestra el qr","qr de la mision","escanea el qr"],
-      status:["cuantos puntos","mis puntos","muestra mis puntos","filo verde","mi filo verde","puntuacion filo verde"],
+      status:["cuantos puntos","mis puntos","muestra mis puntos","muestra mi filo verde","filo verde","mi filo verde","puntuacion filo verde"],
       share:{
         route:["comparte la ruta","comparte mi ruta"],
         act:["comparte las misiones","comparte mis puntos","comparte filo verde"],
@@ -1731,14 +1731,38 @@
 
     const toolRequests=detectToolRequests(text,language,places);
 
-    // App navigation/modal tools take precedence over the generic POI "open"
-    // intent when there is no explicit POI target for that open clause.
-    const appUiTool=toolRequests.some(request=>
-      ["navigate","journal_open","mission_open","qr_open","maps_open"].includes(request.name)
-    );
-    if(appUiTool && !(analysis.targets?.open?.length)) {
-      const openIndex=cues.findIndex(cue=>cue.name==="open");
-      if(openIndex>=0)cues.splice(openIndex,1);
+    // Structured tool positions act as clause boundaries for conversational
+    // intents. This prevents a later tool target from leaking into an earlier
+    // "tell me about..." clause.
+    for(const cue of cues) {
+      const laterToolPositions=toolRequests
+        .map(request=>request.pos)
+        .filter(pos=>pos>cue.pos)
+        .sort((a,b)=>a-b);
+
+      if(!laterToolPositions.length)continue;
+      const boundary=laterToolPositions[0];
+      const currentTargets=analysis.targets?.[cue.name]||[];
+
+      if(currentTargets.length) {
+        const scoped=currentTargets.filter(place=>{
+          const pos=findPlacePosition(n,place);
+          return pos>=cue.pos && pos<boundary;
+        });
+
+        if(scoped.length)analysis.targets[cue.name]=scoped;
+      }
+    }
+
+    // If the old generic "open/show" cue starts at the same point as a
+    // structured app tool ("open passport", "show my Filo Verde", etc.),
+    // the structured tool owns that verb. A separate earlier "open Otranto"
+    // remains a POI action.
+    const openIndex=cues.findIndex(cue=>cue.name==="open");
+    if(openIndex>=0) {
+      const openCue=cues[openIndex];
+      const sameTool=toolRequests.some(request=>Math.abs(request.pos-openCue.pos)<=2);
+      if(sameTool)cues.splice(openIndex,1);
     }
 
     // Commands that operate on the CURRENT route must not be reinterpreted
