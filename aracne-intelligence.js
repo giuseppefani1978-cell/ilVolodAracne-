@@ -1434,11 +1434,9 @@
 
     if(pendingCapability) {
       if(explicitSection==="act" || hasAny(n,rules.actions||[])) {
-        sessionState.pendingClarification=null;
         return {type:"section",section:"act",reason:"capability_followup_act"};
       }
       if(hasAny(n,rules.wholeApp||[]) || hasAny(n,rules.general||[])) {
-        sessionState.pendingClarification=null;
         return {type:"overview",section:null,reason:"capability_followup_app"};
       }
     }
@@ -2968,6 +2966,9 @@
         &&
         !(analysis.toolRequests?.length)
       ) {
+        if(String(analysis.capabilityQuery.reason||"").startsWith("capability_followup_")) {
+          sessionState.pendingClarification=null;
+        }
         if(analysis.capabilityQuery.type==="ambiguous_actions") {
           sessionState.language=analysis.language||sessionState.language;
           sessionState.pendingClarification={
