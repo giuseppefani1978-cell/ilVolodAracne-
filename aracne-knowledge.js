@@ -2,7 +2,7 @@
   "use strict";
 
   const DATA = {
-    "version": "0.9.0",
+    "version": "1.0.0",
     "updated": "2026-09-15",
     "languages": [
       "it",
@@ -18,7 +18,13 @@
         "curated-tourism"
       ],
       "dynamicFacts": "Opening hours, prices, events and temporary access conditions must be treated as volatile and verified before being presented as current.",
-      "legendRule": "Myths and traditions are explicitly labelled as such and are never presented as established historical fact."
+      "legendRule": "Myths and traditions are explicitly labelled as such and are never presented as established historical fact.",
+      "coverage": "All 50 HIRUNDU POIs have a knowledge record. Records marked legacy-pending are intentionally cautious until the inherited POI label is field-verified.",
+      "qualityLevels": {
+        "high": "Specific institutional/official or high-quality territorial source supports the POI.",
+        "medium": "Reliable territorial source supports the place and its core characteristics.",
+        "legacy-pending": "POI retained for app compatibility, but exact inherited label or historical identification still requires verification."
+      }
     },
     "sources": {
       "italia-otranto-castle": {
@@ -128,6 +134,186 @@
         "publisher": "Italia.it",
         "type": "official-tourism",
         "url": "https://www.italia.it/en/puglia/brindisi/ostuni"
+      },
+      "visitpuglia-otranto-guide": {
+        "title": "Otranto: what to do and see, beaches, nature, history",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/en/otranto"
+      },
+      "visitpuglia-bauxite": {
+        "title": "Cava di Bauxite Otranto",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/it/cava-di-bauxite"
+      },
+      "italia-palascia": {
+        "title": "Faro di Punta Palascìa",
+        "publisher": "Italia.it",
+        "type": "official-tourism",
+        "url": "https://www.italia.it/fr/pouilles/otranto/phare-de-punta-palascia"
+      },
+      "parco-otranto-leuca-itinerari": {
+        "title": "Itinerari nel Parco Costa Otranto – Santa Maria di Leuca e Bosco di Tricase",
+        "publisher": "Parco Naturale Regionale Costa Otranto – Santa Maria di Leuca e Bosco di Tricase",
+        "type": "protected-area",
+        "url": "https://www.sentierinelparco.it/gli-itinerari/"
+      },
+      "parco-otranto-leuca-comuni": {
+        "title": "I comuni del Parco",
+        "publisher": "Parco Naturale Regionale Costa Otranto – Santa Maria di Leuca e Bosco di Tricase",
+        "type": "protected-area",
+        "url": "https://www.parcootrantoleuca.it/pagina191381_i-comuni-del-parco.html"
+      },
+      "italia-cammino-salento": {
+        "title": "Cammino del Salento: da Lecce a Leuca",
+        "publisher": "Italia.it",
+        "type": "official-tourism",
+        "url": "https://www.italia.it/it/puglia/cosa-fare/cammino-salento-6-tappe-lecce-leuca"
+      },
+      "visitpuglia-portomiggiano": {
+        "title": "Porto Miggiano",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/en/porto-miggiano-beach"
+      },
+      "italia-santacesarea": {
+        "title": "Santa Cesarea Terme",
+        "publisher": "Italia.it",
+        "type": "official-tourism",
+        "url": "https://www.italia.it/fr/pouilles/santa-cesarea-terme"
+      },
+      "tourpuglia-acquaviva": {
+        "title": "Cala dell'Acquaviva",
+        "publisher": "TourPuglia",
+        "type": "curated-tourism",
+        "url": "https://tour.puglia.it/en/things-to-see/provincia-di-lecce/comuni/diso/beaches/cala-dellacquaviva"
+      },
+      "tricase-caprarica": {
+        "title": "Caprarica del Capo",
+        "publisher": "Tricase Destinazione Autentica",
+        "type": "institutional-tourism",
+        "url": "https://tricaseautentica.it/caprarica-del-capo/"
+      },
+      "visitpuglia-leuca": {
+        "title": "Santa Maria di Leuca",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/en/santa-maria-di-leuca"
+      },
+      "ugento-park": {
+        "title": "Parco Naturale Regionale Litorale di Ugento",
+        "publisher": "Parco Naturale Regionale Litorale di Ugento / Comune di Ugento",
+        "type": "protected-area",
+        "url": "https://www.parcolitoralediugento.it/"
+      },
+      "gallipoli-park": {
+        "title": "Parco naturale regionale Isola di S. Andrea e litorale di Punta Pizzo",
+        "publisher": "Comune di Gallipoli",
+        "type": "institutional",
+        "url": "https://www.comune.gallipoli.le.it/item/parco-naturale-regionale-isola-di-s-andrea-e-litorale-di-punta-pizzo"
+      },
+      "visitgallipoli-puntasuina": {
+        "title": "Punta della Suina",
+        "publisher": "Visit Gallipoli",
+        "type": "curated-tourism",
+        "url": "https://www.visit-gallipoli.com/en/spiagge/punta-della-suina/"
+      },
+      "visitnardo-marinas": {
+        "title": "Marinas: Santa Maria al Bagno, Santa Caterina, Sant'Isidoro",
+        "publisher": "Visit Nardò / Comune di Nardò",
+        "type": "institutional-tourism",
+        "url": "https://www.visitnardo.it/en/beauty/points-of-interest/marinas"
+      },
+      "visitnardo-fiume": {
+        "title": "Torre del Fiume - Quattro Colonne",
+        "publisher": "Visit Nardò / Comune di Nardò",
+        "type": "institutional-tourism",
+        "url": "https://www.visitnardo.it/en/beauty/points-of-interest/river-towers/204-torre-del-fiume-quattro-colonne-en"
+      },
+      "visitnardo-uluzzo": {
+        "title": "Torre Uluzzo",
+        "publisher": "Visit Nardò / Comune di Nardò",
+        "type": "institutional-tourism",
+        "url": "https://www.visitnardo.it/en/beauty/points-of-interest/river-towers/207-torre-uluzzo-en"
+      },
+      "visitnardo-park": {
+        "title": "Porto Selvaggio Park and Palude del Capitano",
+        "publisher": "Visit Nardò / Comune di Nardò",
+        "type": "institutional-tourism",
+        "url": "https://www.visitnardo.it/en/beauty/157-thematic-itineraries/in-contact-with-nature/228-porto-selvaggio-park-and-palude-del-capitano"
+      },
+      "visitnardo-santacaterina": {
+        "title": "Santa Caterina Tower",
+        "publisher": "Visit Nardò / Comune di Nardò",
+        "type": "institutional-tourism",
+        "url": "https://www.visitnardo.it/en/beauty/points-of-interest/river-towers/205-santa-caterina-tower"
+      },
+      "visitpuglia-portocesareo": {
+        "title": "Porto Cesareo",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/en/porto-cesareo"
+      },
+      "portocesareo-torri": {
+        "title": "Le Torri Costiere di Porto Cesareo",
+        "publisher": "Visita Porto Cesareo",
+        "type": "curated-tourism",
+        "url": "https://www.visitaportocesareo.it/torri-costiere/"
+      },
+      "portocesareo-conigli": {
+        "title": "Isola dei Conigli / Isola Grande",
+        "publisher": "Visita Porto Cesareo",
+        "type": "curated-tourism",
+        "url": "https://www.visitaportocesareo.it/isola-dei-conigli/"
+      },
+      "visitmelendugno": {
+        "title": "Visit Melendugno",
+        "publisher": "Comune di Melendugno",
+        "type": "institutional-tourism",
+        "url": "https://www.visitmelendugno.com/"
+      },
+      "visitmelendugno-poi": {
+        "title": "Punti di Interesse",
+        "publisher": "Comune di Melendugno",
+        "type": "institutional-tourism",
+        "url": "https://www.visitmelendugno.com/lista/punti-interesse/"
+      },
+      "visitpuglia-poesia": {
+        "title": "Grotta della Poesia",
+        "publisher": "Visit Puglia",
+        "type": "curated-tourism",
+        "url": "https://visit.puglia.it/en/cave-of-poetry"
+      },
+      "torcito-official": {
+        "title": "Parco Torcito",
+        "publisher": "Parco Torcito",
+        "type": "institutional-tourism",
+        "url": "https://www.parcotorcito.com/en/"
+      },
+      "copertino-grottella": {
+        "title": "Santuario della Grottella",
+        "publisher": "Comune di Copertino",
+        "type": "institutional",
+        "url": "https://www.comune.copertino.le.it/vivere-il-comune/luoghi/santuario-della-grottella/"
+      },
+      "manduria-salina": {
+        "title": "Salina dei Monaci",
+        "publisher": "Visit Manduria",
+        "type": "institutional-tourism",
+        "url": "https://visitmanduria.it/en/listing-category/cosa-vedere/148-salina-dei-monaci"
+      },
+      "mic-rudiae": {
+        "title": "Rudiae e il suo anfiteatro",
+        "publisher": "Ministero della Cultura",
+        "type": "institutional",
+        "url": "https://cultura.gov.it/evento/gep-2024-rudiae-e-il-suo-anfiteatro"
+      },
+      "otranto-cathedral": {
+        "title": "Cattedrale di Santa Maria Annunziata",
+        "publisher": "Otranto Welcome",
+        "type": "institutional-tourism",
+        "url": "https://www.otrantowelcome.it/en/punti-di-interesse/cattedrale-di-santa-maria-annunziata"
       }
     },
     "entries": {
@@ -180,7 +366,11 @@
             "tres torres cilíndricas angulares",
             "bastiones y escudos monumentales"
           ]
-        }
+        },
+        "territoryIds": [
+          "otranto"
+        ],
+        "verificationStatus": "verified"
       },
       "badisco": {
         "poiId": "badisco",
@@ -238,7 +428,11 @@
             "snorkel y mar",
             "senderismo costero"
           ]
-        }
+        },
+        "territoryIds": [
+          "otranto"
+        ],
+        "verificationStatus": "verified"
       },
       "cervi": {
         "poiId": "cervi",
@@ -294,7 +488,11 @@
             "escenas de caza",
             "símbolos y motivos geométricos"
           ]
-        }
+        },
+        "territoryIds": [
+          "otranto"
+        ],
+        "verificationStatus": "verified"
       },
       "zinzulusa": {
         "poiId": "zinzulusa",
@@ -354,7 +552,11 @@
             "lago Cocito",
             "formaciones llamadas «zinzuli»"
           ]
-        }
+        },
+        "territoryIds": [
+          "castro"
+        ],
+        "verificationStatus": "verified"
       },
       "cesine": {
         "poiId": "cesine",
@@ -411,7 +613,11 @@
             "orquídeas silvestres",
             "pinar y matorral mediterráneo"
           ]
-        }
+        },
+        "territoryIds": [
+          "vernole"
+        ],
+        "verificationStatus": "verified"
       },
       "alto": {
         "poiId": "alto",
@@ -468,7 +674,11 @@
             "senderos en el pinar",
             "paisaje kárstico y marino"
           ]
-        }
+        },
+        "territoryIds": [
+          "nardo"
+        ],
+        "verificationStatus": "verified"
       },
       "cerrate": {
         "poiId": "cerrate",
@@ -529,7 +739,11 @@
             "almazaras subterráneas",
             "herencia del rito griego"
           ]
-        }
+        },
+        "territoryIds": [
+          "lecce"
+        ],
+        "verificationStatus": "verified"
       },
       "copertino": {
         "poiId": "copertino",
@@ -585,7 +799,11 @@
           "fr": "Horaires, jours d’ouverture et tarifs sont des données dynamiques : ARACNE doit renvoyer à la source officielle du ministère italien de la Culture pour l’information à jour.",
           "en": "Opening times, days and ticket prices are dynamic data: ARACNE should refer to the official Italian Ministry of Culture source for current information.",
           "es": "Los horarios, días de apertura y precios son datos dinámicos: ARACNE debe remitir a la fuente oficial del Ministerio de Cultura italiano para la información actualizada."
-        }
+        },
+        "territoryIds": [
+          "copertino"
+        ],
+        "verificationStatus": "verified"
       },
       "galatina": {
         "poiId": "galatina",
@@ -635,6 +853,1925 @@
             "fachada románica",
             "rosetón y portal esculpido",
             "ángeles músicos e instrumentos medievales"
+          ]
+        },
+        "territoryIds": [
+          "galatina"
+        ],
+        "verificationStatus": "verified"
+      },
+      "lecce": {
+        "poiId": "lecce",
+        "territoryIds": [
+          "lecce"
+        ],
+        "confidence": "legacy-pending",
+        "verificationStatus": "legacy-pending",
+        "themes": [
+          "culture",
+          "historic-centre"
+        ],
+        "sourceIds": [
+          "italia-lecce-city"
+        ],
+        "summary": {
+          "it": "Questo POI culturale è collocato nel centro di Lecce, ma l’intitolazione ereditata «Basilica di S.M. Annunziata, Lecce» richiede una verifica puntuale prima di associarle una storia monumentale specifica.",
+          "fr": "Ce POI culturel est situé dans le centre de Lecce, mais l’intitulé hérité « Basilica di S.M. Annunziata, Lecce » doit être vérifié avant de lui attribuer une histoire monumentale précise.",
+          "en": "This cultural POI is located in central Lecce, but the inherited label “Basilica di S.M. Annunziata, Lecce” needs verification before attaching a specific monument history to it.",
+          "es": "Este POI cultural está situado en el centro de Lecce, pero la etiqueta heredada «Basilica di S.M. Annunziata, Lecce» debe verificarse antes de atribuirle una historia monumental concreta."
+        },
+        "highlights": {
+          "it": [
+            "centro storico di Lecce"
+          ],
+          "fr": [
+            "centre historique de Lecce"
+          ],
+          "en": [
+            "Lecce historic centre"
+          ],
+          "es": [
+            "centro histórico de Lecce"
+          ]
+        },
+        "notes": "Inherited POI label needs review; do not silently identify it with a different church."
+      },
+      "bauxite": {
+        "poiId": "bauxite",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "nature",
+          "geology",
+          "industrial-history"
+        ],
+        "sourceIds": [
+          "visitpuglia-bauxite",
+          "italia-cammino-salento"
+        ],
+        "summary": {
+          "it": "La cava di bauxite a sud di Otranto è un’ex area estrattiva divenuta celebre per il contrasto fra la terra rosso-corallo e il piccolo lago verde formatosi nel fondo della cava.",
+          "fr": "La carrière de bauxite au sud d’Otranto est une ancienne zone d’extraction devenue célèbre pour le contraste entre la terre rouge-corail et le petit lac vert formé au fond.",
+          "en": "The bauxite quarry south of Otranto is a former extraction site famous for the contrast between coral-red earth and the small green lake formed in the pit.",
+          "es": "La cantera de bauxita al sur de Otranto es una antigua zona de extracción famosa por el contraste entre la tierra rojo coral y el pequeño lago verde formado en el fondo."
+        },
+        "history": {
+          "it": "L’estrazione della bauxite interessò il sito soprattutto tra gli anni Sessanta e la metà degli anni Settanta; il paesaggio attuale è il risultato della dismissione e della successiva rinaturalizzazione spontanea.",
+          "fr": "L’extraction de bauxite a surtout concerné le site entre les années 1960 et le milieu des années 1970 ; le paysage actuel résulte de l’abandon du site et de sa renaturalisation spontanée.",
+          "en": "Bauxite extraction mainly affected the site from the 1960s to the mid-1970s; today’s landscape results from abandonment and spontaneous renaturalisation.",
+          "es": "La extracción de bauxita afectó principalmente al lugar entre los años sesenta y mediados de los setenta; el paisaje actual es fruto del abandono y la renaturalización espontánea."
+        },
+        "highlights": {
+          "it": [
+            "terre rosso-corallo",
+            "laghetto verde",
+            "trekking verso Punta Palascia"
+          ],
+          "fr": [
+            "terres rouge-corail",
+            "petit lac vert",
+            "randonnée vers Punta Palascia"
+          ],
+          "en": [
+            "coral-red earth",
+            "green lake",
+            "walks toward Punta Palascia"
+          ],
+          "es": [
+            "tierra rojo coral",
+            "pequeño lago verde",
+            "senderos hacia Punta Palascia"
+          ]
+        }
+      },
+      "palascia": {
+        "poiId": "palascia",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "lighthouse",
+          "landscape",
+          "adriatic"
+        ],
+        "sourceIds": [
+          "italia-palascia"
+        ],
+        "summary": {
+          "it": "Punta Palascìa, o Capo d’Otranto, è il punto più orientale d’Italia; il faro domina il Canale d’Otranto e uno dei paesaggi costieri più simbolici del Salento.",
+          "fr": "Punta Palascìa, ou Cap d’Otrante, est le point le plus oriental d’Italie ; le phare domine le canal d’Otrante et l’un des paysages côtiers les plus symboliques du Salento.",
+          "en": "Punta Palascìa, or Capo d’Otranto, is Italy’s easternmost point; its lighthouse overlooks the Otranto Channel and one of Salento’s most emblematic coastal landscapes.",
+          "es": "Punta Palascìa, o Cabo de Otranto, es el punto más oriental de Italia; su faro domina el canal de Otranto y uno de los paisajes costeros más emblemáticos del Salento."
+        },
+        "history": {
+          "it": "Il faro fu eretto nel 1867, rimase inattivo per un periodo nel Novecento e venne recuperato e riacceso negli anni Duemila.",
+          "fr": "Le phare fut érigé en 1867, resta inactif pendant une période du XXe siècle puis fut restauré et rallumé dans les années 2000.",
+          "en": "The lighthouse was built in 1867, remained inactive for a period in the 20th century and was restored and relit in the 2000s.",
+          "es": "El faro fue construido en 1867, permaneció inactivo durante un periodo del siglo XX y fue restaurado y reencendido en los años 2000."
+        },
+        "highlights": {
+          "it": [
+            "prima alba simbolica d’Italia",
+            "faro storico",
+            "panorama sul Canale d’Otranto"
+          ],
+          "fr": [
+            "première aube symbolique d’Italie",
+            "phare historique",
+            "vue sur le canal d’Otrante"
+          ],
+          "en": [
+            "symbolic first sunrise in Italy",
+            "historic lighthouse",
+            "Otranto Channel panorama"
+          ],
+          "es": [
+            "primera salida del sol simbólica de Italia",
+            "faro histórico",
+            "panorama del canal de Otranto"
+          ]
+        }
+      },
+      "santemiliano": {
+        "poiId": "santemiliano",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "medium",
+        "verificationStatus": "verified",
+        "themes": [
+          "coast",
+          "islet",
+          "protected-landscape"
+        ],
+        "sourceIds": [
+          "parco-otranto-leuca-itinerari"
+        ],
+        "summary": {
+          "it": "Sant’Emiliano appartiene al tratto costiero protetto a sud di Otranto, lungo l’itinerario fra Porto Badisco e Punta Palascia, caratterizzato da falesie, macchia mediterranea e mare aperto.",
+          "fr": "Sant’Emiliano appartient au littoral protégé au sud d’Otranto, sur l’itinéraire entre Porto Badisco et Punta Palascia, marqué par les falaises, le maquis méditerranéen et la mer ouverte.",
+          "en": "Sant’Emiliano lies on the protected coast south of Otranto, along the route between Porto Badisco and Punta Palascia, characterised by cliffs, Mediterranean scrub and open sea.",
+          "es": "Sant’Emiliano forma parte de la costa protegida al sur de Otranto, en la ruta entre Porto Badisco y Punta Palascia, caracterizada por acantilados, matorral mediterráneo y mar abierto."
+        },
+        "highlights": {
+          "it": [
+            "costa selvaggia",
+            "macchia mediterranea",
+            "itinerario Sant’Emiliano"
+          ],
+          "fr": [
+            "côte sauvage",
+            "maquis méditerranéen",
+            "itinéraire Sant’Emiliano"
+          ],
+          "en": [
+            "wild coastline",
+            "Mediterranean scrub",
+            "Sant’Emiliano route"
+          ],
+          "es": [
+            "costa salvaje",
+            "matorral mediterráneo",
+            "itinerario Sant’Emiliano"
+          ]
+        }
+      },
+      "miggiano": {
+        "poiId": "miggiano",
+        "territoryIds": [
+          "santa_cesarea"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "cliffs",
+          "watchtower"
+        ],
+        "sourceIds": [
+          "visitpuglia-portomiggiano",
+          "italia-santacesarea"
+        ],
+        "summary": {
+          "it": "Porto Miggiano è una piccola baia nel comune di Santa Cesarea Terme, incastonata fra alte pareti calcaree e nota anche come spiaggia dei «100 scalini».",
+          "fr": "Porto Miggiano est une petite baie de Santa Cesarea Terme, enchâssée entre de hautes falaises calcaires et également connue comme la plage des « 100 marches ».",
+          "en": "Porto Miggiano is a small bay in Santa Cesarea Terme, enclosed by high limestone cliffs and also known as the “100 Steps” beach.",
+          "es": "Porto Miggiano es una pequeña bahía de Santa Cesarea Terme, encajada entre altos acantilados de caliza y conocida también como la playa de los «100 escalones»."
+        },
+        "history": {
+          "it": "Sopra la baia si trova la Torre di Porto Miggiano, parte del sistema cinquecentesco di avvistamento e difesa costiera del Salento.",
+          "fr": "Au-dessus de la baie se dresse la tour de Porto Miggiano, élément du système de surveillance et de défense côtière du XVIe siècle.",
+          "en": "Above the bay stands Porto Miggiano Tower, part of Salento’s 16th-century coastal watch and defence system.",
+          "es": "Sobre la bahía se alza la Torre de Porto Miggiano, parte del sistema de vigilancia y defensa costera del siglo XVI."
+        },
+        "highlights": {
+          "it": [
+            "baia dei 100 scalini",
+            "falesie calcaree",
+            "Torre di Porto Miggiano"
+          ],
+          "fr": [
+            "baie des 100 marches",
+            "falaises calcaires",
+            "tour de Porto Miggiano"
+          ],
+          "en": [
+            "100 Steps bay",
+            "limestone cliffs",
+            "Porto Miggiano Tower"
+          ],
+          "es": [
+            "bahía de los 100 escalones",
+            "acantilados calcáreos",
+            "Torre de Porto Miggiano"
+          ]
+        }
+      },
+      "scarra": {
+        "poiId": "scarra",
+        "territoryIds": [
+          "tricase"
+        ],
+        "confidence": "legacy-pending",
+        "verificationStatus": "legacy-pending",
+        "themes": [
+          "woodland",
+          "nature"
+        ],
+        "sourceIds": [
+          "parco-otranto-leuca-comuni"
+        ],
+        "summary": {
+          "it": "Bosco della Scarra è registrato in HIRUNDU come area naturale del basso Salento; la localizzazione e la scheda botanica dettagliata devono ancora essere verificate con una fonte puntuale.",
+          "fr": "Bosco della Scarra est enregistré dans HIRUNDU comme espace naturel du bas Salento ; sa localisation et sa fiche botanique détaillée doivent encore être vérifiées par une source précise.",
+          "en": "Bosco della Scarra is recorded in HIRUNDU as a natural area of lower Salento; its precise location and detailed botanical record still need point-source verification.",
+          "es": "Bosco della Scarra figura en HIRUNDU como área natural del bajo Salento; su localización y ficha botánica detallada aún deben verificarse con una fuente específica."
+        },
+        "highlights": {
+          "it": [
+            "bosco salentino",
+            "paesaggio rurale"
+          ],
+          "fr": [
+            "bois salentin",
+            "paysage rural"
+          ],
+          "en": [
+            "Salento woodland",
+            "rural landscape"
+          ],
+          "es": [
+            "bosque salentino",
+            "paisaje rural"
+          ]
+        }
+      },
+      "enea": {
+        "poiId": "enea",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "legacy-pending",
+        "verificationStatus": "legacy-pending",
+        "themes": [
+          "sea",
+          "myth"
+        ],
+        "sourceIds": [
+          "italia-cammino-salento"
+        ],
+        "summary": {
+          "it": "Il POI «Porto Enea» è collegato nell’app al tratto costiero di Porto Badisco, tradizionalmente associato all’approdo di Enea; l’esatta denominazione locale del POI va ancora verificata.",
+          "fr": "Le POI « Porto Enea » est relié dans l’app au secteur côtier de Porto Badisco, traditionnellement associé au débarquement d’Énée ; l’appellation locale exacte doit encore être vérifiée.",
+          "en": "The “Porto Enea” POI is linked in the app to the Porto Badisco coastal area, traditionally associated with Aeneas’ landing; the exact local POI name still needs verification.",
+          "es": "El POI «Porto Enea» está vinculado en la app al tramo costero de Porto Badisco, tradicionalmente asociado al desembarco de Eneas; la denominación local exacta aún debe verificarse."
+        },
+        "myth": {
+          "it": "La tradizione letteraria identifica Porto Badisco con uno degli approdi di Enea. ARACNE lo tratta come tradizione culturale, non come fatto archeologico dimostrato.",
+          "fr": "La tradition littéraire identifie Porto Badisco comme l’un des lieux de débarquement d’Énée. ARACNE le traite comme une tradition culturelle, non comme un fait archéologique démontré.",
+          "en": "Literary tradition identifies Porto Badisco as one of Aeneas’ landing places. ARACNE treats this as cultural tradition, not as proven archaeological fact.",
+          "es": "La tradición literaria identifica Porto Badisco como uno de los desembarcos de Eneas. ARACNE lo trata como tradición cultural, no como hecho arqueológico demostrado."
+        },
+        "highlights": {
+          "it": [
+            "mito di Enea",
+            "costa di Porto Badisco"
+          ],
+          "fr": [
+            "mythe d’Énée",
+            "côte de Porto Badisco"
+          ],
+          "en": [
+            "Aeneas tradition",
+            "Porto Badisco coast"
+          ],
+          "es": [
+            "mito de Eneas",
+            "costa de Porto Badisco"
+          ]
+        }
+      },
+      "acquaviva": {
+        "poiId": "acquaviva",
+        "territoryIds": [
+          "diso"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "springs",
+          "cove"
+        ],
+        "sourceIds": [
+          "tourpuglia-acquaviva",
+          "italia-cammino-salento"
+        ],
+        "summary": {
+          "it": "Cala dell’Acquaviva è una stretta insenatura di Marina di Marittima, nel comune di Diso, dove sorgenti di acqua dolce e fredda raggiungono il mare fra pareti rocciose e vegetazione.",
+          "fr": "Cala dell’Acquaviva est une étroite crique de Marina di Marittima, dans la commune de Diso, où des sources d’eau douce et fraîche rejoignent la mer entre rochers et végétation.",
+          "en": "Cala dell’Acquaviva is a narrow inlet at Marina di Marittima in the municipality of Diso, where cool freshwater springs reach the sea between rocky walls and vegetation.",
+          "es": "Cala dell’Acquaviva es una estrecha cala de Marina di Marittima, en el municipio de Diso, donde manantiales de agua dulce y fría llegan al mar entre rocas y vegetación."
+        },
+        "why": {
+          "it": "Il nome richiama direttamente le sorgenti di acqua dolce e fresca che caratterizzano la cala.",
+          "fr": "Le nom fait directement référence aux sources d’eau douce et fraîche qui caractérisent la crique.",
+          "en": "The name directly refers to the cool freshwater springs that characterise the cove.",
+          "es": "El nombre hace referencia directa a los manantiales de agua dulce y fresca que caracterizan la cala."
+        },
+        "highlights": {
+          "it": [
+            "sorgenti fredde",
+            "insenatura stretta",
+            "acqua trasparente"
+          ],
+          "fr": [
+            "sources froides",
+            "crique étroite",
+            "eau transparente"
+          ],
+          "en": [
+            "cool springs",
+            "narrow inlet",
+            "clear water"
+          ],
+          "es": [
+            "manantiales fríos",
+            "cala estrecha",
+            "agua transparente"
+          ]
+        }
+      },
+      "ripe": {
+        "poiId": "ripe",
+        "territoryIds": [
+          "tricase"
+        ],
+        "confidence": "legacy-pending",
+        "verificationStatus": "legacy-pending",
+        "themes": [
+          "coastal-tower",
+          "history"
+        ],
+        "sourceIds": [
+          "parco-otranto-leuca-comuni"
+        ],
+        "summary": {
+          "it": "Torre di Ripe è conservata come POI storico nella base HIRUNDU del basso Salento; la denominazione e la posizione esatte richiedono ancora una verifica documentaria puntuale.",
+          "fr": "Torre di Ripe est conservée comme POI historique dans la base HIRUNDU du bas Salento ; son appellation et sa position exactes nécessitent encore une vérification documentaire précise.",
+          "en": "Torre di Ripe is retained as a historical lower-Salento POI in HIRUNDU; its exact name and location still require point-by-point documentary verification.",
+          "es": "Torre di Ripe se conserva como POI histórico del bajo Salento en HIRUNDU; su denominación y ubicación exactas aún requieren una verificación documental específica."
+        },
+        "highlights": {
+          "it": [
+            "sistema delle torri costiere",
+            "paesaggio del Capo di Leuca"
+          ],
+          "fr": [
+            "système des tours côtières",
+            "paysage du Cap de Leuca"
+          ],
+          "en": [
+            "coastal-tower network",
+            "Capo di Leuca landscape"
+          ],
+          "es": [
+            "red de torres costeras",
+            "paisaje del Capo di Leuca"
+          ]
+        }
+      },
+      "verde": {
+        "poiId": "verde",
+        "territoryIds": [
+          "andrano"
+        ],
+        "confidence": "medium",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "cave",
+          "light"
+        ],
+        "sourceIds": [
+          "parco-otranto-leuca-itinerari"
+        ],
+        "summary": {
+          "it": "Grotta Verde, lungo la costa di Andrano, è una cavità marina nota per i riflessi verdi prodotti dalla luce che penetra nell’acqua e si riflette sulle pareti della grotta.",
+          "fr": "Grotta Verde, sur la côte d’Andrano, est une cavité marine connue pour les reflets verts produits par la lumière dans l’eau et sur les parois rocheuses.",
+          "en": "Grotta Verde on the Andrano coast is a sea cave known for the green reflections created as light enters the water and bounces off the cave walls.",
+          "es": "Grotta Verde, en la costa de Andrano, es una cueva marina conocida por los reflejos verdes producidos por la luz en el agua y las paredes rocosas."
+        },
+        "highlights": {
+          "it": [
+            "riflessi verdi",
+            "grotta marina",
+            "costa rocciosa di Andrano"
+          ],
+          "fr": [
+            "reflets verts",
+            "grotte marine",
+            "côte rocheuse d’Andrano"
+          ],
+          "en": [
+            "green reflections",
+            "sea cave",
+            "Andrano rocky coast"
+          ],
+          "es": [
+            "reflejos verdes",
+            "cueva marina",
+            "costa rocosa de Andrano"
+          ]
+        }
+      },
+      "caprarica": {
+        "poiId": "caprarica",
+        "territoryIds": [
+          "tricase"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "castle",
+          "renaissance",
+          "fortification"
+        ],
+        "sourceIds": [
+          "parco-otranto-leuca-comuni",
+          "tricase-caprarica"
+        ],
+        "summary": {
+          "it": "Il Castello di Caprarica del Capo, frazione di Tricase, è una fortezza del primo Cinquecento a pianta rettangolare, rafforzata da torri circolari agli angoli.",
+          "fr": "Le château de Caprarica del Capo, hameau de Tricase, est une forteresse du début du XVIe siècle de plan rectangulaire, renforcée par des tours circulaires aux angles.",
+          "en": "Caprarica del Capo Castle, in the municipality of Tricase, is an early-16th-century rectangular fortress reinforced by circular corner towers.",
+          "es": "El Castillo de Caprarica del Capo, en el municipio de Tricase, es una fortaleza de comienzos del siglo XVI de planta rectangular, reforzada por torres circulares en las esquinas."
+        },
+        "history": {
+          "it": "Una fonte del Parco ricorda la costruzione del castello nel 1524. Il borgo di Caprarica ha origini medievali ed entrò nei domini di diverse famiglie feudali del Capo di Leuca.",
+          "fr": "Une source du parc mentionne la construction du château en 1524. Le bourg de Caprarica a des origines médiévales et passa sous le contrôle de plusieurs familles féodales du Cap de Leuca.",
+          "en": "A park source records the castle’s construction in 1524. Caprarica itself has medieval origins and passed through several feudal families of the Capo di Leuca area.",
+          "es": "Una fuente del parque sitúa la construcción del castillo en 1524. Caprarica tiene orígenes medievales y pasó por varias familias feudales del Capo di Leuca."
+        },
+        "highlights": {
+          "it": [
+            "torri circolari",
+            "mura in carparo",
+            "portale difeso da caditoie"
+          ],
+          "fr": [
+            "tours circulaires",
+            "murs en carparo",
+            "portail défendu par des mâchicoulis"
+          ],
+          "en": [
+            "circular towers",
+            "carparo-stone walls",
+            "defended entrance"
+          ],
+          "es": [
+            "torres circulares",
+            "muros de carparo",
+            "entrada defendida"
+          ]
+        }
+      },
+      "treporte": {
+        "poiId": "treporte",
+        "territoryIds": [
+          "leuca"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea-cave",
+          "geology",
+          "prehistory"
+        ],
+        "sourceIds": [
+          "visitpuglia-leuca"
+        ],
+        "summary": {
+          "it": "La Grotta delle Tre Porte, sul versante di ponente di Santa Maria di Leuca, deve il nome alle tre grandi aperture naturali che introducono in una vasta cavità marina.",
+          "fr": "La Grotta delle Tre Porte, sur le versant ouest de Santa Maria di Leuca, doit son nom aux trois grandes ouvertures naturelles donnant accès à une vaste cavité marine.",
+          "en": "Grotta delle Tre Porte, on the western side of Santa Maria di Leuca, takes its name from the three large natural openings leading into a broad sea cave.",
+          "es": "La Grotta delle Tre Porte, en el lado occidental de Santa Maria di Leuca, debe su nombre a las tres grandes aberturas naturales que dan acceso a una amplia cueva marina."
+        },
+        "history": {
+          "it": "Nella vicina Grotta del Bambino sono stati rinvenuti resti neandertaliani e fossili di grandi mammiferi, elemento che aggiunge interesse preistorico al complesso.",
+          "fr": "Dans la proche Grotta del Bambino, des restes néandertaliens et des fossiles de grands mammifères ont été retrouvés, ajoutant un intérêt préhistorique au complexe.",
+          "en": "Nearby Grotta del Bambino yielded Neanderthal remains and fossils of large mammals, adding prehistoric interest to the cave complex.",
+          "es": "En la cercana Grotta del Bambino se hallaron restos neandertales y fósiles de grandes mamíferos, lo que añade interés prehistórico al conjunto."
+        },
+        "highlights": {
+          "it": [
+            "tre grandi archi naturali",
+            "Grotta del Bambino",
+            "paesaggio delle falesie di Leuca"
+          ],
+          "fr": [
+            "trois grands arcs naturels",
+            "Grotta del Bambino",
+            "falaises de Leuca"
+          ],
+          "en": [
+            "three natural arches",
+            "Grotta del Bambino",
+            "Leuca cliff landscape"
+          ],
+          "es": [
+            "tres grandes arcos naturales",
+            "Grotta del Bambino",
+            "acantilados de Leuca"
+          ]
+        }
+      },
+      "ugento": {
+        "poiId": "ugento",
+        "territoryIds": [
+          "ugento"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "wetlands",
+          "dunes",
+          "mediterranean-scrub"
+        ],
+        "sourceIds": [
+          "ugento-park"
+        ],
+        "summary": {
+          "it": "Il Parco Naturale Regionale Litorale di Ugento protegge circa 9 km di costa con dune, bacini, canali, zone umide, pinete e una delle più estese aree di macchia mediterranea del Salento.",
+          "fr": "Le Parc naturel régional du littoral d’Ugento protège environ 9 km de côte avec dunes, bassins, canaux, zones humides, pinèdes et l’un des plus vastes maquis méditerranéens du Salento.",
+          "en": "The Litorale di Ugento Regional Natural Park protects about 9 km of coast with dunes, basins, canals, wetlands, pine woods and one of Salento’s largest expanses of Mediterranean scrub.",
+          "es": "El Parque Natural Regional del Litoral de Ugento protege unos 9 km de costa con dunas, lagunas, canales, humedales, pinares y una de las mayores extensiones de matorral mediterráneo del Salento."
+        },
+        "nature": {
+          "it": "Il parco, istituito nel 2007, copre circa 1.626 ettari e comprende habitat dunali, retrodunali, palustri e sistemi carsici dell’entroterra.",
+          "fr": "Le parc, créé en 2007, couvre environ 1 626 hectares et comprend des habitats dunaires, arrière-dunaires, marécageux et des systèmes karstiques intérieurs.",
+          "en": "Established in 2007, the park covers about 1,626 hectares and includes dune, back-dune and wetland habitats as well as inland karst systems.",
+          "es": "Creado en 2007, el parque abarca unas 1.626 hectáreas e incluye hábitats de dunas, retrodunas, humedales y sistemas kársticos interiores."
+        },
+        "highlights": {
+          "it": [
+            "dune costiere",
+            "bacini e zone umide",
+            "macchia mediterranea",
+            "gravinelle carsiche"
+          ],
+          "fr": [
+            "dunes côtières",
+            "bassins et zones humides",
+            "maquis méditerranéen",
+            "ravins karstiques"
+          ],
+          "en": [
+            "coastal dunes",
+            "wetland basins",
+            "Mediterranean scrub",
+            "karst ravines"
+          ],
+          "es": [
+            "dunas costeras",
+            "lagunas y humedales",
+            "matorral mediterráneo",
+            "barrancos kársticos"
+          ]
+        }
+      },
+      "casale": {
+        "poiId": "casale",
+        "territoryIds": [
+          "ugento"
+        ],
+        "confidence": "medium",
+        "verificationStatus": "verified",
+        "themes": [
+          "church",
+          "rural-history",
+          "religious"
+        ],
+        "sourceIds": [
+          "ugento-park"
+        ],
+        "summary": {
+          "it": "La Madonna del Casale è una chiesa rurale del territorio di Ugento, inserita nel paesaggio storico dell’entroterra costiero.",
+          "fr": "La Madonna del Casale est une église rurale du territoire d’Ugento, intégrée au paysage historique de l’arrière-pays côtier.",
+          "en": "Madonna del Casale is a rural church in the Ugento area, set within the historic landscape behind the coast.",
+          "es": "Madonna del Casale es una iglesia rural del territorio de Ugento, integrada en el paisaje histórico del interior costero."
+        },
+        "history": {
+          "it": "Fonti comunali descrivono Santa Maria del Casale come un eremo di origine medievale; la scheda HIRUNDU conserva il luogo come testimonianza religiosa rurale.",
+          "fr": "Des sources communales décrivent Santa Maria del Casale comme un ermitage d’origine médiévale ; HIRUNDU le conserve comme témoignage religieux rural.",
+          "en": "Municipal sources describe Santa Maria del Casale as a medieval-origin hermitage; HIRUNDU retains it as a rural religious heritage site.",
+          "es": "Fuentes municipales describen Santa Maria del Casale como una ermita de origen medieval; HIRUNDU la conserva como testimonio religioso rural."
+        },
+        "highlights": {
+          "it": [
+            "chiesa rurale",
+            "paesaggio dell’entroterra di Ugento"
+          ],
+          "fr": [
+            "église rurale",
+            "paysage intérieur d’Ugento"
+          ],
+          "en": [
+            "rural church",
+            "Ugento hinterland landscape"
+          ],
+          "es": [
+            "iglesia rural",
+            "paisaje interior de Ugento"
+          ]
+        }
+      },
+      "giurupi": {
+        "poiId": "giurupi",
+        "territoryIds": [
+          "ugento"
+        ],
+        "confidence": "legacy-pending",
+        "verificationStatus": "legacy-pending",
+        "themes": [
+          "architecture",
+          "historic-building"
+        ],
+        "sourceIds": [],
+        "summary": {
+          "it": "«Palazzo Giurupi» è presente nella base storica HIRUNDU come POI culturale, ma l’identificazione monumentale e la localizzazione esatta non sono ancora sufficientemente documentate.",
+          "fr": "« Palazzo Giurupi » figure dans l’ancienne base HIRUNDU comme POI culturel, mais son identification monumentale et sa localisation exacte ne sont pas encore suffisamment documentées.",
+          "en": "“Palazzo Giurupi” is present in the legacy HIRUNDU dataset as a cultural POI, but its exact monument identification and location are not yet sufficiently documented.",
+          "es": "«Palazzo Giurupi» figura en la base histórica de HIRUNDU como POI cultural, pero su identificación monumental y ubicación exacta aún no están suficientemente documentadas."
+        },
+        "highlights": {
+          "it": [
+            "scheda da verificare"
+          ],
+          "fr": [
+            "fiche à vérifier"
+          ],
+          "en": [
+            "record pending verification"
+          ],
+          "es": [
+            "ficha pendiente de verificación"
+          ]
+        }
+      },
+      "santandrea_gallipoli": {
+        "poiId": "santandrea_gallipoli",
+        "territoryIds": [
+          "gallipoli"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "island",
+          "birdlife",
+          "protected-area"
+        ],
+        "sourceIds": [
+          "gallipoli-park"
+        ],
+        "summary": {
+          "it": "L’Isola di Sant’Andrea, davanti a Gallipoli, è il cuore insulare del parco naturale regionale che comprende anche il litorale di Punta Pizzo.",
+          "fr": "L’île de Sant’Andrea, face à Gallipoli, est le cœur insulaire du parc naturel régional qui comprend aussi le littoral de Punta Pizzo.",
+          "en": "Sant’Andrea Island, off Gallipoli, is the island core of the regional nature park that also includes the Punta Pizzo coastline.",
+          "es": "La isla de Sant’Andrea, frente a Gallipoli, es el núcleo insular del parque natural regional que también incluye el litoral de Punta Pizzo."
+        },
+        "nature": {
+          "it": "L’isola ospita habitat costieri prioritari e una colonia nidificante di gabbiano corso, specie di grande interesse conservazionistico nel Mediterraneo.",
+          "fr": "L’île abrite des habitats côtiers prioritaires et une colonie nicheuse de goéland d’Audouin, espèce méditerranéenne de grand intérêt pour la conservation.",
+          "en": "The island supports priority coastal habitats and a breeding colony of Audouin’s gull, a Mediterranean species of major conservation interest.",
+          "es": "La isla alberga hábitats costeros prioritarios y una colonia reproductora de gaviota de Audouin, especie mediterránea de gran interés de conservación."
+        },
+        "highlights": {
+          "it": [
+            "faro e isola",
+            "gabbiano corso",
+            "parco Punta Pizzo"
+          ],
+          "fr": [
+            "phare et île",
+            "goéland d’Audouin",
+            "parc Punta Pizzo"
+          ],
+          "en": [
+            "island and lighthouse",
+            "Audouin’s gull",
+            "Punta Pizzo park"
+          ],
+          "es": [
+            "isla y faro",
+            "gaviota de Audouin",
+            "parque Punta Pizzo"
+          ]
+        }
+      },
+      "montagna": {
+        "poiId": "montagna",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "medium",
+        "verificationStatus": "verified",
+        "themes": [
+          "coast",
+          "cliff",
+          "landscape"
+        ],
+        "sourceIds": [
+          "visitnardo-marinas"
+        ],
+        "summary": {
+          "it": "La Montagna Spaccata è un tratto scenografico della costa ionica nell’area fra le marine di Nardò e Lido Conchiglie, riconoscibile per il taglio della roccia attraversato dalla strada litoranea.",
+          "fr": "La Montagna Spaccata est un secteur spectaculaire de la côte ionienne entre les marinas de Nardò et Lido Conchiglie, reconnaissable à la coupure de la roche traversée par la route côtière.",
+          "en": "Montagna Spaccata is a striking Ionian-coast landmark between Nardò’s seaside area and Lido Conchiglie, recognisable by the road cutting through the rock.",
+          "es": "La Montagna Spaccata es un paisaje destacado de la costa jónica entre la zona costera de Nardò y Lido Conchiglie, reconocible por el corte de la roca atravesado por la carretera."
+        },
+        "highlights": {
+          "it": [
+            "taglio nella roccia",
+            "panorama ionico",
+            "collegamento fra marine"
+          ],
+          "fr": [
+            "entaille dans la roche",
+            "panorama ionien",
+            "liaison entre stations balnéaires"
+          ],
+          "en": [
+            "rock cutting",
+            "Ionian panorama",
+            "coastal connection"
+          ],
+          "es": [
+            "corte en la roca",
+            "panorama jónico",
+            "conexión costera"
+          ]
+        },
+        "notes": "The legacy POI label says Gallipoli; territorial sources place Montagna Spaccata in the Nardò/Lido Conchiglie coastal area."
+      },
+      "fiume": {
+        "poiId": "fiume",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "coastal-tower",
+          "freshwater",
+          "history"
+        ],
+        "sourceIds": [
+          "visitnardo-fiume"
+        ],
+        "summary": {
+          "it": "Torre del Fiume, oggi nota come Quattro Colonne, è ciò che resta di una fortezza costiera costruita presso una sorgente d’acqua dolce a Santa Maria al Bagno.",
+          "fr": "Torre del Fiume, aujourd’hui connue comme les Quattro Colonne, est ce qui reste d’une forteresse côtière construite près d’une source d’eau douce à Santa Maria al Bagno.",
+          "en": "Torre del Fiume, now known as Quattro Colonne, is the surviving part of a coastal fortress built beside a freshwater spring at Santa Maria al Bagno.",
+          "es": "Torre del Fiume, hoy conocida como Quattro Colonne, es lo que queda de una fortaleza costera construida junto a un manantial de agua dulce en Santa Maria al Bagno."
+        },
+        "history": {
+          "it": "La torre fu completata all’inizio del Seicento per proteggere la sorgente dagli approvvigionamenti dei corsari. Il corpo centrale crollò e oggi restano i quattro bastioni angolari.",
+          "fr": "La tour fut achevée au début du XVIIe siècle pour protéger la source des ravitaillements des corsaires. Le corps central s’effondra et il reste aujourd’hui les quatre bastions d’angle.",
+          "en": "The tower was completed in the early 17th century to protect the spring from corsair resupply. Its central body collapsed, leaving the four corner bastions.",
+          "es": "La torre se completó a comienzos del siglo XVII para proteger el manantial del aprovisionamiento de corsarios. El cuerpo central se derrumbó y hoy quedan los cuatro bastiones angulares."
+        },
+        "highlights": {
+          "it": [
+            "Quattro Colonne",
+            "antica sorgente",
+            "sistema difensivo costiero"
+          ],
+          "fr": [
+            "Quattro Colonne",
+            "ancienne source",
+            "système défensif côtier"
+          ],
+          "en": [
+            "Quattro Colonne",
+            "historic spring",
+            "coastal defence system"
+          ],
+          "es": [
+            "Quattro Colonne",
+            "antiguo manantial",
+            "sistema defensivo costero"
+          ]
+        }
+      },
+      "cavallo": {
+        "poiId": "cavallo",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "prehistory",
+          "archaeology",
+          "cave"
+        ],
+        "sourceIds": [
+          "visitnardo-uluzzo",
+          "visitnardo-park"
+        ],
+        "summary": {
+          "it": "Grotta del Cavallo, nella Baia di Uluzzo, è uno dei siti preistorici più importanti del territorio di Nardò e ha dato il nome alla cultura paleolitica detta Uluzziano.",
+          "fr": "La Grotta del Cavallo, dans la baie d’Uluzzo, est l’un des sites préhistoriques les plus importants du territoire de Nardò et a donné son nom à la culture paléolithique dite Uluzzienne.",
+          "en": "Grotta del Cavallo in Uluzzo Bay is one of Nardò’s most important prehistoric sites and gave its name to the Upper-Palaeolithic Uluzzian culture.",
+          "es": "La Grotta del Cavallo, en la bahía de Uluzzo, es uno de los yacimientos prehistóricos más importantes de Nardò y dio nombre a la cultura paleolítica Uluzziense."
+        },
+        "highlights": {
+          "it": [
+            "Baia di Uluzzo",
+            "preistoria europea",
+            "cultura uluzziana"
+          ],
+          "fr": [
+            "baie d’Uluzzo",
+            "préhistoire européenne",
+            "culture uluzzienne"
+          ],
+          "en": [
+            "Uluzzo Bay",
+            "European prehistory",
+            "Uluzzian culture"
+          ],
+          "es": [
+            "bahía de Uluzzo",
+            "prehistoria europea",
+            "cultura uluzziense"
+          ]
+        }
+      },
+      "uluzzo": {
+        "poiId": "uluzzo",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "coastal-tower",
+          "prehistory",
+          "sunset"
+        ],
+        "sourceIds": [
+          "visitnardo-uluzzo"
+        ],
+        "summary": {
+          "it": "Torre Uluzzo è una torre costiera cinquecentesca in rovina, posta sulla falesia presso Porto Selvaggio e affacciata sulla baia che ospita importanti siti preistorici.",
+          "fr": "Torre Uluzzo est une tour côtière du XVIe siècle en ruine, dressée sur la falaise près de Porto Selvaggio et dominant une baie riche en sites préhistoriques.",
+          "en": "Torre Uluzzo is a ruined 16th-century coastal tower on the cliff near Porto Selvaggio, overlooking a bay rich in prehistoric sites.",
+          "es": "Torre Uluzzo es una torre costera en ruinas del siglo XVI, situada sobre el acantilado cerca de Porto Selvaggio y dominando una bahía rica en yacimientos prehistóricos."
+        },
+        "history": {
+          "it": "La costruzione fu affidata nel 1568. La torre comunicava visivamente con Torre dell’Alto e Torre Inserraglio e venne restaurata e messa in sicurezza nel 2020.",
+          "fr": "La construction fut confiée en 1568. La tour communiquait visuellement avec Torre dell’Alto et Torre Inserraglio et fut restaurée et sécurisée en 2020.",
+          "en": "Construction was commissioned in 1568. The tower communicated visually with Torre dell’Alto and Torre Inserraglio and was restored and secured in 2020.",
+          "es": "La construcción fue encargada en 1568. La torre se comunicaba visualmente con Torre dell’Alto y Torre Inserraglio y fue restaurada y asegurada en 2020."
+        },
+        "highlights": {
+          "it": [
+            "rovine della torre",
+            "Baia di Uluzzo",
+            "tramonto sullo Ionio"
+          ],
+          "fr": [
+            "ruines de la tour",
+            "baie d’Uluzzo",
+            "coucher de soleil ionien"
+          ],
+          "en": [
+            "tower ruins",
+            "Uluzzo Bay",
+            "Ionian sunset"
+          ],
+          "es": [
+            "ruinas de la torre",
+            "bahía de Uluzzo",
+            "puesta de sol jónica"
+          ]
+        }
+      },
+      "capitano": {
+        "poiId": "capitano",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "wetland",
+          "karst",
+          "nature"
+        ],
+        "sourceIds": [
+          "visitnardo-park"
+        ],
+        "summary": {
+          "it": "Palude del Capitano è una zona umida carsica del Parco di Porto Selvaggio, caratterizzata dalle «spundurate», doline di crollo nelle quali affiora l’acqua.",
+          "fr": "Palude del Capitano est une zone humide karstique du parc de Porto Selvaggio, caractérisée par les « spundurate », dolines d’effondrement où l’eau affleure.",
+          "en": "Palude del Capitano is a karst wetland in Porto Selvaggio Park, characterised by “spundurate”, collapse sinkholes where water reaches the surface.",
+          "es": "Palude del Capitano es un humedal kárstico del Parque de Porto Selvaggio, caracterizado por las «spundurate», dolinas de colapso donde aflora el agua."
+        },
+        "nature": {
+          "it": "L’area unisce ambienti umidi, vegetazione mediterranea e fenomeni carsici, ed è uno dei nuclei naturalistici più delicati del parco.",
+          "fr": "La zone associe milieux humides, végétation méditerranéenne et phénomènes karstiques, et constitue l’un des secteurs naturels les plus sensibles du parc.",
+          "en": "The area combines wetlands, Mediterranean vegetation and karst phenomena, forming one of the park’s most sensitive natural zones.",
+          "es": "La zona combina humedales, vegetación mediterránea y fenómenos kársticos, y constituye uno de los sectores naturales más delicados del parque."
+        },
+        "highlights": {
+          "it": [
+            "spundurate",
+            "zona umida carsica",
+            "macchia mediterranea"
+          ],
+          "fr": [
+            "spundurate",
+            "zone humide karstique",
+            "maquis méditerranéen"
+          ],
+          "en": [
+            "spundurate sinkholes",
+            "karst wetland",
+            "Mediterranean scrub"
+          ],
+          "es": [
+            "spundurate",
+            "humedal kárstico",
+            "matorral mediterráneo"
+          ]
+        }
+      },
+      "frascone": {
+        "poiId": "frascone",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "medium",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "protected-coast",
+          "nature"
+        ],
+        "sourceIds": [
+          "visitnardo-park"
+        ],
+        "summary": {
+          "it": "La Spiaggia del Frascone si trova lungo il litorale protetto a nord di Porto Selvaggio, in un paesaggio ionico di rocce basse, piccole insenature e vegetazione mediterranea.",
+          "fr": "La plage du Frascone se trouve sur le littoral protégé au nord de Porto Selvaggio, dans un paysage ionien de rochers bas, petites criques et végétation méditerranéenne.",
+          "en": "Frascone beach lies on the protected coast north of Porto Selvaggio, in an Ionian landscape of low rocks, small coves and Mediterranean vegetation.",
+          "es": "La playa del Frascone se encuentra en la costa protegida al norte de Porto Selvaggio, en un paisaje jónico de rocas bajas, pequeñas calas y vegetación mediterránea."
+        },
+        "highlights": {
+          "it": [
+            "costa protetta",
+            "piccole cale",
+            "mare ionico"
+          ],
+          "fr": [
+            "côte protégée",
+            "petites criques",
+            "mer Ionienne"
+          ],
+          "en": [
+            "protected coast",
+            "small coves",
+            "Ionian Sea"
+          ],
+          "es": [
+            "costa protegida",
+            "pequeñas calas",
+            "mar Jónico"
+          ]
+        }
+      },
+      "chianca": {
+        "poiId": "chianca",
+        "territoryIds": [
+          "porto_cesareo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "coastal-tower",
+          "sea",
+          "history"
+        ],
+        "sourceIds": [
+          "portocesareo-torri",
+          "visitpuglia-portocesareo"
+        ],
+        "summary": {
+          "it": "Torre Chianca, detta anche Torre Santo Stefano, è una torre costiera cinquecentesca su una penisola a nord di Porto Cesareo, affacciata su bassi fondali sabbiosi.",
+          "fr": "Torre Chianca, également appelée Torre Santo Stefano, est une tour côtière du XVIe siècle sur une péninsule au nord de Porto Cesareo, face à de faibles fonds sableux.",
+          "en": "Torre Chianca, also called Torre Santo Stefano, is a 16th-century coastal watchtower on a peninsula north of Porto Cesareo, overlooking shallow sandy waters.",
+          "es": "Torre Chianca, también llamada Torre Santo Stefano, es una torre costera del siglo XVI situada en una península al norte de Porto Cesareo, frente a aguas arenosas poco profundas."
+        },
+        "history": {
+          "it": "La torre faceva parte della rete difensiva costiera del Cinquecento e comunicava con Torre Cesarea e Torre Lapillo.",
+          "fr": "La tour faisait partie du réseau défensif côtier du XVIe siècle et communiquait avec Torre Cesarea et Torre Lapillo.",
+          "en": "The tower formed part of the 16th-century coastal defence network and communicated with Torre Cesarea and Torre Lapillo.",
+          "es": "La torre formaba parte de la red defensiva costera del siglo XVI y se comunicaba con Torre Cesarea y Torre Lapillo."
+        },
+        "highlights": {
+          "it": [
+            "torre costiera",
+            "fondali bassi",
+            "sistema difensivo cinquecentesco"
+          ],
+          "fr": [
+            "tour côtière",
+            "fonds peu profonds",
+            "système défensif du XVIe siècle"
+          ],
+          "en": [
+            "coastal tower",
+            "shallow water",
+            "16th-century defence network"
+          ],
+          "es": [
+            "torre costera",
+            "fondos poco profundos",
+            "red defensiva del siglo XVI"
+          ]
+        }
+      },
+      "conigli": {
+        "poiId": "conigli",
+        "territoryIds": [
+          "porto_cesareo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "island",
+          "nature",
+          "sea"
+        ],
+        "sourceIds": [
+          "portocesareo-conigli",
+          "visitpuglia-portocesareo"
+        ],
+        "summary": {
+          "it": "L’Isola dei Conigli, storicamente Isola Grande, è un isolotto molto vicino al centro di Porto Cesareo, ricoperto da vegetazione mediterranea e pineta.",
+          "fr": "L’Isola dei Conigli, historiquement Isola Grande, est un îlot très proche du centre de Porto Cesareo, couvert de végétation méditerranéenne et de pinède.",
+          "en": "Isola dei Conigli, historically Isola Grande, is an islet very close to central Porto Cesareo, covered with Mediterranean vegetation and pine woodland.",
+          "es": "La Isola dei Conigli, históricamente Isola Grande, es un islote muy próximo al centro de Porto Cesareo, cubierto de vegetación mediterránea y pinar."
+        },
+        "why": {
+          "it": "Il nome moderno deriva dalla presenza, soprattutto nel Novecento, di allevamenti di conigli lasciati sull’isola.",
+          "fr": "Le nom moderne vient de la présence, surtout au XXe siècle, d’élevages de lapins installés sur l’île.",
+          "en": "The modern name comes from rabbit colonies kept on the island, particularly in the 20th century.",
+          "es": "El nombre moderno procede de las colonias de conejos criadas en la isla, especialmente durante el siglo XX."
+        },
+        "highlights": {
+          "it": [
+            "isolotto vicino alla costa",
+            "macchia mediterranea",
+            "pineta"
+          ],
+          "fr": [
+            "îlot proche du rivage",
+            "maquis méditerranéen",
+            "pinède"
+          ],
+          "en": [
+            "nearshore islet",
+            "Mediterranean scrub",
+            "pine woodland"
+          ],
+          "es": [
+            "islote próximo a la costa",
+            "matorral mediterráneo",
+            "pinar"
+          ]
+        }
+      },
+      "santandrea": {
+        "poiId": "santandrea",
+        "territoryIds": [
+          "melendugno"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "sea-stack",
+          "coast"
+        ],
+        "sourceIds": [
+          "visitmelendugno",
+          "visitmelendugno-poi"
+        ],
+        "summary": {
+          "it": "Il faraglione di Sant’Andrea appartiene alla spettacolare costa di Melendugno, dove il calcare chiaro è modellato dal mare in archi, pilastri e scogli isolati.",
+          "fr": "Le faraglione de Sant’Andrea appartient à la spectaculaire côte de Melendugno, où le calcaire clair est sculpté par la mer en arches, piliers et rochers isolés.",
+          "en": "The Sant’Andrea sea stack belongs to Melendugno’s spectacular coast, where pale limestone is sculpted by the sea into arches, pillars and isolated rocks.",
+          "es": "El farallón de Sant’Andrea forma parte de la espectacular costa de Melendugno, donde la caliza clara es esculpida por el mar en arcos, pilares y rocas aisladas."
+        },
+        "highlights": {
+          "it": [
+            "faraglioni bianchi",
+            "archi naturali",
+            "mare Adriatico"
+          ],
+          "fr": [
+            "faraglioni blancs",
+            "arches naturelles",
+            "Adriatique"
+          ],
+          "en": [
+            "white sea stacks",
+            "natural arches",
+            "Adriatic Sea"
+          ],
+          "es": [
+            "farallones blancos",
+            "arcos naturales",
+            "mar Adriático"
+          ]
+        }
+      },
+      "sorelle": {
+        "poiId": "sorelle",
+        "territoryIds": [
+          "melendugno"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "legend",
+          "sea-stacks"
+        ],
+        "sourceIds": [
+          "visitmelendugno",
+          "visitpuglia-otranto-guide"
+        ],
+        "summary": {
+          "it": "Le Due Sorelle sono i due celebri faraglioni che emergono davanti alla spiaggia di Torre dell’Orso, una delle immagini più riconoscibili della costa di Melendugno.",
+          "fr": "Les Due Sorelle sont les deux célèbres stacks qui émergent devant la plage de Torre dell’Orso, l’une des images les plus reconnaissables de la côte de Melendugno.",
+          "en": "Le Due Sorelle are the two famous sea stacks off Torre dell’Orso beach, one of the most recognisable images of the Melendugno coastline.",
+          "es": "Le Due Sorelle son los dos famosos farallones frente a la playa de Torre dell’Orso, una de las imágenes más reconocibles de la costa de Melendugno."
+        },
+        "myth": {
+          "it": "La leggenda locale racconta di due sorelle trasformate dagli dei nei due scogli. È una tradizione narrativa, non un fatto storico.",
+          "fr": "La légende locale raconte que deux sœurs furent transformées par les dieux en deux rochers. Il s’agit d’une tradition narrative, non d’un fait historique.",
+          "en": "Local legend tells of two sisters transformed by the gods into the two rocks. This is a narrative tradition, not a historical fact.",
+          "es": "La leyenda local cuenta que dos hermanas fueron transformadas por los dioses en los dos peñascos. Es una tradición narrativa, no un hecho histórico."
+        },
+        "highlights": {
+          "it": [
+            "due faraglioni",
+            "spiaggia di Torre dell’Orso",
+            "leggenda locale"
+          ],
+          "fr": [
+            "deux stacks",
+            "plage de Torre dell’Orso",
+            "légende locale"
+          ],
+          "en": [
+            "twin sea stacks",
+            "Torre dell’Orso beach",
+            "local legend"
+          ],
+          "es": [
+            "dos farallones",
+            "playa de Torre dell’Orso",
+            "leyenda local"
+          ]
+        }
+      },
+      "grottella": {
+        "poiId": "grottella",
+        "territoryIds": [
+          "copertino"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "religious",
+          "saint-joseph",
+          "history"
+        ],
+        "sourceIds": [
+          "copertino-grottella"
+        ],
+        "summary": {
+          "it": "Il Santuario della Grottella, poco fuori Copertino, è legato alla devozione mariana e alla biografia di San Giuseppe da Copertino.",
+          "fr": "Le sanctuaire de la Grottella, juste à l’extérieur de Copertino, est lié à la dévotion mariale et à la vie de saint Joseph de Copertino.",
+          "en": "The Grottella Sanctuary, just outside Copertino, is linked to Marian devotion and the life of Saint Joseph of Copertino.",
+          "es": "El Santuario de la Grottella, a las afueras de Copertino, está ligado a la devoción mariana y a la vida de San José de Copertino."
+        },
+        "history": {
+          "it": "L’attuale chiesa fu edificata nel 1577 sul luogo dove era stata ritrovata un’icona mariana; dal Seicento il complesso passò ai francescani e fu profondamente legato alla vocazione di Giuseppe Maria Desa.",
+          "fr": "L’église actuelle fut édifiée en 1577 sur le lieu où une icône mariale avait été découverte ; au XVIIe siècle, le complexe passa aux franciscains et fut fortement lié à la vocation de Giuseppe Maria Desa.",
+          "en": "The present church was built in 1577 where a Marian icon had been found; in the 17th century the complex passed to the Franciscans and became closely linked with Giuseppe Maria Desa’s vocation.",
+          "es": "La iglesia actual fue construida en 1577 en el lugar donde se halló un icono mariano; en el siglo XVII el complejo pasó a los franciscanos y quedó muy ligado a la vocación de Giuseppe Maria Desa."
+        },
+        "highlights": {
+          "it": [
+            "icona della Madonna",
+            "luoghi di San Giuseppe da Copertino",
+            "convento francescano"
+          ],
+          "fr": [
+            "icône de la Vierge",
+            "lieux de saint Joseph de Copertino",
+            "couvent franciscain"
+          ],
+          "en": [
+            "Marian icon",
+            "Saint Joseph of Copertino sites",
+            "Franciscan convent"
+          ],
+          "es": [
+            "icono mariano",
+            "lugares de San José de Copertino",
+            "convento franciscano"
+          ]
+        }
+      },
+      "santacaterina": {
+        "poiId": "santacaterina",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "marina",
+          "pinewood"
+        ],
+        "sourceIds": [
+          "visitnardo-marinas",
+          "visitnardo-santacaterina"
+        ],
+        "summary": {
+          "it": "Santa Caterina è una marina di Nardò, raccolta attorno a una costa rocciosa con pineta e numerosi accessi al mare, fra Santa Maria al Bagno e Porto Selvaggio.",
+          "fr": "Santa Caterina est une marina de Nardò, organisée autour d’une côte rocheuse avec pinède et nombreux accès à la mer, entre Santa Maria al Bagno et Porto Selvaggio.",
+          "en": "Santa Caterina is a seaside settlement of Nardò, set around a rocky coast with pine woodland and many sea access points, between Santa Maria al Bagno and Porto Selvaggio.",
+          "es": "Santa Caterina es una marina de Nardò, situada en una costa rocosa con pinar y numerosos accesos al mar, entre Santa Maria al Bagno y Porto Selvaggio."
+        },
+        "highlights": {
+          "it": [
+            "lungomare",
+            "pineta",
+            "Torre Santa Caterina"
+          ],
+          "fr": [
+            "front de mer",
+            "pinède",
+            "Torre Santa Caterina"
+          ],
+          "en": [
+            "seafront",
+            "pine woodland",
+            "Santa Caterina Tower"
+          ],
+          "es": [
+            "paseo marítimo",
+            "pinar",
+            "Torre Santa Caterina"
+          ]
+        },
+        "notes": "The legacy POI label says Gallipoli; official Nardò tourism sources place Santa Caterina in the municipality of Nardò."
+      },
+      "cesarea": {
+        "poiId": "cesarea",
+        "territoryIds": [
+          "santa_cesarea"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "thermal",
+          "architecture",
+          "sea"
+        ],
+        "sourceIds": [
+          "italia-santacesarea",
+          "visitpuglia-portomiggiano"
+        ],
+        "summary": {
+          "it": "Santa Cesarea Terme è una località adriatica costruita su terrazze rocciose, nota per le sorgenti termali sulfuree e per l’architettura eclettica e moresca affacciata sul mare.",
+          "fr": "Santa Cesarea Terme est une localité adriatique bâtie sur des terrasses rocheuses, connue pour ses sources thermales sulfureuses et son architecture éclectique et mauresque face à la mer.",
+          "en": "Santa Cesarea Terme is an Adriatic resort built on rocky terraces, known for sulphurous thermal springs and eclectic, Moorish-style architecture overlooking the sea.",
+          "es": "Santa Cesarea Terme es una localidad adriática construida sobre terrazas rocosas, conocida por sus aguas termales sulfurosas y su arquitectura ecléctica y morisca frente al mar."
+        },
+        "nature": {
+          "it": "Le acque termali sgorgano da grotte costiere naturali; il territorio ricade nel Parco Costa Otranto–Santa Maria di Leuca.",
+          "fr": "Les eaux thermales jaillissent de grottes côtières naturelles ; le territoire appartient au parc Costa Otranto–Santa Maria di Leuca.",
+          "en": "Thermal waters emerge from natural coastal caves; the area lies within the Costa Otranto–Santa Maria di Leuca regional park.",
+          "es": "Las aguas termales brotan de cuevas costeras naturales; el territorio forma parte del parque Costa Otranto–Santa Maria di Leuca."
+        },
+        "highlights": {
+          "it": [
+            "acque termali",
+            "Villa Sticchi",
+            "costa rocciosa"
+          ],
+          "fr": [
+            "eaux thermales",
+            "Villa Sticchi",
+            "côte rocheuse"
+          ],
+          "en": [
+            "thermal waters",
+            "Villa Sticchi",
+            "rocky coast"
+          ],
+          "es": [
+            "aguas termales",
+            "Villa Sticchi",
+            "costa rocosa"
+          ]
+        }
+      },
+      "suina": {
+        "poiId": "suina",
+        "territoryIds": [
+          "gallipoli"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "beach",
+          "protected-area",
+          "pinewood"
+        ],
+        "sourceIds": [
+          "visitgallipoli-puntasuina",
+          "gallipoli-park"
+        ],
+        "summary": {
+          "it": "Punta della Suina è un promontorio e sistema di piccole cale sabbiose nella parte meridionale del litorale di Gallipoli, dentro il Parco Isola di Sant’Andrea e Punta Pizzo.",
+          "fr": "Punta della Suina est un promontoire et un ensemble de petites criques sableuses au sud du littoral de Gallipoli, dans le parc Isola di Sant’Andrea et Punta Pizzo.",
+          "en": "Punta della Suina is a headland and series of small sandy coves on Gallipoli’s southern coast, within the Isola di Sant’Andrea and Punta Pizzo park.",
+          "es": "Punta della Suina es un promontorio y conjunto de pequeñas calas arenosas en la costa sur de Gallipoli, dentro del parque Isola di Sant’Andrea y Punta Pizzo."
+        },
+        "nature": {
+          "it": "La spiaggia alterna sabbia, scogli bassi, pineta e macchia mediterranea in un’area naturale protetta.",
+          "fr": "La plage alterne sable, rochers bas, pinède et maquis méditerranéen dans une zone naturelle protégée.",
+          "en": "The beach alternates sand, low rocks, pine woodland and Mediterranean scrub within a protected natural area.",
+          "es": "La playa alterna arena, rocas bajas, pinar y matorral mediterráneo dentro de un espacio natural protegido."
+        },
+        "highlights": {
+          "it": [
+            "piccole cale",
+            "pineta",
+            "parco Punta Pizzo"
+          ],
+          "fr": [
+            "petites criques",
+            "pinède",
+            "parc Punta Pizzo"
+          ],
+          "en": [
+            "small coves",
+            "pine woodland",
+            "Punta Pizzo park"
+          ],
+          "es": [
+            "pequeñas calas",
+            "pinar",
+            "parque Punta Pizzo"
+          ]
+        }
+      },
+      "monaci": {
+        "poiId": "monaci",
+        "territoryIds": [
+          "manduria"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "wetland",
+          "saltpan",
+          "birdlife"
+        ],
+        "sourceIds": [
+          "manduria-salina"
+        ],
+        "summary": {
+          "it": "La Salina dei Monaci, presso Torre Colimena, è una storica salina costiera oggi inserita in un’area protetta di grande valore naturalistico.",
+          "fr": "La Salina dei Monaci, près de Torre Colimena, est une ancienne saline côtière aujourd’hui intégrée à une zone protégée de grande valeur naturelle.",
+          "en": "Salina dei Monaci, near Torre Colimena, is a historic coastal saltpan now within a protected area of major natural value.",
+          "es": "La Salina dei Monaci, cerca de Torre Colimena, es una histórica salina costera hoy incluida en un espacio protegido de gran valor natural."
+        },
+        "history": {
+          "it": "La salina deve il nome ai monaci benedettini di Aversa, che la gestirono fino al 1404; depositi e opere idrauliche ricordano la lunga attività di estrazione del sale.",
+          "fr": "La saline doit son nom aux moines bénédictins d’Aversa, qui la gérèrent jusqu’en 1404 ; dépôts et ouvrages hydrauliques rappellent la longue activité d’extraction du sel.",
+          "en": "The saltpan takes its name from the Benedictine monks of Aversa, who managed it until 1404; storage buildings and hydraulic works recall centuries of salt extraction.",
+          "es": "La salina debe su nombre a los monjes benedictinos de Aversa, que la gestionaron hasta 1404; almacenes y obras hidráulicas recuerdan siglos de extracción de sal."
+        },
+        "nature": {
+          "it": "È un habitat per vegetazione alofila e numerosi uccelli migratori, fra cui fenicotteri, cavalieri d’Italia e garzette.",
+          "fr": "C’est un habitat pour la végétation halophile et de nombreux oiseaux migrateurs, dont flamants roses, échasses blanches et aigrettes.",
+          "en": "It supports salt-tolerant vegetation and many migratory birds, including flamingos, black-winged stilts and egrets.",
+          "es": "Alberga vegetación halófila y numerosas aves migratorias, entre ellas flamencos, cigüeñuelas y garcetas."
+        },
+        "highlights": {
+          "it": [
+            "fenicotteri",
+            "dune e salina",
+            "storia del sale"
+          ],
+          "fr": [
+            "flamants roses",
+            "dunes et saline",
+            "histoire du sel"
+          ],
+          "en": [
+            "flamingos",
+            "dunes and saltpan",
+            "salt-making history"
+          ],
+          "es": [
+            "flamencos",
+            "dunas y salina",
+            "historia de la sal"
+          ]
+        }
+      },
+      "santamaria": {
+        "poiId": "santamaria",
+        "territoryIds": [
+          "nardo"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "sea",
+          "marina",
+          "memory"
+        ],
+        "sourceIds": [
+          "visitnardo-marinas"
+        ],
+        "summary": {
+          "it": "Santa Maria al Bagno è una marina di Nardò raccolta attorno a una piccola baia e a una piazza affacciata sullo Ionio.",
+          "fr": "Santa Maria al Bagno est une marina de Nardò organisée autour d’une petite baie et d’une place ouverte sur la mer Ionienne.",
+          "en": "Santa Maria al Bagno is a seaside settlement of Nardò centred on a small bay and a square overlooking the Ionian Sea.",
+          "es": "Santa Maria al Bagno es una marina de Nardò organizada alrededor de una pequeña bahía y una plaza frente al mar Jónico."
+        },
+        "highlights": {
+          "it": [
+            "piazza sul mare",
+            "piccola baia",
+            "tramonti ionici"
+          ],
+          "fr": [
+            "place sur la mer",
+            "petite baie",
+            "couchers de soleil ioniens"
+          ],
+          "en": [
+            "seafront square",
+            "small bay",
+            "Ionian sunsets"
+          ],
+          "es": [
+            "plaza frente al mar",
+            "pequeña bahía",
+            "puestas de sol jónicas"
+          ]
+        }
+      },
+      "alimini": {
+        "poiId": "alimini",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "lakes",
+          "wetland",
+          "nature"
+        ],
+        "sourceIds": [
+          "visitpuglia-otranto-guide"
+        ],
+        "summary": {
+          "it": "I Laghi Alimini sono un sistema di laghi costieri e zone umide a nord di Otranto, circondato da pinete, macchia mediterranea e lunghi tratti di costa sabbiosa.",
+          "fr": "Les lacs Alimini forment un système de lacs côtiers et de zones humides au nord d’Otranto, entouré de pinèdes, de maquis méditerranéen et de longues plages sableuses.",
+          "en": "The Alimini Lakes form a system of coastal lakes and wetlands north of Otranto, surrounded by pine woods, Mediterranean scrub and long sandy shores.",
+          "es": "Los Lagos Alimini forman un sistema de lagos costeros y humedales al norte de Otranto, rodeado de pinares, matorral mediterráneo y largas playas de arena."
+        },
+        "highlights": {
+          "it": [
+            "laghi costieri",
+            "pineta",
+            "zone umide"
+          ],
+          "fr": [
+            "lacs côtiers",
+            "pinède",
+            "zones humides"
+          ],
+          "en": [
+            "coastal lakes",
+            "pine woods",
+            "wetlands"
+          ],
+          "es": [
+            "lagos costeros",
+            "pinar",
+            "humedales"
+          ]
+        }
+      },
+      "turchi": {
+        "poiId": "turchi",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "beach",
+          "protected-area",
+          "history"
+        ],
+        "sourceIds": [
+          "visitpuglia-otranto-guide"
+        ],
+        "summary": {
+          "it": "Baia dei Turchi è una baia sabbiosa a nord di Otranto, immersa nella pineta e nella macchia mediterranea di un tratto costiero protetto.",
+          "fr": "Baia dei Turchi est une baie sableuse au nord d’Otranto, entourée de pinède et de maquis méditerranéen dans un secteur côtier protégé.",
+          "en": "Baia dei Turchi is a sandy bay north of Otranto, surrounded by pine woodland and Mediterranean scrub within a protected coastal area.",
+          "es": "Baia dei Turchi es una bahía de arena al norte de Otranto, rodeada de pinar y matorral mediterráneo en un tramo de costa protegida."
+        },
+        "why": {
+          "it": "Il nome richiama la tradizione che lega questo tratto di costa allo sbarco delle forze ottomane durante l’assedio di Otranto del 1480.",
+          "fr": "Le nom renvoie à la tradition qui associe ce secteur côtier au débarquement des forces ottomanes pendant le siège d’Otranto de 1480.",
+          "en": "The name recalls the tradition linking this stretch of coast with the Ottoman landing during the 1480 siege of Otranto.",
+          "es": "El nombre recuerda la tradición que vincula este tramo de costa con el desembarco otomano durante el asedio de Otranto de 1480."
+        },
+        "highlights": {
+          "it": [
+            "sabbia chiara",
+            "pineta",
+            "costa protetta"
+          ],
+          "fr": [
+            "sable clair",
+            "pinède",
+            "côte protégée"
+          ],
+          "en": [
+            "light sand",
+            "pine woodland",
+            "protected coast"
+          ],
+          "es": [
+            "arena clara",
+            "pinar",
+            "costa protegida"
+          ]
+        }
+      },
+      "mulino": {
+        "poiId": "mulino",
+        "territoryIds": [
+          "otranto"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "bay",
+          "sea-caves",
+          "snorkeling"
+        ],
+        "sourceIds": [
+          "visitpuglia-otranto-guide"
+        ],
+        "summary": {
+          "it": "Baia del Mulino d’Acqua è una piccola baia della costa di Otranto nota per l’acqua limpida e per il sistema di grotte marine e cavità costiere vicine.",
+          "fr": "Baia del Mulino d’Acqua est une petite baie de la côte d’Otranto connue pour son eau claire et son système de grottes marines et cavités côtières voisines.",
+          "en": "Baia del Mulino d’Acqua is a small bay on the Otranto coast known for clear water and a nearby system of sea caves and coastal cavities.",
+          "es": "Baia del Mulino d’Acqua es una pequeña bahía de la costa de Otranto conocida por sus aguas claras y por el sistema cercano de cuevas marinas."
+        },
+        "why": {
+          "it": "Il nome ricorda un antico mulino ad acqua che si trovava nei pressi della baia.",
+          "fr": "Le nom rappelle un ancien moulin à eau qui se trouvait près de la baie.",
+          "en": "The name recalls an old watermill that once stood near the bay.",
+          "es": "El nombre recuerda un antiguo molino de agua que existía cerca de la bahía."
+        },
+        "highlights": {
+          "it": [
+            "grotte marine",
+            "acqua limpida",
+            "baia raccolta"
+          ],
+          "fr": [
+            "grottes marines",
+            "eau claire",
+            "petite baie"
+          ],
+          "en": [
+            "sea caves",
+            "clear water",
+            "small bay"
+          ],
+          "es": [
+            "cuevas marinas",
+            "agua clara",
+            "pequeña bahía"
+          ]
+        }
+      },
+      "torre_santandrea": {
+        "poiId": "torre_santandrea",
+        "territoryIds": [
+          "melendugno"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "coast",
+          "sea-stacks",
+          "watchtower"
+        ],
+        "sourceIds": [
+          "visitmelendugno",
+          "visitmelendugno-poi"
+        ],
+        "summary": {
+          "it": "Torre Sant’Andrea è una marina del comune di Melendugno celebre per la costa di calcare bianco modellata in faraglioni, archi naturali e piccole cale.",
+          "fr": "Torre Sant’Andrea est une marina de Melendugno célèbre pour sa côte de calcaire blanc sculptée en stacks, arches naturelles et petites criques.",
+          "en": "Torre Sant’Andrea is a Melendugno seaside area famous for pale limestone coast sculpted into sea stacks, natural arches and small coves.",
+          "es": "Torre Sant’Andrea es una marina de Melendugno famosa por su costa de caliza blanca esculpida en farallones, arcos naturales y pequeñas calas."
+        },
+        "history": {
+          "it": "La torre costiera di Sant’Andrea fu costruita nel XVI secolo come parte della rete difensiva contro le incursioni dal mare.",
+          "fr": "La tour côtière de Sant’Andrea fut construite au XVIe siècle dans le cadre du réseau défensif contre les incursions maritimes.",
+          "en": "Sant’Andrea’s coastal tower was built in the 16th century as part of the defence network against raids from the sea.",
+          "es": "La torre costera de Sant’Andrea fue construida en el siglo XVI como parte de la red defensiva contra incursiones marítimas."
+        },
+        "highlights": {
+          "it": [
+            "faraglioni",
+            "archi naturali",
+            "torre costiera"
+          ],
+          "fr": [
+            "faraglioni",
+            "arches naturelles",
+            "tour côtière"
+          ],
+          "en": [
+            "sea stacks",
+            "natural arches",
+            "coastal tower"
+          ],
+          "es": [
+            "farallones",
+            "arcos naturales",
+            "torre costera"
+          ]
+        }
+      },
+      "poesia": {
+        "poiId": "poesia",
+        "territoryIds": [
+          "melendugno"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "archaeology",
+          "karst",
+          "natural-pool"
+        ],
+        "sourceIds": [
+          "visitpuglia-poesia",
+          "visitmelendugno"
+        ],
+        "summary": {
+          "it": "La Grotta della Poesia a Roca Vecchia è una grande cavità carsica aperta sul mare, parte di un sito di eccezionale interesse paesaggistico e archeologico.",
+          "fr": "La Grotta della Poesia à Roca Vecchia est une grande cavité karstique ouverte sur la mer, au sein d’un site d’un intérêt paysager et archéologique exceptionnel.",
+          "en": "Grotta della Poesia at Roca Vecchia is a large karst cavity open to the sea, within a site of exceptional landscape and archaeological interest.",
+          "es": "La Grotta della Poesia en Roca Vecchia es una gran cavidad kárstica abierta al mar, dentro de un lugar de excepcional interés paisajístico y arqueológico."
+        },
+        "history": {
+          "it": "Roca Vecchia è frequentata fin dall’età del Bronzo e conserva importanti testimonianze messapiche e iscrizioni legate all’antico luogo di culto.",
+          "fr": "Roca Vecchia est fréquentée depuis l’âge du Bronze et conserve d’importants témoignages messapiens ainsi que des inscriptions liées à l’ancien lieu de culte.",
+          "en": "Roca Vecchia has been occupied since the Bronze Age and preserves important Messapian evidence and inscriptions linked to the ancient cult site.",
+          "es": "Roca Vecchia está ocupada desde la Edad del Bronce y conserva importantes testimonios mesapios e inscripciones vinculadas al antiguo lugar de culto."
+        },
+        "myth": {
+          "it": "Una leggenda popolare collega il nome della grotta a una giovane principessa la cui bellezza avrebbe ispirato poeti; ARACNE la presenta come leggenda.",
+          "fr": "Une légende populaire relie le nom de la grotte à une jeune princesse dont la beauté aurait inspiré les poètes ; ARACNE la présente comme une légende.",
+          "en": "A popular legend links the cave’s name to a young princess whose beauty inspired poets; ARACNE presents this as legend.",
+          "es": "Una leyenda popular relaciona el nombre de la cueva con una joven princesa cuya belleza habría inspirado a poetas; ARACNE la presenta como leyenda."
+        },
+        "highlights": {
+          "it": [
+            "grande piscina naturale",
+            "area archeologica di Roca",
+            "fenomeni carsici"
+          ],
+          "fr": [
+            "grande piscine naturelle",
+            "site archéologique de Roca",
+            "phénomènes karstiques"
+          ],
+          "en": [
+            "large natural pool",
+            "Roca archaeological site",
+            "karst features"
+          ],
+          "es": [
+            "gran piscina natural",
+            "zona arqueológica de Roca",
+            "fenómenos kársticos"
+          ]
+        }
+      },
+      "torcito": {
+        "poiId": "torcito",
+        "territoryIds": [
+          "cannole"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "nature",
+          "rural-history",
+          "walking"
+        ],
+        "sourceIds": [
+          "torcito-official"
+        ],
+        "summary": {
+          "it": "Parco Torcito è un paesaggio naturale, archeologico e rurale di oltre 200 ettari presso Cannole, attraversato da sentieri, muri a secco, cave dismesse e testimonianze della civiltà agricola.",
+          "fr": "Le parc Torcito est un paysage naturel, archéologique et rural de plus de 200 hectares près de Cannole, traversé de sentiers, murs en pierre sèche, anciennes carrières et patrimoine agricole.",
+          "en": "Parco Torcito is a natural, archaeological and rural landscape of more than 200 hectares near Cannole, crossed by trails, dry-stone walls, former quarries and rural heritage.",
+          "es": "Parco Torcito es un paisaje natural, arqueológico y rural de más de 200 hectáreas cerca de Cannole, atravesado por senderos, muros de piedra seca, antiguas canteras y patrimonio agrícola."
+        },
+        "highlights": {
+          "it": [
+            "sentieri",
+            "masseria fortificata",
+            "muri a secco",
+            "paesaggio rurale"
+          ],
+          "fr": [
+            "sentiers",
+            "masseria fortifiée",
+            "murs en pierre sèche",
+            "paysage rural"
+          ],
+          "en": [
+            "trails",
+            "fortified masseria",
+            "dry-stone walls",
+            "rural landscape"
+          ],
+          "es": [
+            "senderos",
+            "masseria fortificada",
+            "muros de piedra seca",
+            "paisaje rural"
+          ]
+        }
+      },
+      "borgagne": {
+        "poiId": "borgagne",
+        "territoryIds": [
+          "melendugno"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "village",
+          "rural-history",
+          "food"
+        ],
+        "sourceIds": [
+          "visitmelendugno",
+          "visitmelendugno-poi"
+        ],
+        "summary": {
+          "it": "Borgagne è un borgo dell’entroterra di Melendugno che conserva un forte carattere agricolo e un tessuto storico di case a corte, architetture fortificate e tradizioni locali.",
+          "fr": "Borgagne est un village de l’intérieur de Melendugno qui conserve un fort caractère agricole, avec maisons à cour, architectures fortifiées et traditions locales.",
+          "en": "Borgagne is an inland village of Melendugno with a strong agricultural identity, preserving courtyard houses, fortified architecture and local traditions.",
+          "es": "Borgagne es un pueblo del interior de Melendugno con una fuerte identidad agrícola, que conserva casas con patio, arquitectura fortificada y tradiciones locales."
+        },
+        "history": {
+          "it": "Il borgo conserva tracce medievali e rinascimentali; il portale turistico comunale segnala la fortificazione diffusa fra la fine del Quattrocento e la prima metà del Cinquecento.",
+          "fr": "Le village conserve des traces médiévales et Renaissance ; le portail touristique communal signale une fortification diffuse entre la fin du XVe et la première moitié du XVIe siècle.",
+          "en": "The village preserves medieval and Renaissance traces; the municipal tourism portal records widespread fortification between the late 15th and first half of the 16th century.",
+          "es": "El pueblo conserva huellas medievales y renacentistas; el portal turístico municipal señala una fortificación extendida entre finales del siglo XV y la primera mitad del XVI."
+        },
+        "highlights": {
+          "it": [
+            "case a corte",
+            "Castello Petraroli",
+            "tradizioni rurali"
+          ],
+          "fr": [
+            "maisons à cour",
+            "château Petraroli",
+            "traditions rurales"
+          ],
+          "en": [
+            "courtyard houses",
+            "Petraroli Castle",
+            "rural traditions"
+          ],
+          "es": [
+            "casas con patio",
+            "Castillo Petraroli",
+            "tradiciones rurales"
+          ]
+        }
+      },
+      "rudiae": {
+        "poiId": "rudiae",
+        "territoryIds": [
+          "lecce"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "archaeology",
+          "messapian",
+          "roman"
+        ],
+        "sourceIds": [
+          "mic-rudiae"
+        ],
+        "summary": {
+          "it": "Rudiae è uno dei principali siti archeologici del Salento, noto come luogo di nascita del poeta latino Quinto Ennio e per il suo anfiteatro di età imperiale.",
+          "fr": "Rudiae est l’un des principaux sites archéologiques du Salento, connu comme lieu de naissance du poète latin Quintus Ennius et pour son amphithéâtre d’époque impériale.",
+          "en": "Rudiae is one of Salento’s major archaeological sites, known as the birthplace of Latin poet Quintus Ennius and for its Roman imperial amphitheatre.",
+          "es": "Rudiae es uno de los principales yacimientos arqueológicos del Salento, conocido como lugar de nacimiento del poeta latino Quinto Ennio y por su anfiteatro de época imperial."
+        },
+        "history": {
+          "it": "Il sito conserva fortificazioni messapiche, necropoli, strade basolate e edifici pubblici romani. L’anfiteatro fu costruito durante il regno di Traiano, fra il 98 e il 117 d.C.",
+          "fr": "Le site conserve fortifications messapiennes, nécropoles, voies dallées et bâtiments publics romains. L’amphithéâtre fut construit sous le règne de Trajan, entre 98 et 117 apr. J.-C.",
+          "en": "The site preserves Messapian fortifications, necropolises, paved streets and Roman public buildings. The amphitheatre was built during Trajan’s reign, between AD 98 and 117.",
+          "es": "El yacimiento conserva fortificaciones mesapias, necrópolis, calles pavimentadas y edificios públicos romanos. El anfiteatro fue construido durante el reinado de Trajano, entre 98 y 117 d.C."
+        },
+        "highlights": {
+          "it": [
+            "anfiteatro romano",
+            "fortificazioni messapiche",
+            "patria di Quinto Ennio"
+          ],
+          "fr": [
+            "amphithéâtre romain",
+            "fortifications messapiennes",
+            "patrie de Quintus Ennius"
+          ],
+          "en": [
+            "Roman amphitheatre",
+            "Messapian fortifications",
+            "birthplace of Quintus Ennius"
+          ],
+          "es": [
+            "anfiteatro romano",
+            "fortificaciones mesapias",
+            "patria de Quinto Ennio"
           ]
         }
       }
@@ -747,7 +2884,8 @@
           "cervi",
           "turchi",
           "mulino",
-          "alimini"
+          "alimini",
+          "enea"
         ],
         "themes": [
           "adriatic",
@@ -912,7 +3050,8 @@
           "capitano",
           "frascone",
           "santamaria",
-          "santacaterina"
+          "santacaterina",
+          "montagna"
         ],
         "themes": [
           "baroque",
@@ -1349,7 +3488,651 @@
           ]
         },
         "name": "Ostuni"
+      },
+      "santa_cesarea": {
+        "id": "santa_cesarea",
+        "name": "Santa Cesarea Terme",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "santa cesarea terme",
+            "santa cesarea"
+          ],
+          "fr": [
+            "santa cesarea terme",
+            "santa cesarea"
+          ],
+          "en": [
+            "santa cesarea terme",
+            "santa cesarea"
+          ],
+          "es": [
+            "santa cesarea terme",
+            "santa cesarea"
+          ]
+        },
+        "sourceIds": [
+          "italia-santacesarea"
+        ],
+        "poiIds": [
+          "miggiano",
+          "cesarea"
+        ],
+        "themes": [
+          "thermal",
+          "adriatic",
+          "cliffs"
+        ],
+        "summary": {
+          "it": "Santa Cesarea Terme è un territorio costiero adriatico noto per le sorgenti termali sulfuree, le falesie e le architetture eclettiche.",
+          "fr": "Santa Cesarea Terme est un territoire côtier adriatique connu pour ses sources thermales sulfureuses, ses falaises et son architecture éclectique.",
+          "en": "Santa Cesarea Terme is an Adriatic coastal territory known for sulphurous thermal springs, cliffs and eclectic architecture.",
+          "es": "Santa Cesarea Terme es un territorio costero adriático conocido por sus aguas termales sulfurosas, acantilados y arquitectura ecléctica."
+        },
+        "highlights": {
+          "it": [
+            "Santa Cesarea Terme",
+            "Porto Miggiano",
+            "grotte termali"
+          ],
+          "fr": [
+            "Santa Cesarea Terme",
+            "Porto Miggiano",
+            "grottes thermales"
+          ],
+          "en": [
+            "Santa Cesarea Terme",
+            "Porto Miggiano",
+            "thermal caves"
+          ],
+          "es": [
+            "Santa Cesarea Terme",
+            "Porto Miggiano",
+            "cuevas termales"
+          ]
+        }
+      },
+      "tricase": {
+        "id": "tricase",
+        "name": "Tricase e Serra del Mito",
+        "type": "territory",
+        "confidence": "medium",
+        "aliases": {
+          "it": [
+            "tricase",
+            "caprarica del capo"
+          ],
+          "fr": [
+            "tricase",
+            "caprarica del capo"
+          ],
+          "en": [
+            "tricase",
+            "caprarica del capo"
+          ],
+          "es": [
+            "tricase",
+            "caprarica del capo"
+          ]
+        },
+        "sourceIds": [
+          "parco-otranto-leuca-comuni",
+          "tricase-caprarica"
+        ],
+        "poiIds": [
+          "scarra",
+          "ripe",
+          "caprarica"
+        ],
+        "themes": [
+          "rural-history",
+          "coast",
+          "fortifications"
+        ],
+        "summary": {
+          "it": "Il territorio di Tricase collega borghi storici, paesaggio rurale, Serre salentine e la costa del Parco Otranto–Leuca.",
+          "fr": "Le territoire de Tricase relie villages historiques, paysage rural, collines des Serre salentine et côte du parc Otranto–Leuca.",
+          "en": "The Tricase area links historic villages, rural landscapes, Salento ridges and the Otranto–Leuca park coast.",
+          "es": "El territorio de Tricase une pueblos históricos, paisaje rural, sierras salentinas y la costa del parque Otranto–Leuca."
+        },
+        "highlights": {
+          "it": [
+            "Caprarica del Capo",
+            "Serra del Mito",
+            "paesaggio rurale"
+          ],
+          "fr": [
+            "Caprarica del Capo",
+            "Serra del Mito",
+            "paysage rural"
+          ],
+          "en": [
+            "Caprarica del Capo",
+            "Serra del Mito",
+            "rural landscape"
+          ],
+          "es": [
+            "Caprarica del Capo",
+            "Serra del Mito",
+            "paisaje rural"
+          ]
+        }
+      },
+      "diso": {
+        "id": "diso",
+        "name": "Diso e Marina di Marittima",
+        "type": "territory",
+        "confidence": "medium",
+        "aliases": {
+          "it": [
+            "diso",
+            "marittima"
+          ],
+          "fr": [
+            "diso",
+            "marittima"
+          ],
+          "en": [
+            "diso",
+            "marittima"
+          ],
+          "es": [
+            "diso",
+            "marittima"
+          ]
+        },
+        "sourceIds": [
+          "tourpuglia-acquaviva"
+        ],
+        "poiIds": [
+          "acquaviva"
+        ],
+        "themes": [
+          "coast",
+          "springs",
+          "coves"
+        ],
+        "summary": {
+          "it": "Il territorio di Diso scende verso la costa di Marina di Marittima, caratterizzata da insenature rocciose e sorgenti d’acqua dolce.",
+          "fr": "Le territoire de Diso descend vers la côte de Marina di Marittima, caractérisée par criques rocheuses et sources d’eau douce.",
+          "en": "The Diso area reaches the Marina di Marittima coast, characterised by rocky inlets and freshwater springs.",
+          "es": "El territorio de Diso llega a la costa de Marina di Marittima, caracterizada por calas rocosas y manantiales de agua dulce."
+        },
+        "highlights": {
+          "it": [
+            "Cala dell’Acquaviva",
+            "Marina di Marittima"
+          ],
+          "fr": [
+            "Cala dell’Acquaviva",
+            "Marina di Marittima"
+          ],
+          "en": [
+            "Cala dell’Acquaviva",
+            "Marina di Marittima"
+          ],
+          "es": [
+            "Cala dell’Acquaviva",
+            "Marina di Marittima"
+          ]
+        }
+      },
+      "andrano": {
+        "id": "andrano",
+        "name": "Andrano",
+        "type": "territory",
+        "confidence": "medium",
+        "aliases": {
+          "it": [
+            "andrano",
+            "marina di andrano"
+          ],
+          "fr": [
+            "andrano",
+            "marina di andrano"
+          ],
+          "en": [
+            "andrano",
+            "marina di andrano"
+          ],
+          "es": [
+            "andrano",
+            "marina di andrano"
+          ]
+        },
+        "sourceIds": [
+          "parco-otranto-leuca-itinerari"
+        ],
+        "poiIds": [
+          "verde"
+        ],
+        "themes": [
+          "rocky-coast",
+          "sea-caves"
+        ],
+        "summary": {
+          "it": "Andrano comprende un tratto di costa rocciosa del basso Adriatico salentino, con cavità marine e acque trasparenti.",
+          "fr": "Andrano comprend un secteur de côte rocheuse du bas Adriatique salentin, avec grottes marines et eaux transparentes.",
+          "en": "Andrano includes a rocky stretch of lower Salento’s Adriatic coast, with sea caves and clear water.",
+          "es": "Andrano comprende un tramo de costa rocosa del bajo Adriático salentino, con cuevas marinas y aguas transparentes."
+        },
+        "highlights": {
+          "it": [
+            "Grotta Verde",
+            "Marina di Andrano"
+          ],
+          "fr": [
+            "Grotta Verde",
+            "Marina di Andrano"
+          ],
+          "en": [
+            "Grotta Verde",
+            "Marina di Andrano"
+          ],
+          "es": [
+            "Grotta Verde",
+            "Marina di Andrano"
+          ]
+        }
+      },
+      "leuca": {
+        "id": "leuca",
+        "name": "Santa Maria di Leuca",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "santa maria di leuca",
+            "leuca"
+          ],
+          "fr": [
+            "santa maria di leuca",
+            "leuca"
+          ],
+          "en": [
+            "santa maria di leuca",
+            "leuca"
+          ],
+          "es": [
+            "santa maria di leuca",
+            "leuca"
+          ]
+        },
+        "sourceIds": [
+          "visitpuglia-leuca"
+        ],
+        "poiIds": [
+          "treporte"
+        ],
+        "themes": [
+          "cliffs",
+          "sea-caves",
+          "pilgrimage"
+        ],
+        "summary": {
+          "it": "Santa Maria di Leuca occupa l’estremo meridionale del Salento, con alte falesie, numerose grotte marine, il santuario e il terminale monumentale dell’Acquedotto Pugliese.",
+          "fr": "Santa Maria di Leuca occupe l’extrémité méridionale du Salento, avec hautes falaises, nombreuses grottes marines, sanctuaire et terminal monumental de l’aqueduc des Pouilles.",
+          "en": "Santa Maria di Leuca occupies Salento’s southern tip, with high cliffs, many sea caves, its sanctuary and the monumental terminal of the Apulian Aqueduct.",
+          "es": "Santa Maria di Leuca ocupa el extremo meridional del Salento, con altos acantilados, numerosas cuevas marinas, santuario y terminal monumental del Acueducto de Apulia."
+        },
+        "highlights": {
+          "it": [
+            "Grotta delle Tre Porte",
+            "falesie",
+            "Santuario de Finibus Terrae"
+          ],
+          "fr": [
+            "Grotta delle Tre Porte",
+            "falaises",
+            "sanctuaire de Finibus Terrae"
+          ],
+          "en": [
+            "Grotta delle Tre Porte",
+            "cliffs",
+            "De Finibus Terrae sanctuary"
+          ],
+          "es": [
+            "Grotta delle Tre Porte",
+            "acantilados",
+            "Santuario de Finibus Terrae"
+          ]
+        }
+      },
+      "ugento": {
+        "id": "ugento",
+        "name": "Ugento e il suo litorale",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "ugento"
+          ],
+          "fr": [
+            "ugento"
+          ],
+          "en": [
+            "ugento"
+          ],
+          "es": [
+            "ugento"
+          ]
+        },
+        "sourceIds": [
+          "ugento-park"
+        ],
+        "poiIds": [
+          "ugento",
+          "casale",
+          "giurupi"
+        ],
+        "themes": [
+          "wetlands",
+          "ionian",
+          "history"
+        ],
+        "summary": {
+          "it": "Ugento unisce un centro storico dell’entroterra a un vasto litorale ionico protetto, fatto di dune, bacini e macchia mediterranea.",
+          "fr": "Ugento relie un centre historique intérieur à un vaste littoral ionien protégé composé de dunes, bassins et maquis méditerranéen.",
+          "en": "Ugento links an inland historic centre with a broad protected Ionian coast of dunes, basins and Mediterranean scrub.",
+          "es": "Ugento une un centro histórico interior con una amplia costa jónica protegida de dunas, lagunas y matorral mediterráneo."
+        },
+        "highlights": {
+          "it": [
+            "Parco Litorale di Ugento",
+            "Madonna del Casale"
+          ],
+          "fr": [
+            "Parc du littoral d’Ugento",
+            "Madonna del Casale"
+          ],
+          "en": [
+            "Ugento Coastal Park",
+            "Madonna del Casale"
+          ],
+          "es": [
+            "Parque Litoral de Ugento",
+            "Madonna del Casale"
+          ]
+        }
+      },
+      "porto_cesareo": {
+        "id": "porto_cesareo",
+        "name": "Porto Cesareo",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "porto cesareo"
+          ],
+          "fr": [
+            "porto cesareo"
+          ],
+          "en": [
+            "porto cesareo"
+          ],
+          "es": [
+            "porto cesareo"
+          ]
+        },
+        "sourceIds": [
+          "visitpuglia-portocesareo"
+        ],
+        "poiIds": [
+          "chianca",
+          "conigli"
+        ],
+        "themes": [
+          "ionian",
+          "dunes",
+          "coastal-towers"
+        ],
+        "summary": {
+          "it": "Porto Cesareo è un territorio ionico noto per spiagge sabbiose, bassi fondali, dune, isolotti e torri costiere cinquecentesche.",
+          "fr": "Porto Cesareo est un territoire ionien connu pour ses plages sableuses, faibles fonds, dunes, îlots et tours côtières du XVIe siècle.",
+          "en": "Porto Cesareo is an Ionian territory known for sandy beaches, shallow water, dunes, islets and 16th-century coastal towers.",
+          "es": "Porto Cesareo es un territorio jónico conocido por playas de arena, aguas poco profundas, dunas, islotes y torres costeras del siglo XVI."
+        },
+        "highlights": {
+          "it": [
+            "Torre Chianca",
+            "Isola dei Conigli",
+            "spiagge e dune"
+          ],
+          "fr": [
+            "Torre Chianca",
+            "Isola dei Conigli",
+            "plages et dunes"
+          ],
+          "en": [
+            "Torre Chianca",
+            "Isola dei Conigli",
+            "beaches and dunes"
+          ],
+          "es": [
+            "Torre Chianca",
+            "Isola dei Conigli",
+            "playas y dunas"
+          ]
+        }
+      },
+      "melendugno": {
+        "id": "melendugno",
+        "name": "Melendugno e le sue marine",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "melendugno",
+            "torre dell orso",
+            "roca vecchia"
+          ],
+          "fr": [
+            "melendugno",
+            "torre dell orso",
+            "roca vecchia"
+          ],
+          "en": [
+            "melendugno",
+            "torre dell orso",
+            "roca vecchia"
+          ],
+          "es": [
+            "melendugno",
+            "torre dell orso",
+            "roca vecchia"
+          ]
+        },
+        "sourceIds": [
+          "visitmelendugno"
+        ],
+        "poiIds": [
+          "santandrea",
+          "sorelle",
+          "torre_santandrea",
+          "poesia",
+          "borgagne"
+        ],
+        "themes": [
+          "adriatic",
+          "archaeology",
+          "sea-stacks",
+          "villages"
+        ],
+        "summary": {
+          "it": "Il territorio di Melendugno unisce l’entroterra agricolo e Borgagne a una costa adriatica di spiagge, falesie, faraglioni e siti archeologici come Roca Vecchia.",
+          "fr": "Le territoire de Melendugno relie l’arrière-pays agricole et Borgagne à une côte adriatique de plages, falaises, stacks et sites archéologiques comme Roca Vecchia.",
+          "en": "Melendugno links its agricultural hinterland and Borgagne with an Adriatic coast of beaches, cliffs, sea stacks and archaeological sites such as Roca Vecchia.",
+          "es": "Melendugno une su interior agrícola y Borgagne con una costa adriática de playas, acantilados, farallones y yacimientos arqueológicos como Roca Vecchia."
+        },
+        "highlights": {
+          "it": [
+            "Torre dell’Orso",
+            "Due Sorelle",
+            "Torre Sant’Andrea",
+            "Grotta della Poesia",
+            "Borgagne"
+          ],
+          "fr": [
+            "Torre dell’Orso",
+            "Due Sorelle",
+            "Torre Sant’Andrea",
+            "Grotta della Poesia",
+            "Borgagne"
+          ],
+          "en": [
+            "Torre dell’Orso",
+            "Due Sorelle",
+            "Torre Sant’Andrea",
+            "Grotta della Poesia",
+            "Borgagne"
+          ],
+          "es": [
+            "Torre dell’Orso",
+            "Due Sorelle",
+            "Torre Sant’Andrea",
+            "Grotta della Poesia",
+            "Borgagne"
+          ]
+        }
+      },
+      "vernole": {
+        "id": "vernole",
+        "name": "Vernole e Le Cesine",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "vernole",
+            "le cesine"
+          ],
+          "fr": [
+            "vernole",
+            "le cesine"
+          ],
+          "en": [
+            "vernole",
+            "le cesine"
+          ],
+          "es": [
+            "vernole",
+            "le cesine"
+          ]
+        },
+        "sourceIds": [
+          "wwf-cesine"
+        ],
+        "poiIds": [
+          "cesine"
+        ],
+        "themes": [
+          "wetlands",
+          "biodiversity"
+        ],
+        "summary": {
+          "it": "Il territorio di Vernole comprende la Riserva delle Cesine, uno dei più importanti sistemi di zone umide costiere del Salento.",
+          "fr": "Le territoire de Vernole comprend la réserve des Cesine, l’un des plus importants systèmes de zones humides côtières du Salento.",
+          "en": "The Vernole area includes Le Cesine reserve, one of Salento’s most important coastal wetland systems.",
+          "es": "El territorio de Vernole incluye la reserva de Le Cesine, uno de los sistemas de humedales costeros más importantes del Salento."
+        },
+        "highlights": {
+          "it": [
+            "Le Cesine",
+            "birdwatching",
+            "zone umide"
+          ],
+          "fr": [
+            "Le Cesine",
+            "observation des oiseaux",
+            "zones humides"
+          ],
+          "en": [
+            "Le Cesine",
+            "birdwatching",
+            "wetlands"
+          ],
+          "es": [
+            "Le Cesine",
+            "observación de aves",
+            "humedales"
+          ]
+        }
+      },
+      "cannole": {
+        "id": "cannole",
+        "name": "Cannole e Torcito",
+        "type": "territory",
+        "confidence": "high",
+        "aliases": {
+          "it": [
+            "cannole",
+            "torcito"
+          ],
+          "fr": [
+            "cannole",
+            "torcito"
+          ],
+          "en": [
+            "cannole",
+            "torcito"
+          ],
+          "es": [
+            "cannole",
+            "torcito"
+          ]
+        },
+        "sourceIds": [
+          "torcito-official"
+        ],
+        "poiIds": [
+          "torcito"
+        ],
+        "themes": [
+          "rural-landscape",
+          "walking",
+          "heritage"
+        ],
+        "summary": {
+          "it": "Cannole è collegata al paesaggio rurale di Torcito, un grande sistema di sentieri, masserie, cave e muri a secco a pochi chilometri da Otranto.",
+          "fr": "Cannole est liée au paysage rural de Torcito, vaste système de sentiers, masserie, carrières et murs en pierre sèche à quelques kilomètres d’Otranto.",
+          "en": "Cannole is linked with the rural landscape of Torcito, a large system of trails, masserie, quarries and dry-stone walls a few kilometres from Otranto.",
+          "es": "Cannole está vinculada al paisaje rural de Torcito, un amplio sistema de senderos, masserie, canteras y muros de piedra seca a pocos kilómetros de Otranto."
+        },
+        "highlights": {
+          "it": [
+            "Parco Torcito",
+            "masserie",
+            "sentieri rurali"
+          ],
+          "fr": [
+            "Parc Torcito",
+            "masserie",
+            "sentiers ruraux"
+          ],
+          "en": [
+            "Parco Torcito",
+            "masserie",
+            "rural trails"
+          ],
+          "es": [
+            "Parco Torcito",
+            "masserie",
+            "senderos rurales"
+          ]
+        }
       }
+    },
+    "coverage": {
+      "poiTotal": 50,
+      "knowledgeEntries": 49,
+      "territories": 19,
+      "pendingVerification": [
+        "lecce",
+        "scarra",
+        "enea",
+        "ripe",
+        "giurupi"
+      ]
     }
   };
 
@@ -1431,6 +4214,15 @@
       return !!DATA.entries[id];
     },
 
+    quality(id) {
+      const entry=DATA.entries[id];
+      return entry ? {
+        confidence:entry.confidence||null,
+        verificationStatus:entry.verificationStatus||null,
+        territoryIds:[...(entry.territoryIds||[])]
+      } : null;
+    },
+
     sourcesFor(id) {
       const entry=DATA.entries[id];
       if(!entry)return [];
@@ -1459,7 +4251,8 @@
         updated:DATA.updated,
         entries:Object.keys(DATA.entries).length,
         territories:Object.keys(DATA.territories||{}).length,
-        sources:Object.keys(DATA.sources).length
+        sources:Object.keys(DATA.sources).length,
+        coverage:DATA.coverage||null
       };
     }
   };
