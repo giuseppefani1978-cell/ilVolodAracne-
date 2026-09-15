@@ -2774,6 +2774,63 @@
             "patria de Quinto Ennio"
           ]
         }
+      },
+      "castro": {
+        "poiId": "castro",
+        "territoryIds": [
+          "castro"
+        ],
+        "confidence": "high",
+        "verificationStatus": "verified",
+        "themes": [
+          "archaeology",
+          "messapian",
+          "minerva",
+          "religious-history"
+        ],
+        "sourceIds": [
+          "italia-castro-city"
+        ],
+        "summary": {
+          "it": "Il Tempio di Minerva è il riferimento archeologico che lega Castro all’antica Castrum Minervae. Gli scavi nell’area del borgo alto hanno restituito elementi di un importante santuario dedicato alla dea.",
+          "fr": "Le Temple de Minerve est le grand repère archéologique qui relie Castro à l’antique Castrum Minervae. Les fouilles du bourg haut ont révélé des éléments d’un important sanctuaire dédié à la déesse.",
+          "en": "The Temple of Minerva is the key archaeological reference linking Castro with ancient Castrum Minervae. Excavations in the upper town have revealed elements of an important sanctuary dedicated to the goddess.",
+          "es": "El Templo de Minerva es la principal referencia arqueológica que vincula Castro con la antigua Castrum Minervae. Las excavaciones del núcleo alto han revelado elementos de un importante santuario dedicado a la diosa."
+        },
+        "history": {
+          "it": "Le ricerche archeologiche hanno individuato strutture e reperti riconducibili al santuario, compresi frammenti attribuiti a una grande statua di Minerva. I materiali sono parte essenziale del racconto archeologico di Castro.",
+          "fr": "Les recherches archéologiques ont identifié des structures et des vestiges liés au sanctuaire, dont des fragments attribués à une grande statue de Minerve. Ces découvertes sont essentielles au récit archéologique de Castro.",
+          "en": "Archaeological research has identified structures and finds connected with the sanctuary, including fragments attributed to a large statue of Minerva. These finds are central to Castro’s archaeological story.",
+          "es": "Las investigaciones arqueológicas han identificado estructuras y hallazgos vinculados al santuario, incluidos fragmentos atribuidos a una gran estatua de Minerva. Estos materiales son esenciales para la historia arqueológica de Castro."
+        },
+        "myth": {
+          "it": "Il nome Castrum Minervae e la tradizione letteraria hanno favorito il legame fra Castro, Minerva e il viaggio di Enea. ARACNE distingue questa dimensione letteraria dai dati archeologici documentati.",
+          "fr": "Le nom Castrum Minervae et la tradition littéraire ont renforcé le lien entre Castro, Minerve et le voyage d’Énée. ARACNE distingue cette dimension littéraire des données archéologiques documentées.",
+          "en": "The name Castrum Minervae and literary tradition have reinforced the link between Castro, Minerva and Aeneas’ journey. ARACNE distinguishes this literary layer from documented archaeological evidence.",
+          "es": "El nombre Castrum Minervae y la tradición literaria han reforzado el vínculo entre Castro, Minerva y el viaje de Eneas. ARACNE distingue esta dimensión literaria de la evidencia arqueológica documentada."
+        },
+        "highlights": {
+          "it": [
+            "area archeologica del santuario",
+            "reperti legati alla grande statua di Minerva",
+            "Museo Archeologico nel Castello"
+          ],
+          "fr": [
+            "zone archéologique du sanctuaire",
+            "vestiges liés à la grande statue de Minerve",
+            "musée archéologique dans le château"
+          ],
+          "en": [
+            "sanctuary archaeological area",
+            "finds linked to the large Minerva statue",
+            "Archaeological Museum in the castle"
+          ],
+          "es": [
+            "zona arqueológica del santuario",
+            "hallazgos ligados a la gran estatua de Minerva",
+            "Museo Arqueológico en el castillo"
+          ]
+        }
       }
     },
     "territories": {
@@ -4124,7 +4181,7 @@
     },
     "coverage": {
       "poiTotal": 50,
-      "knowledgeEntries": 49,
+      "knowledgeEntries": 50,
       "territories": 19,
       "pendingVerification": [
         "lecce",
