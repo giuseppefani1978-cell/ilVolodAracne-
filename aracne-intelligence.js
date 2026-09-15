@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.0.0";
+  const VERSION = "1.1.0";
 
   const LANGS = [
     "it",
@@ -22,6 +22,9 @@
   let activeRequestLanguage = null;
   let askButton = null;
 
+  const CONVERSATION_MAX_TURNS = 4;
+  const CLARIFICATION_MAX_AGE = 3;
+
   const sessionState = {
     turn: 0,
     language: null,
@@ -29,7 +32,19 @@
     lastTerritoryId: null,
     lastIntents: [],
     lastRoute: null,
-    pendingClarification: null
+    pendingClarification: null,
+    turns: [],
+    focus: {
+      territoryId: null,
+      poiIds: [],
+      section: null
+    },
+    lastResult: {
+      type: null,
+      poiIds: [],
+      territoryId: null,
+      intent: null
+    }
   };
 
 
@@ -799,6 +814,19 @@
     return typeof value==="function" ? value(...args) : value;
   }
 
+  function activePendingClarification() {
+    const pending=activePendingClarification();
+    if(!pending)return null;
+
+    const createdTurn=Number(pending.createdTurn||0);
+    if(createdTurn && (sessionState.turn-createdTurn)>=CLARIFICATION_MAX_AGE) {
+      sessionState.pendingClarification=null;
+      return null;
+    }
+
+    return pending;
+  }
+
   function resetContext() {
     sessionState.turn=0;
     sessionState.language=null;
@@ -807,11 +835,16 @@
     sessionState.lastIntents=[];
     sessionState.lastRoute=null;
     sessionState.pendingClarification=null;
+    sessionState.turns=[];
+    sessionState.focus={territoryId:null,poiIds:[],section:null};
+    sessionState.lastResult={type:null,poiIds:[],territoryId:null,intent:null};
     try{updateContextIndicator();}catch(error){}
     return getContext();
   }
 
   function getContext() {
+    const pending=activePendingClarification();
+
     return {
       turn:sessionState.turn,
       language:sessionState.language,
@@ -819,6 +852,27 @@
       lastPlaceIds:[...sessionState.lastPlaceIds],
       lastTerritoryId:sessionState.lastTerritoryId,
       lastIntents:[...sessionState.lastIntents],
+      focus:{
+        territoryId:sessionState.focus?.territoryId||null,
+        poiIds:[...(sessionState.focus?.poiIds||[])],
+        section:sessionState.focus?.section||currentSectionId()||null
+      },
+      lastResult:{
+        type:sessionState.lastResult?.type||null,
+        poiIds:[...(sessionState.lastResult?.poiIds||[])],
+        territoryId:sessionState.lastResult?.territoryId||null,
+        intent:sessionState.lastResult?.intent||null
+      },
+      turns:(sessionState.turns||[]).map(turn=>({
+        turn:turn.turn,
+        user:turn.user,
+        intents:[...(turn.intents||[])],
+        entityRefs:[...(turn.entityRefs||[])],
+        territoryId:turn.territoryId||null,
+        poiIds:[...(turn.poiIds||[])],
+        resultPoiIds:[...(turn.resultPoiIds||[])],
+        clarificationType:turn.clarificationType||null
+      })),
       lastRoute:sessionState.lastRoute
         ? {
             placeIds:[...(sessionState.lastRoute.originPlaceIds||sessionState.lastRoute.placeIds||[])],
@@ -829,13 +883,87 @@
             mode:sessionState.lastRoute.mode||null
           }
         : null,
-      pendingClarification:sessionState.pendingClarification
+      pendingClarification:pending
         ? {
-            type:sessionState.pendingClarification.type,
-            placeIds:[...(sessionState.pendingClarification.placeIds||[])]
+            type:pending.type,
+            placeIds:[...(pending.placeIds||[])],
+            createdTurn:pending.createdTurn||null
           }
         : null
     };
+  }
+
+  function conversationEntityRefs(analysis) {
+    const refs=[];
+    const add=ref=>{
+      if(!ref||!ref.type||!ref.id)return;
+      const key=ref.type+":"+ref.id;
+      if(!refs.some(item=>item.key===key))refs.push({...ref,key});
+    };
+
+    if(analysis?.territory?.id)add({type:"territory",id:analysis.territory.id});
+
+    for(const place of analysis?.places||[]) {
+      if(place?.id)add({type:"poi",id:place.id});
+    }
+
+    for(const request of analysis?.plan||[]) {
+      for(const ref of request.entityRefs||[])add(ref);
+    }
+
+    return refs.map(({key,...ref})=>ref);
+  }
+
+  function recordConversationTurn(userText,analysis,meta={}) {
+    sessionState.turn+=1;
+    sessionState.language=analysis?.language||sessionState.language;
+
+    const entityRefs=conversationEntityRefs(analysis);
+    const poiIds=[
+      ...(meta.resultPoiIds||[]),
+      ...entityRefs.filter(ref=>ref.type==="poi").map(ref=>ref.id)
+    ].filter(Boolean);
+    const uniquePoiIds=[...new Set(poiIds)].slice(0,12);
+    const territoryId=
+      meta.resultTerritoryId
+      || analysis?.territory?.id
+      || entityRefs.find(ref=>ref.type==="territory")?.id
+      || null;
+
+    const record={
+      turn:sessionState.turn,
+      user:String(userText||"").slice(0,240),
+      intents:[...(analysis?.intents||[])],
+      entityRefs,
+      territoryId,
+      poiIds:[...new Set(entityRefs.filter(ref=>ref.type==="poi").map(ref=>ref.id))],
+      resultPoiIds:uniquePoiIds,
+      clarificationType:meta.clarificationType||null
+    };
+
+    sessionState.turns.push(record);
+    if(sessionState.turns.length>CONVERSATION_MAX_TURNS) {
+      sessionState.turns=sessionState.turns.slice(-CONVERSATION_MAX_TURNS);
+    }
+
+    sessionState.focus={
+      territoryId:territoryId||sessionState.focus?.territoryId||null,
+      poiIds:uniquePoiIds.length
+        ? [...uniquePoiIds]
+        : [...(sessionState.focus?.poiIds||[])],
+      section:currentSectionId()||sessionState.focus?.section||null
+    };
+
+    if(meta.resultType || uniquePoiIds.length || territoryId) {
+      sessionState.lastResult={
+        type:meta.resultType||"answer",
+        poiIds:[...uniquePoiIds],
+        territoryId:territoryId||null,
+        intent:meta.resultIntent||analysis?.intents?.[0]||null
+      };
+    }
+
+    return record;
   }
 
   function placesByIds(ids=[]) {
@@ -1769,7 +1897,7 @@
     const rules=CAPABILITY_RULES[language] || CAPABILITY_RULES.it;
     const explicitSection=detectCapabilitySection(text, language);
     const currentSection=currentSectionId();
-    const pendingCapability=sessionState.pendingClarification?.type==="capability_actions";
+    const pendingCapability=activePendingClarification()?.type==="capability_actions";
 
     if(pendingCapability) {
       if(explicitSection==="act" || hasAny(n,rules.actions||[])) {
