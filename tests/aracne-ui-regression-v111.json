@@ -1,0 +1,52 @@
+{
+  "version": "1.1.1",
+  "purpose": "Prevent regressions in the restored Aracne answer lifecycle, visible route weaving, and journal persistence.",
+  "cases": [
+    {
+      "id": "route-answer-keeps-speaking-while-modal-closes",
+      "given": "A route request is answered with speech enabled and the assistant modal is open.",
+      "expect": [
+        "speech synthesis is started with the full Aracne answer",
+        "the assistant modal closes shortly after speech begins",
+        "closing the modal does not cancel speech synthesis"
+      ]
+    },
+    {
+      "id": "route-weave-reveals-map",
+      "given": "A route has been calculated and pendingAracneMapWeave is true.",
+      "expect": [
+        "closing the assistant modal triggers weaveAracneRoute",
+        "a spider marker is visible",
+        "a magenta thread is progressively drawn along the route geometry",
+        "the final route returns to normal opacity"
+      ]
+    },
+    {
+      "id": "aracne-answer-is-journaled",
+      "given": "Aracne returns a non-empty answer.",
+      "expect": [
+        "the answer text is written to aracne_journal_notes",
+        "the note source is aracne",
+        "language and timestamp are stored",
+        "territory, POI or route context is stored when available"
+      ]
+    },
+    {
+      "id": "manual-save-prefers-aracne-answer",
+      "given": "An Aracne answer is visible in assistantResultText.",
+      "expect": [
+        "Save note stores the visible Aracne answer rather than only the user's prompt",
+        "immediate duplicates are not added"
+      ]
+    },
+    {
+      "id": "conversation-memory-remains-safe",
+      "given": "Conversation context is queried after a normal turn.",
+      "expect": [
+        "activePendingClarification reads sessionState.pendingClarification without recursion",
+        "the turn counter increments once per remembered turn",
+        "the structured conversation history retains at most four turns"
+      ]
+    }
+  ]
+}
