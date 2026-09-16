@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.6";
+  const VERSION = "1.1.7";
 
   const LANGS = [
     "it",
@@ -4387,6 +4387,21 @@
           try {
 
             await ask();
+
+          } catch (error) {
+
+            console.error("[Aracne] request failed",error);
+
+            const message=toolText(lang(),"toolFail");
+            try{
+              bridge?.showResult?.(tr("title"),message);
+            }catch(displayError){
+              console.warn("[Aracne] error display failed",displayError);
+            }
+
+            try{
+              bridge?.toast?.(message);
+            }catch(toastError){}
 
           } finally {
 
