@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.7"></script>
+  <script src="./aracne-intelligence.js?v=1.1.8"></script>
 
   <script>
   (() => {
@@ -1592,6 +1592,14 @@
     }
 
     function openAssistant(){
+      // Opening a fresh Aracne interaction explicitly cancels any delayed
+      // reveal/speech left by the previous route. Otherwise an old iOS
+      // speech fallback can close the new modal a few seconds later.
+      aracneRouteRevealToken++;
+      pendingAracneMapWeave=false;
+      try{window.AracneIntelligence?.stopSpeaking?.();}catch(e){}
+      hideAracneSpeechRibbon(0);
+
       stopVoiceRecognition(); voiceLang=lang; syncVoiceLangButtons(); setAssistantStatus("ready");
       $("#assistantResult")?.classList.remove("show"); $("#assistantModal").classList.add("show");
       playAracneCue("open");
@@ -2002,6 +2010,13 @@
     }
 
     function openJournalNotes(){
+      // A direct user request to open the carnet wins over any delayed
+      // automatic map reveal from a previous Aracne route.
+      aracneRouteRevealToken++;
+      pendingAracneMapWeave=false;
+      try{window.AracneIntelligence?.stopSpeaking?.();}catch(e){}
+      hideAracneSpeechRibbon(0);
+
       closeModal("assistantModal",{weave:false});
       renderJournal();
       openSheet("passport");
