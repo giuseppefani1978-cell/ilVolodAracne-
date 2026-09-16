@@ -1,0 +1,48 @@
+{
+  "version": "1.1.4",
+  "purpose": "Protect multi-intent understanding and route statistics for requests that mix a city explanation, nearby discovery, and a final multi-city route.",
+  "cases": [
+    {
+      "id": "italian-otranto-information-plus-route",
+      "input": "Parti da Otranto, parlami di Otranto e dimmi cosa c'è intorno. Alla fine fammi un percorso tra Otranto, Gallipoli, Lecce e Nardò.",
+      "expect": {
+        "language": "it",
+        "informationalTerritory": "Otranto",
+        "informationalIntents": [
+          "tell",
+          "near_place"
+        ],
+        "routeOrder": [
+          "Otranto",
+          "Gallipoli",
+          "Lecce",
+          "Nardò"
+        ],
+        "routeExactSequence": true,
+        "requestedDurationHours": null,
+        "forbidden": [
+          "Gallipoli must not replace Otranto as the informational subject",
+          "Duration must not be shown as 0 h"
+        ]
+      }
+    },
+    {
+      "id": "route-statistics-from-map",
+      "expect": [
+        "route distance comes from lastRouteStats.distance after drawRoute completes",
+        "route travel time comes from lastRouteStats.duration after drawRoute completes",
+        "null requested duration remains null instead of becoming zero",
+        "actual total distance and travel time are included in Aracne's route response when available"
+      ]
+    },
+    {
+      "id": "answer-then-weave",
+      "expect": [
+        "the written answer remains visible while Aracne speaks",
+        "the assistant modal is not closed on speech start",
+        "after speech end the panels close and the map is revealed",
+        "the spider then weaves the already-computed route as a separate visual phase"
+      ]
+    }
+  ]
+}
