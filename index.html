@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.5"></script>
+  <script src="./aracne-intelligence.js?v=1.1.6"></script>
 
   <script>
   (() => {
@@ -2373,6 +2373,53 @@
 
       aracneWeaveFrame=requestAnimationFrame(tick);
     }
+    function buildLocalRouteFallback(points,travelMode){
+      const valid=(points||[]).filter(p=>
+        Number.isFinite(Number(p?.lat))
+        && Number.isFinite(Number(p?.lng))
+      );
+      if(valid.length<2)return null;
+
+      let totalKm=0;
+      const legs=[];
+      for(let i=1;i<valid.length;i++){
+        const km=haversine(
+          Number(valid[i-1].lat),
+          Number(valid[i-1].lng),
+          Number(valid[i].lat),
+          Number(valid[i].lng)
+        );
+        totalKm+=km;
+        legs.push({distance:km*1000});
+      }
+
+      const roadFactor=travelMode==="walking"?1.08:(travelMode==="cycling"?1.12:1.20);
+      const adjustedKm=totalKm*roadFactor;
+      const speedKmh=travelMode==="walking"?4.8:(travelMode==="cycling"?15:55);
+      const durationSeconds=(adjustedKm/speedKmh)*3600;
+
+      let adjustedAccumulated=0;
+      const adjustedLegs=legs.map(leg=>{
+        const adjustedDistance=leg.distance*roadFactor;
+        adjustedAccumulated+=adjustedDistance;
+        return {
+          distance:adjustedDistance,
+          duration:(adjustedDistance/1000)/speedKmh*3600
+        };
+      });
+
+      return {
+        geometry:{
+          type:"LineString",
+          coordinates:valid.map(p=>[Number(p.lng),Number(p.lat)])
+        },
+        distance:adjustedKm*1000,
+        duration:durationSeconds,
+        legs:adjustedLegs,
+        localFallback:true
+      };
+    }
+
     async function drawRoute(options={}){
       stopAracneMapWeave();
       pendingAracneMapWeave=false;
@@ -2421,9 +2468,13 @@
             r.legs=(r.legs||[]).map(leg=>({...leg,duration:(leg.distance/1000)/speedKmh*3600}));
           }
         }catch(fallbackErr){
-          console.warn(primaryErr,fallbackErr);
-          if(status){status.textContent=t("route_error");status.classList.remove("loading")}
-          return;
+          console.warn("[Aracne route] external routing unavailable; using local fallback",primaryErr,fallbackErr);
+          r=buildLocalRouteFallback(waypoints,mode);
+          exact=false;
+          if(!r){
+            if(status){status.textContent=t("route_error");status.classList.remove("loading")}
+            return;
+          }
         }
       }
 
@@ -2447,7 +2498,12 @@
         legs:(r.legs||[]).map(l=>({distance:l.distance||0,duration:l.duration||0})),
         exact
       };
-      if(status){status.textContent=exact?t("route_exact"):t("route_fallback");status.classList.remove("loading")}
+      if(status){
+        status.textContent=exact
+          ? t("route_exact")
+          : (r?.localFallback ? (voiceLang==="it"?"Percorso indicativo":voiceLang==="fr"?"Parcours indicatif":voiceLang==="es"?"Ruta indicativa":"Indicative route") : t("route_fallback"));
+        status.classList.remove("loading");
+      }
       renderRouteSummary();renderPassport();renderPlanner();
 
       if(options.weave!==false && routeLayer && lastRouteGeometryPoints.length>1){
