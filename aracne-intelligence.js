@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.5";
+  const VERSION = "1.1.6";
 
   const LANGS = [
     "it",
@@ -997,12 +997,35 @@
     const n=normalize(text);
     const matches=territoryMatches(text,language)||[];
     const out=[];
+    const seen=new Set();
+
+    const allPositions=(haystack,needle)=>{
+      const positions=[];
+      if(!needle)return positions;
+      let from=0;
+
+      while(from<haystack.length){
+        const pos=haystack.indexOf(needle,from);
+        if(pos<0)break;
+
+        const before=pos===0 ? " " : haystack[pos-1];
+        const afterPos=pos+needle.length;
+        const after=afterPos>=haystack.length ? " " : haystack[afterPos];
+        const boundaryBefore=before===" ";
+        const boundaryAfter=after===" ";
+
+        if(boundaryBefore && boundaryAfter)positions.push(pos);
+        from=pos+Math.max(1,needle.length);
+      }
+
+      return positions;
+    };
 
     for(const match of matches){
       const territory=hydrateTerritoryMatch(match);
       if(!territory?.id)continue;
 
-      const aliases=[
+      const aliases=[...new Set([
         match.matchedAlias,
         territory.id,
         territory.name,
@@ -1011,29 +1034,25 @@
       ]
         .filter(Boolean)
         .map(normalize)
-        .filter(Boolean);
+        .filter(Boolean))];
 
-      let pos=-1;
-      let alias=null;
-      for(const candidate of aliases){
-        const candidatePos=earliestMatch(n,[candidate]);
-        if(candidatePos>=0 && (pos<0 || candidatePos<pos)){
-          pos=candidatePos;
-          alias=candidate;
+      for(const alias of aliases){
+        for(const pos of allPositions(n,alias)){
+          const key=territory.id+"@"+pos;
+          if(seen.has(key))continue;
+          seen.add(key);
+
+          out.push({
+            id:territory.id,
+            territory,
+            pos,
+            alias
+          });
         }
-      }
-
-      if(pos>=0 && !out.some(item=>item.id===territory.id)){
-        out.push({
-          id:territory.id,
-          territory,
-          pos,
-          alias:alias||match.matchedAlias||territory.id
-        });
       }
     }
 
-    return out.sort((a,b)=>a.pos-b.pos);
+    return out.sort((a,b)=>a.pos-b.pos || a.id.localeCompare(b.id));
   }
 
   function representativePlaceForTerritory(territory){
