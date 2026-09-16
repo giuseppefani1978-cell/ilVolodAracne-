@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.3"></script>
+  <script src="./aracne-intelligence.js?v=1.1.4"></script>
 
   <script>
   (() => {
@@ -1818,7 +1818,9 @@
       const requestedIds=Array.isArray(request.placeIds)?request.placeIds.filter(Boolean):[];
       const mentioned=requestedIds.map(getPoi).filter(Boolean).filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
       const cats=Array.isArray(request.themes)?request.themes.filter(Boolean):[];
-      const hours=Number.isFinite(Number(request.durationHours))?Number(request.durationHours):null;
+      const hours=request.durationHours!=null && Number.isFinite(Number(request.durationHours))
+        ? Number(request.durationHours)
+        : null;
       const detectedMode=["driving","cycling","walking"].includes(request.mode)?request.mode:null;
       const maxStops=hours!==null?(hours<=2?2:hours<=5?3:4):3;
 
@@ -1868,8 +1870,23 @@
     }
 
     function routeAssistantText(info){
-      const places=info.selected.map(p=>p.name).join(" → "); const m=info.detectedMode?({driving:t("car"),cycling:t("bike"),walking:t("walk")}[info.detectedMode]):modeLabel();
-      const lines=[`${t("assistant_route_places")}: ${places}`,`${t("assistant_route_mode")}: ${m}`]; if(info.hours!==null)lines.push(`${t("assistant_route_duration")}: ${info.hours} h`);return lines.join("\n");
+      const places=(info?.selected||[]).map(p=>p.name).join(" → ");
+      const m=info?.detectedMode
+        ? ({driving:t("car"),cycling:t("bike"),walking:t("walk")}[info.detectedMode])
+        : modeLabel();
+      const lines=[`${t("assistant_route_places")}: ${places}`,`${t("assistant_route_mode")}: ${m}`];
+
+      if(info?.hours!=null && Number(info.hours)>0){
+        lines.push(`${t("assistant_route_duration")}: ${Number(info.hours)} h`);
+      }
+      if(Number(info?.distanceKm)>0){
+        lines.push(`${t("distance")}: ${Number(info.distanceKm).toFixed(1)} km`);
+      }
+      if(Number(info?.travelMinutes)>0){
+        lines.push(`${t("travel")}: ${Math.round(Number(info.travelMinutes))} min`);
+      }
+
+      return lines.join("\n");
     }
     function saveAssistantNote(){
       const text=(assistantResultText||assistantText()).trim();
@@ -2660,33 +2677,44 @@ function resultHasAracneRoute(result={}){
 function startAracneSpeechExperience(result={}){
   if(!resultHasAracneRoute(result))return;
 
-  // The full text remains visible even when the dialogue panel gives way to the map.
-  showAracneSpeechRibbon(result?.text||assistantResultText);
+  // v1.1.4: keep the written answer fully visible while Aracne is speaking.
+  // The map transition happens only when the answer is finished.
+  hideAracneSpeechRibbon(0);
+}
+
+function revealAracneRouteAfterAnswer(result={}){
+  if(!resultHasAracneRoute(result))return;
 
   if($("#assistantModal")?.classList.contains("show")){
     closeModal("assistantModal",{weave:false});
   }
 
+  hideAracneSpeechRibbon(0);
   closeSheets();
 
   setTimeout(()=>{
     try{map.invalidateSize();}catch(e){}
+
     if(routeLayer && lastRouteGeometryPoints.length>1){
-      weaveAracneRoute(estimatedSpeechDurationMs(result?.text||assistantResultText));
+      // The weaving is now a distinct visual phase, after the written/spoken answer.
+      weaveAracneRoute(3800);
+    }else{
+      pendingAracneMapWeave=false;
     }
-  },120);
+  },180);
 }
 
 function endAracneSpeechExperience(result={}){
-  if(!resultHasAracneRoute(result))return;
-  stopAracneMapWeave();
-  pendingAracneMapWeave=false;
-  hideAracneSpeechRibbon(2600);
+  revealAracneRouteAfterAnswer(result);
 }
 
 function afterAracneAnswer(result={}){
-  // Fallback used when speech synthesis is unavailable or WebKit does not fire onstart.
-  startAracneSpeechExperience(result);
+  if(!resultHasAracneRoute(result))return;
+
+  // No speech available: leave enough time to see the written answer before
+  // handing the screen to the map.
+  const delay=Math.max(3200,Math.min(9000,estimatedSpeechDurationMs(result?.text||assistantResultText)*0.55));
+  setTimeout(()=>revealAracneRouteAfterAnswer(result),delay);
 }
 
 function scheduleAracneUiAction(fn,composite=false){
@@ -2933,6 +2961,14 @@ window.aracneIntelligenceBridge = {
     renderAll();
 
     await drawRoute();
+
+    if(Number(lastRouteStats.distance)>0){
+      info.distanceKm=Number(lastRouteStats.distance)/1000;
+    }
+    if(Number(lastRouteStats.duration)>0){
+      info.travelMinutes=Number(lastRouteStats.duration)/60;
+    }
+    info.routeExact=!!lastRouteStats.exact;
 
     const resultText =
       routeAssistantText(info);
