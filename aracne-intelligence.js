@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.3";
+  const VERSION = "1.1.4";
 
   const LANGS = [
     "it",
@@ -757,7 +757,7 @@
       contextPlace:["li","quel posto","questa zona","quel luogo"],
       both:["entrambi","tutti e due","tutte e due"],
       between:["tra","fra"],
-      clauseBreaks:["e poi","poi","dopo","e puoi","e potresti"]
+      clauseBreaks:["e alla fine","alla fine","infine","per finire","e poi","poi","dopo","e puoi","e potresti"]
     },
     fr:{
       nearby:["et autour","autour","et a proximite","a proximite","dans les environs","et pres de la"],
@@ -773,7 +773,7 @@
       contextPlace:["la bas","ce lieu","cet endroit","sur place"],
       both:["les deux","tous les deux","toutes les deux"],
       between:["entre"],
-      clauseBreaks:["et apres","puis","ensuite","et est ce que","et peux tu","et tu peux","apres ca"]
+      clauseBreaks:["et a la fin","a la fin","enfin","pour finir","et apres","puis","ensuite","et est ce que","et peux tu","et tu peux","apres ca"]
     },
     en:{
       nearby:["and around","around there","nearby","near there","what is around"],
@@ -789,7 +789,7 @@
       contextPlace:["there","that place","this place","on site"],
       both:["both","both of them"],
       between:["between"],
-      clauseBreaks:["and then","then","after that","and can you","can you also"]
+      clauseBreaks:["and finally","finally","in the end","to finish","and then","then","after that","and can you","can you also"]
     },
     es:{
       nearby:["y alrededor","alrededor","cerca de alli","en los alrededores","y cerca"],
@@ -805,7 +805,7 @@
       contextPlace:["alli","ese lugar","este lugar","ahi"],
       both:["los dos","las dos","ambos","ambas"],
       between:["entre"],
-      clauseBreaks:["y luego","luego","despues","despues de eso","y puedes"]
+      clauseBreaks:["y al final","al final","por ultimo","finalmente","para terminar","y luego","luego","despues","despues de eso","y puedes"]
     }
   };
 
@@ -984,6 +984,13 @@
     }catch(error){
       return [];
     }
+  }
+
+  function hydrateTerritoryMatch(match){
+    if(!match)return null;
+    if(match.entry)return {id:match.id,...match.entry};
+    if(match.id)return territoryById(match.id);
+    return null;
   }
 
   function territoryById(id){
@@ -2422,6 +2429,9 @@
       .filter(item=>item.pos>=0)
       .sort((a,b)=>a.pos-b.pos)
       .map(item=>item.place);
+    const territories=(territoryMatches(clause,language)||[])
+      .map(hydrateTerritoryMatch)
+      .filter(Boolean);
 
     const intents=[];
     const add=name=>{if(!intents.includes(name))intents.push(name);};
@@ -2441,6 +2451,7 @@
     return {
       text:clause,
       places,
+      territories,
       intents,
       between:hasAny(clause,ctx.between||[])
     };
@@ -2799,6 +2810,8 @@
       places,
       territories,
       territory:primaryTerritory,
+      infoTerritory:null,
+      infoPlaces:[],
       intents:cues.map(x=>x.name),
       cues,
       durationHours,
@@ -2816,17 +2829,62 @@
 
     analysis.targets=assignTargets(n,cues,places);
 
-    // Prefer clause-local places when one sentence contains several intents.
+    // Prefer clause-local places only when that clause owns a single intent.
+    // A multi-intent sentence must keep the positional targets computed above,
+    // otherwise a final route list leaks back into an earlier "parlami di...".
     for(const clause of clauseAnalyses) {
-      for(const intentName of clause.intents) {
-        if(clause.places.length) {
-          analysis.targets[intentName]=[...clause.places];
-        }
+      if(clause.intents.length===1 && clause.places.length) {
+        analysis.targets[clause.intents[0]]=[...clause.places];
       }
 
-      if(clause.intents.includes("route") && clause.between && clause.places.length>=2) {
-        analysis.targets.route=[...clause.places];
-        analysis.routeExactSequence=true;
+      if(clause.intents.includes("route") && clause.between) {
+        const routeLocal=
+          clause.intents.length===1 && clause.places.length
+            ? clause.places
+            : (analysis.targets.route||[]);
+
+        if(routeLocal.length>=2) {
+          analysis.targets.route=[...routeLocal];
+          analysis.routeExactSequence=true;
+        }
+      }
+    }
+
+    // Explicitly separate the informational subject from the later route.
+    // Example: "parlami di Otranto ... alla fine fammi un percorso tra
+    // Otranto, Gallipoli, Lecce e Nardò".
+    const informationalCue=[...cues]
+      .filter(cue=>["tell","see_place","near_place"].includes(cue.name))
+      .sort((a,b)=>a.pos-b.pos)[0]||null;
+    const routeCue=[...cues]
+      .filter(cue=>cue.name==="route")
+      .sort((a,b)=>a.pos-b.pos)[0]||null;
+
+    if(informationalCue) {
+      const boundary=
+        routeCue && routeCue.pos>informationalCue.pos
+          ? routeCue.pos
+          : n.length;
+      const infoSegment=n.slice(informationalCue.pos,boundary);
+
+      const infoTerritories=(territoryMatches(infoSegment,language)||[])
+        .map(hydrateTerritoryMatch)
+        .filter(Boolean);
+      const infoPlaces=(getPlaces(infoSegment)||[])
+        .map(place=>({place,pos:findPlacePosition(infoSegment,place)}))
+        .filter(item=>item.pos>=0)
+        .sort((a,b)=>a.pos-b.pos)
+        .map(item=>item.place);
+
+      analysis.infoTerritory=infoTerritories[0]||null;
+      analysis.infoPlaces=[...new Map(infoPlaces.map(place=>[place.id||place.name,place])).values()];
+
+      if(analysis.infoPlaces.length) {
+        for(const intentName of ["tell","see_place","near_place"]) {
+          if(analysis.intents.includes(intentName)) {
+            analysis.targets[intentName]=[...analysis.infoPlaces];
+          }
+        }
       }
     }
 
@@ -2966,7 +3024,7 @@
       &&
       routeTargets.length>=2
     ) {
-      analysis.durationHours=estimateMinimumRouteHours(routeTargets,analysis.mode);
+      analysis.estimatedMinimumRouteHours=estimateMinimumRouteHours(routeTargets,analysis.mode);
     }
 
     if(
@@ -3041,7 +3099,8 @@
     sessionState.turn+=1;
     sessionState.language=analysis.language||sessionState.language;
     sessionState.lastIntents=[...(analysis.intents||[])];
-    if(analysis.territory?.id)sessionState.lastTerritoryId=analysis.territory.id;
+    const rememberedTerritory=analysis.infoTerritory||analysis.territory;
+    if(rememberedTerritory?.id)sessionState.lastTerritoryId=rememberedTerritory.id;
 
     let focusPlaces=[];
 
@@ -3110,12 +3169,20 @@
   function formatRouteResult(info, language) {
     const labels=SECTION_LABELS[language]||SECTION_LABELS.it;
     const modes=MODE_LABELS[language]||MODE_LABELS.it;
+    const metrics={
+      it:{available:"Tempo disponibile",distance:"Distanza totale",travel:"Tempo di viaggio"},
+      fr:{available:"Temps disponible",distance:"Distance totale",travel:"Temps de trajet"},
+      en:{available:"Available time",distance:"Total distance",travel:"Travel time"},
+      es:{available:"Tiempo disponible",distance:"Distancia total",travel:"Tiempo de viaje"}
+    }[language]||{};
     const lines=[];
     const selected=info?.selected||[];
 
     if(selected.length)lines.push(labels.stops+": "+selected.map(placeName).join(" → "));
-    if(info?.hours!=null)lines.push(labels.duration+": "+info.hours+" h");
     if(info?.detectedMode)lines.push(labels.mode+": "+(modes[info.detectedMode]||info.detectedMode));
+    if(info?.hours!=null && Number(info.hours)>0)lines.push((metrics.available||labels.duration)+": "+Number(info.hours)+" h");
+    if(Number(info?.distanceKm)>0)lines.push((metrics.distance||"Distance")+": "+Number(info.distanceKm).toFixed(1)+" km");
+    if(Number(info?.travelMinutes)>0)lines.push((metrics.travel||"Travel time")+": "+Math.round(Number(info.travelMinutes))+" min");
 
     return lines.join("\n");
   }
@@ -3479,13 +3546,19 @@
       }
 
       const comparePlaces=analysis.targets.compare?.length ? analysis.targets.compare : analysis.places;
-      const tellPlaces=analysis.targets.tell?.length ? analysis.targets.tell : analysis.places;
+      const tellPlaces=analysis.infoPlaces?.length
+        ? analysis.infoPlaces
+        : (analysis.targets.tell?.length ? analysis.targets.tell : analysis.places);
       const territoryForInfo=
-        analysis.territory
-        &&
-        !(analysis.specificPlaces?.length)
-          ? analysis.territory
-          : null;
+        analysis.infoTerritory
+        ||
+        (
+          analysis.territory
+          &&
+          !(analysis.specificPlaces?.length)
+            ? analysis.territory
+            : null
+        );
 
       if(analysis.intents.includes("compare") && comparePlaces.length>=2) {
         sections.push(labels.compare+"\n"+multiAnswer(comparePlaces));
@@ -3503,25 +3576,35 @@
         }
       }
 
-      const seePlaces=analysis.targets.see_place?.length
-        ? analysis.targets.see_place
-        : analysis.places;
+      const seePlaces=analysis.infoPlaces?.length
+        ? analysis.infoPlaces
+        : (analysis.targets.see_place?.length
+          ? analysis.targets.see_place
+          : analysis.places);
+      const seeTerritory=
+        analysis.infoTerritory
+        ||
+        (
+          analysis.territory
+          &&
+          !(analysis.specificPlaces?.length)
+            ? analysis.territory
+            : null
+        );
 
       if(
         analysis.intents.includes("see_place")
         &&
-        analysis.territory
-        &&
-        !(analysis.specificPlaces?.length)
+        seeTerritory
       ) {
         const body=[
-          formatTerritoryHighlights(analysis.territory,analysis.language),
-          formatTerritoryPoiList(analysis.territory,analysis.language,{
+          formatTerritoryHighlights(seeTerritory,analysis.language),
+          formatTerritoryPoiList(seeTerritory,analysis.language,{
             themes:analysis.themes,
             aspect:analysis.knowledgeAspect
           })
         ].filter(Boolean).join("\n\n");
-        sections.push(labels.see+" · "+territoryName(analysis.territory)+"\n"+body);
+        sections.push(labels.see+" · "+territoryName(seeTerritory)+"\n"+body);
       } else if(analysis.intents.includes("see_place") && seePlaces.length) {
         const origin=seePlaces[0];
         const data=nearbyFrom(origin,4);
@@ -3537,19 +3620,29 @@
         actions.push("near_me");
       }
 
-      const nearbyPlaces=analysis.targets.near_place?.length ? analysis.targets.near_place : analysis.places;
+      const nearbyPlaces=analysis.infoPlaces?.length
+        ? analysis.infoPlaces
+        : (analysis.targets.near_place?.length ? analysis.targets.near_place : analysis.places);
+      const nearbyTerritory=
+        analysis.infoTerritory
+        ||
+        (
+          analysis.territory
+          &&
+          !(analysis.specificPlaces?.length)
+            ? analysis.territory
+            : null
+        );
       if(
         analysis.intents.includes("near_place")
         &&
-        analysis.territory
-        &&
-        !(analysis.specificPlaces?.length)
+        nearbyTerritory
       ) {
-        const linked=formatTerritoryPoiList(analysis.territory,analysis.language,{
+        const linked=formatTerritoryPoiList(nearbyTerritory,analysis.language,{
           themes:analysis.themes,
           aspect:analysis.knowledgeAspect
         });
-        if(linked)sections.push(labels.nearby+" · "+territoryName(analysis.territory)+"\n"+linked);
+        if(linked)sections.push(labels.nearby+" · "+territoryName(nearbyTerritory)+"\n"+linked);
         actions.push("near_place");
       } else if(analysis.intents.includes("near_place") && nearbyPlaces.length) {
         const origin=nearbyPlaces[0];
@@ -3840,13 +3933,28 @@
           console.warn("[Aracne] afterAnswer",error);
         }
       }else{
+        // Safari/iOS may occasionally miss speech events. Keep the answer
+        // visible; only move to the map at an estimated END, never at start.
+        const words=String(result.text||"").trim().split(/\s+/).filter(Boolean).length;
+        const fallbackEndMs=Math.max(4200,Math.min(26000,Math.round((words/2.15)*1000)+1200));
+
         setTimeout(()=>{
           if(!speechStarted && !speechFinished){
-            try{bridge?.afterAnswer?.(result);}catch(error){
-              console.warn("[Aracne] afterAnswer fallback",error);
+            speechStarted=true;
+            try{bridge?.speechStart?.(result);}catch(error){
+              console.warn("[Aracne] speechStart fallback",error);
             }
           }
         },900);
+
+        setTimeout(()=>{
+          if(!speechFinished){
+            speechFinished=true;
+            try{bridge?.speechEnd?.(result);}catch(error){
+              console.warn("[Aracne] speechEnd fallback",error);
+            }
+          }
+        },fallbackEndMs);
       }
     }
 
