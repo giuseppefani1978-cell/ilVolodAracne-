@@ -1,0 +1,47 @@
+{
+  "version": "1.1.3",
+  "purpose": "Prevent regressions where Aracne speech is not visibly transcribed, not persisted to the travel booklet, or route weaving is not visible during speech.",
+  "cases": [
+    {
+      "id": "answer-written-before-speech",
+      "expect": [
+        "the complete answer is rendered in assistantResultText before speech synthesis starts",
+        "the answer card scrolls into view",
+        "saveAnswer runs before speech starts"
+      ]
+    },
+    {
+      "id": "answer-survives-route-modal-close",
+      "expect": [
+        "when a route answer starts speaking the assistant modal may close",
+        "the complete answer remains visible in the floating Aracne speech ribbon over the map",
+        "the ribbon remains until speech finishes and briefly afterwards"
+      ]
+    },
+    {
+      "id": "booklet-persistence",
+      "expect": [
+        "Aracne answers are written to aracne_journal_notes immediately",
+        "opening the travel booklet re-renders stored entries",
+        "invalid stored JSON does not break the app",
+        "storage quota fallback preserves textual entries even if proof images must be discarded"
+      ]
+    },
+    {
+      "id": "weave-during-speech",
+      "expect": [
+        "route weaving starts from the speech onstart lifecycle",
+        "the spider marker moves along the route while speech is active",
+        "weave duration is estimated from answer length rather than fixed at 2.9 seconds",
+        "speech end restores the normal route and removes the temporary weaving overlay"
+      ]
+    },
+    {
+      "id": "webkit-fallback",
+      "expect": [
+        "if speech synthesis is unavailable, afterAnswer still reveals and weaves the route",
+        "if mobile WebKit does not fire speech onstart promptly, the 900 ms fallback starts the route reveal"
+      ]
+    }
+  ]
+}
