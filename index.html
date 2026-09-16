@@ -2950,9 +2950,14 @@ function afterAracneAnswer(result={}){
   if(!resultHasAracneRoute(result))return;
 
   // No speech available: leave enough time to see the written answer before
-  // handing the screen to the map.
+  // handing the screen to the map. Capture the current reveal token so an
+  // explicit user action (new question, carnet, etc.) cancels this callback.
+  const scheduledToken=aracneRouteRevealToken;
   const delay=Math.max(3200,Math.min(9000,estimatedSpeechDurationMs(result?.text||assistantResultText)*0.55));
-  setTimeout(()=>revealAracneRouteAfterAnswer(result),delay);
+  setTimeout(()=>{
+    if(scheduledToken!==aracneRouteRevealToken)return;
+    revealAracneRouteAfterAnswer(result);
+  },delay);
 }
 
 function scheduleAracneUiAction(fn,composite=false){
