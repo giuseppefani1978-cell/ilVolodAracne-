@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.1"></script>
+  <script src="./aracne-intelligence.js?v=1.1.3"></script>
 
   <script>
   (() => {
@@ -1096,13 +1096,14 @@
     const greenSchemaWas=localStorage.getItem("aracne_green_schema");let didResetGreenProgress=false;
     if(greenSchemaWas!=="v31"){points=0;completed=[];missionClaims=[];localStorage.setItem("aracne_points","0");localStorage.setItem("aracne_completed","[]");localStorage.setItem("aracne_mission_claims_v31","[]");localStorage.setItem("aracne_green_schema","v31");didResetGreenProgress=true;}
     let waypoints = JSON.parse(localStorage.getItem("aracne_route") || "[]");
-    let journalNotes = JSON.parse(localStorage.getItem("aracne_journal_notes") || "[]");
+    let journalNotes = (()=>{try{const value=JSON.parse(localStorage.getItem("aracne_journal_notes")||"[]");return Array.isArray(value)?value:[];}catch(e){console.warn("[Aracne carnet] lecture locale invalide",e);return [];}})();
     let voiceLang = lang;
     let recognition = null;
     let isListening = false;
     let voiceKeepListening = false;
     let aracneAudioCtx = null;
     let assistantResultText = "";
+    let aracneSpeechRibbonTimer=null;
     let selectedMood="mix";
     let filter="all";
     let mode=localStorage.getItem("aracne_mode") || "driving";
@@ -1259,15 +1260,47 @@
       clearTimeout(window.__toast); window.__toast=setTimeout(()=>el.classList.remove("show"),1900);
     }
 
+    function safeLocalSet(key,value){
+      try{
+        localStorage.setItem(key,value);
+        return true;
+      }catch(e){
+        console.warn("[Aracne storage]",key,e);
+        return false;
+      }
+    }
+
+    function persistJournalNotes(){
+      if(safeLocalSet("aracne_journal_notes",JSON.stringify(journalNotes)))return true;
+
+      // Quota fallback: keep the textual memory, discard embedded proof images first.
+      const compact=journalNotes
+        .map(note=>({...note,image:""}))
+        .slice(0,40);
+
+      if(safeLocalSet("aracne_journal_notes",JSON.stringify(compact))){
+        journalNotes=compact;
+        return true;
+      }
+
+      const essential=compact.slice(0,20);
+      if(safeLocalSet("aracne_journal_notes",JSON.stringify(essential))){
+        journalNotes=essential;
+        return true;
+      }
+
+      return false;
+    }
+
     function saveState(){
-      localStorage.setItem("aracne_lang",lang);
-      localStorage.setItem("aracne_points",String(points));
-      localStorage.setItem("aracne_completed",JSON.stringify(completed));
-      localStorage.setItem("aracne_mission_claims_v31",JSON.stringify(missionClaims));
-      localStorage.setItem("aracne_green_schema","v31");
-      localStorage.setItem("aracne_route",JSON.stringify(waypoints));
-      localStorage.setItem("aracne_mode",mode);
-      localStorage.setItem("aracne_journal_notes",JSON.stringify(journalNotes));
+      safeLocalSet("aracne_lang",lang);
+      safeLocalSet("aracne_points",String(points));
+      safeLocalSet("aracne_completed",JSON.stringify(completed));
+      safeLocalSet("aracne_mission_claims_v31",JSON.stringify(missionClaims));
+      safeLocalSet("aracne_green_schema","v31");
+      safeLocalSet("aracne_route",JSON.stringify(waypoints));
+      safeLocalSet("aracne_mode",mode);
+      persistJournalNotes();
     }
 
     function getPoi(id){return poiData.find(p=>p.id===id)}
@@ -1633,7 +1666,70 @@
       if($("#assistantMicStop"))$("#assistantMicStop").disabled=true;
       if($("#assistantStatus"))setAssistantStatus("ready");
     }
-    function showAssistantResult(title,text){assistantResultText=text;$("#assistantResultTitle").textContent=title;$("#assistantResultText").textContent=text;$("#assistantResult").classList.add("show");}
+    function showAssistantResult(title,text){
+      assistantResultText=String(text||"");
+      const result=$("#assistantResult");
+      $("#assistantResultTitle").textContent=title;
+      $("#assistantResultText").textContent=assistantResultText;
+      result.classList.add("show");
+      requestAnimationFrame(()=>{
+        try{result.scrollIntoView({behavior:"smooth",block:"nearest"});}catch(e){}
+      });
+    }
+
+    function ensureAracneSpeechRibbon(){
+      let ribbon=$("#aracneSpeechRibbon");
+      if(ribbon)return ribbon;
+
+      ribbon=document.createElement("div");
+      ribbon.id="aracneSpeechRibbon";
+      ribbon.setAttribute("role","status");
+      ribbon.style.cssText=[
+        "position:fixed",
+        "z-index:1185",
+        "left:14px",
+        "right:14px",
+        "bottom:calc(var(--safe-bottom) + 82px)",
+        "display:none",
+        "max-height:28vh",
+        "overflow:auto",
+        "padding:13px 42px 13px 15px",
+        "border-radius:19px",
+        "background:rgba(255,255,255,.94)",
+        "backdrop-filter:blur(18px)",
+        "-webkit-backdrop-filter:blur(18px)",
+        "box-shadow:0 10px 30px rgba(0,0,0,.14)",
+        "border:1px solid rgba(193,38,132,.13)",
+        "font-size:.80rem",
+        "line-height:1.42",
+        "color:var(--text)"
+      ].join(";");
+
+      ribbon.innerHTML='<div style="font-weight:900;margin-bottom:5px;color:var(--violet)">🕷️ ARACNE</div><div id="aracneSpeechRibbonText"></div><button id="aracneSpeechRibbonClose" aria-label="Close" style="position:absolute;right:10px;top:9px;width:30px;height:30px;border:0;border-radius:50%;background:#f1f1f3;font-size:18px">×</button>';
+      document.body.appendChild(ribbon);
+      $("#aracneSpeechRibbonClose").addEventListener("click",()=>hideAracneSpeechRibbon(0));
+      return ribbon;
+    }
+
+    function showAracneSpeechRibbon(text){
+      clearTimeout(aracneSpeechRibbonTimer);
+      const ribbon=ensureAracneSpeechRibbon();
+      $("#aracneSpeechRibbonText").textContent=String(text||"");
+      ribbon.style.display="block";
+    }
+
+    function hideAracneSpeechRibbon(delay=2200){
+      clearTimeout(aracneSpeechRibbonTimer);
+      aracneSpeechRibbonTimer=setTimeout(()=>{
+        const ribbon=$("#aracneSpeechRibbon");
+        if(ribbon)ribbon.style.display="none";
+      },Math.max(0,delay));
+    }
+
+    function estimatedSpeechDurationMs(text){
+      const words=String(text||"").trim().split(/\s+/).filter(Boolean).length;
+      return Math.max(3600,Math.min(22000,Math.round((words/2.25)*1000)));
+    }
 
     const assistantAliases={
       "lecce":"lecce","otranto":"otranto","castro":"castro","santa cesarea":"cesarea","cesarea":"cesarea","gallipoli":"santandrea_gallipoli",
@@ -1823,7 +1919,8 @@
     }
 
     function openJournalNotes(){
-      closeModal("assistantModal");
+      closeModal("assistantModal",{weave:false});
+      renderJournal();
       openSheet("passport");
       setTimeout(()=>$("#journalSectionTitle")?.scrollIntoView({behavior:"smooth",block:"start"}),180);
     }
@@ -2101,13 +2198,13 @@
     }
 
     function openStory(){$("#storyModal").classList.add("show");}
-    function closeModal(id){
+    function closeModal(id,options={}){
       if(id==="assistantModal"){
         const wasOpen=$("#"+id)?.classList.contains("show");
         stopVoiceRecognition();
         $("#"+id)?.classList.remove("show");
         if(wasOpen)playAracneCue("close");
-        if(pendingAracneMapWeave)setTimeout(weaveAracneRoute,140);
+        if(options.weave!==false && pendingAracneMapWeave)setTimeout(()=>weaveAracneRoute(),140);
         return;
       }
       $("#"+id)?.classList.remove("show");
@@ -2159,7 +2256,7 @@
       }
     }
 
-    function weaveAracneRoute(){
+    function weaveAracneRoute(durationMs=2900){
       pendingAracneMapWeave=false;
       stopAracneMapWeave();
 
@@ -2199,7 +2296,7 @@
       }
       if(total<=0){stopAracneMapWeave();return;}
 
-      const duration=2900;
+      const duration=Math.max(2200,Math.min(24000,Number(durationMs)||2900));
       const started=performance.now();
 
       const tick=now=>{
@@ -2556,18 +2653,40 @@ function saveAracneAnswer(result={}){
   );
 }
 
-function afterAracneAnswer(result={}){
-  const hasRoute=(result?.intents||[]).includes("route") || pendingAracneMapWeave;
-  if(!hasRoute)return;
+function resultHasAracneRoute(result={}){
+  return (result?.intents||[]).includes("route") || pendingAracneMapWeave;
+}
 
-  // Let Aracne start speaking, then reveal the map while her voice continues.
+function startAracneSpeechExperience(result={}){
+  if(!resultHasAracneRoute(result))return;
+
+  // The full text remains visible even when the dialogue panel gives way to the map.
+  showAracneSpeechRibbon(result?.text||assistantResultText);
+
+  if($("#assistantModal")?.classList.contains("show")){
+    closeModal("assistantModal",{weave:false});
+  }
+
+  closeSheets();
+
   setTimeout(()=>{
-    if($("#assistantModal")?.classList.contains("show")){
-      closeModal("assistantModal");
-    }else if(pendingAracneMapWeave){
-      weaveAracneRoute();
+    try{map.invalidateSize();}catch(e){}
+    if(routeLayer && lastRouteGeometryPoints.length>1){
+      weaveAracneRoute(estimatedSpeechDurationMs(result?.text||assistantResultText));
     }
-  },620);
+  },120);
+}
+
+function endAracneSpeechExperience(result={}){
+  if(!resultHasAracneRoute(result))return;
+  stopAracneMapWeave();
+  pendingAracneMapWeave=false;
+  hideAracneSpeechRibbon(2600);
+}
+
+function afterAracneAnswer(result={}){
+  // Fallback used when speech synthesis is unavailable or WebKit does not fire onstart.
+  startAracneSpeechExperience(result);
 }
 
 function scheduleAracneUiAction(fn,composite=false){
@@ -2858,6 +2977,16 @@ window.aracneIntelligenceBridge = {
 
   afterAnswer: result => {
     afterAracneAnswer(result);
+  },
+
+
+  speechStart: result => {
+    startAracneSpeechExperience(result);
+  },
+
+
+  speechEnd: result => {
+    endAracneSpeechExperience(result);
   },
 
 
