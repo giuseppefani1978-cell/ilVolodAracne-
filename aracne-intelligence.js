@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.4";
+  const VERSION = "1.1.5";
 
   const LANGS = [
     "it",
@@ -757,7 +757,7 @@
       contextPlace:["li","quel posto","questa zona","quel luogo"],
       both:["entrambi","tutti e due","tutte e due"],
       between:["tra","fra"],
-      clauseBreaks:["e alla fine","alla fine","infine","per finire","e poi","poi","dopo","e puoi","e potresti"]
+      clauseBreaks:["e poi","poi","dopo","e puoi","e potresti"]
     },
     fr:{
       nearby:["et autour","autour","et a proximite","a proximite","dans les environs","et pres de la"],
@@ -773,7 +773,7 @@
       contextPlace:["la bas","ce lieu","cet endroit","sur place"],
       both:["les deux","tous les deux","toutes les deux"],
       between:["entre"],
-      clauseBreaks:["et a la fin","a la fin","enfin","pour finir","et apres","puis","ensuite","et est ce que","et peux tu","et tu peux","apres ca"]
+      clauseBreaks:["et apres","puis","ensuite","et est ce que","et peux tu","et tu peux","apres ca"]
     },
     en:{
       nearby:["and around","around there","nearby","near there","what is around"],
@@ -789,7 +789,7 @@
       contextPlace:["there","that place","this place","on site"],
       both:["both","both of them"],
       between:["between"],
-      clauseBreaks:["and finally","finally","in the end","to finish","and then","then","after that","and can you","can you also"]
+      clauseBreaks:["and then","then","after that","and can you","can you also"]
     },
     es:{
       nearby:["y alrededor","alrededor","cerca de alli","en los alrededores","y cerca"],
@@ -805,7 +805,7 @@
       contextPlace:["alli","ese lugar","este lugar","ahi"],
       both:["los dos","las dos","ambos","ambas"],
       between:["entre"],
-      clauseBreaks:["y al final","al final","por ultimo","finalmente","para terminar","y luego","luego","despues","despues de eso","y puedes"]
+      clauseBreaks:["y luego","luego","despues","despues de eso","y puedes"]
     }
   };
 
@@ -991,6 +991,133 @@
     if(match.entry)return {id:match.id,...match.entry};
     if(match.id)return territoryById(match.id);
     return null;
+  }
+
+  function orderedTerritoryMentions(text,language){
+    const n=normalize(text);
+    const matches=territoryMatches(text,language)||[];
+    const out=[];
+
+    for(const match of matches){
+      const territory=hydrateTerritoryMatch(match);
+      if(!territory?.id)continue;
+
+      const aliases=[
+        match.matchedAlias,
+        territory.id,
+        territory.name,
+        territory.labels?.[language],
+        ...(territory.aliases?.[language]||territory.aliases?.it||[])
+      ]
+        .filter(Boolean)
+        .map(normalize)
+        .filter(Boolean);
+
+      let pos=-1;
+      let alias=null;
+      for(const candidate of aliases){
+        const candidatePos=earliestMatch(n,[candidate]);
+        if(candidatePos>=0 && (pos<0 || candidatePos<pos)){
+          pos=candidatePos;
+          alias=candidate;
+        }
+      }
+
+      if(pos>=0 && !out.some(item=>item.id===territory.id)){
+        out.push({
+          id:territory.id,
+          territory,
+          pos,
+          alias:alias||match.matchedAlias||territory.id
+        });
+      }
+    }
+
+    return out.sort((a,b)=>a.pos-b.pos);
+  }
+
+  function representativePlaceForTerritory(territory){
+    if(!territory?.id)return null;
+    const places=placesByIds(territoryPoiIds(territory.id));
+
+    return (
+      places.find(place=>place.id===territory.id && hasCoords(place))
+      ||
+      places.find(hasCoords)
+      ||
+      places.find(place=>place.id===territory.id)
+      ||
+      places[0]
+      ||
+      null
+    );
+  }
+
+  function buildSemanticPlan(text,language,cues){
+    const n=normalize(text);
+    const mentions=orderedTerritoryMentions(text,language);
+    const routeCue=[...(cues||[])]
+      .filter(cue=>cue.name==="route")
+      .sort((a,b)=>a.pos-b.pos)[0]||null;
+
+    const infoCues=[...(cues||[])]
+      .filter(cue=>["tell","see_place","near_place"].includes(cue.name))
+      .sort((a,b)=>a.pos-b.pos);
+
+    const routeBoundary=routeCue?.pos>=0 ? routeCue.pos : Number.POSITIVE_INFINITY;
+
+    const preRouteMentions=mentions.filter(item=>item.pos<routeBoundary);
+    const postRouteMentions=routeCue
+      ? mentions.filter(item=>item.pos>routeCue.pos)
+      : [];
+
+    let primaryMention=null;
+
+    for(const cue of infoCues){
+      const afterCue=preRouteMentions.find(item=>item.pos>=cue.pos);
+      if(afterCue){
+        primaryMention=afterCue;
+        break;
+      }
+    }
+
+    if(!primaryMention){
+      primaryMention=preRouteMentions[0]||mentions[0]||null;
+    }
+
+    let routeMentions=[...postRouteMentions];
+
+    // If the route verb appears after a city list ("Lecce, Gallipoli: fammi un percorso"),
+    // retain the ordered city mentions rather than losing them.
+    if(routeCue && routeMentions.length<2){
+      const allBefore=mentions.filter(item=>item.pos<routeCue.pos);
+      if(allBefore.length>=2 && !infoCues.length)routeMentions=allBefore;
+    }
+
+    const uniqueRouteMentions=[];
+    for(const item of routeMentions){
+      if(!uniqueRouteMentions.some(existing=>existing.id===item.id)){
+        uniqueRouteMentions.push(item);
+      }
+    }
+
+    const routePlaces=uniqueRouteMentions
+      .map(item=>representativePlaceForTerritory(item.territory))
+      .filter(Boolean);
+
+    return {
+      cityMentions:mentions.map(item=>({
+        id:item.id,
+        name:territoryName(item.territory),
+        pos:item.pos
+      })),
+      primaryTerritory:primaryMention?.territory||null,
+      infoTerritory:primaryMention?.territory||null,
+      routeTerritories:uniqueRouteMentions.map(item=>item.territory),
+      routePlaces,
+      routeLabels:uniqueRouteMentions.map(item=>territoryName(item.territory)),
+      routeBoundary:Number.isFinite(routeBoundary)?routeBoundary:null
+    };
   }
 
   function territoryById(id){
@@ -1330,7 +1457,7 @@
   const LEXICON = {
     it:{
       scope:["cosa puoi fare","cosa sai fare","come funziona","come puoi aiutarmi"],
-      tell:["parlami di","parlami","raccontami","spiegami","dimmi di","descrivimi","cosa sai di"],
+      tell:["parlami di","parlami","parlarmi di","parlarmi","puoi parlarmi di","mi puoi parlare di","potresti parlarmi di","vorrei sapere di","raccontami","spiegami","dimmi di","descrivimi","cosa sai di"],
       see:["cosa vedere","cosa c e da vedere","che cosa vedere","da vedere"],
       routeNouns:["percorso","tragitto","itinerario","giro","passeggiata","camminata","escursione","tour","viaggio"],
       routeVerbs:["crea","creami","costruisci","proponi","prepara","organizza","fammi","suggerisci","consigliami","pianifica"],
@@ -1344,7 +1471,7 @@
     },
     fr:{
       scope:["que peux tu faire","qu est ce que tu fais","comment ca marche","comment peux tu m aider"],
-      tell:["parle moi de","parle moi d","parle moi","raconte moi","raconte moi d","explique moi","dis moi","decris moi","presente moi","que sais tu de","que sais tu d"],
+      tell:["parle moi de","parle moi d","parle moi","peux tu me parler de","pouvez vous me parler de","parler de","raconte moi","raconte moi d","explique moi","dis moi","decris moi","presente moi","que sais tu de","que sais tu d"],
       see:["qu est ce qu il y a a voir","qu est ce qu il y a voir","que voir","quoi voir","a voir"],
       routeNouns:["parcours","trajet","itineraire","circuit","balade","promenade","excursion","tour","trip","voyage"],
       routeVerbs:["cree","creer","construis","construire","propose","proposer","prepare","preparer","organise","organiser","fais","faire","planifie","planifier","suggere","suggerer","conseille moi"],
@@ -1358,7 +1485,7 @@
     },
     en:{
       scope:["what can you do","what do you do","how does this work","how can you help me"],
-      tell:["tell me about","tell me","talk to me about","describe","explain","what do you know about","introduce me to"],
+      tell:["tell me about","tell me","can you tell me about","could you tell me about","talk to me about","describe","explain","what do you know about","introduce me to"],
       see:["what to see","what is there to see","things to see","what can i see"],
       routeNouns:["route","trip","itinerary","journey","tour","walk","walking tour","excursion","trail","circuit"],
       routeVerbs:["create","build","make","plan","suggest","propose","prepare","organize","organise","recommend"],
@@ -1372,7 +1499,7 @@
     },
     es:{
       scope:["que puedes hacer","que sabes hacer","como funciona","como puedes ayudarme"],
-      tell:["hablame de","hablame","cuentame","explicame","dime","describeme","presentame","que sabes de"],
+      tell:["hablame de","hablame","puedes hablarme de","podrias hablarme de","hablarme de","cuentame","explicame","dime","describeme","presentame","que sabes de"],
       see:["que ver","que hay que ver","que hay para ver","cosas que ver"],
       routeNouns:["ruta","trayecto","recorrido","itinerario","circuito","paseo","excursion","tour","trip","viaje"],
       routeVerbs:["crea","crear","construye","construir","propon","propone","proponer","prepara","organiza","organizar","haz","hacer","planifica","sugiere","recomienda"],
@@ -2812,6 +2939,9 @@
       territory:primaryTerritory,
       infoTerritory:null,
       infoPlaces:[],
+      semanticPlan:null,
+      routeTerritories:[],
+      routeLabels:[],
       intents:cues.map(x=>x.name),
       cues,
       durationHours,
@@ -2850,42 +2980,32 @@
       }
     }
 
-    // Explicitly separate the informational subject from the later route.
-    // Example: "parlami di Otranto ... alla fine fammi un percorso tra
-    // Otranto, Gallipoli, Lecce e Nardò".
-    const informationalCue=[...cues]
-      .filter(cue=>["tell","see_place","near_place"].includes(cue.name))
-      .sort((a,b)=>a.pos-b.pos)[0]||null;
-    const routeCue=[...cues]
-      .filter(cue=>cue.name==="route")
-      .sort((a,b)=>a.pos-b.pos)[0]||null;
+    // Semantic plan: cities are extracted in spoken order before any POI logic.
+    // This is deliberately punctuation-independent and keeps a city-level subject
+    // separate from a later multi-city route.
+    analysis.semanticPlan=buildSemanticPlan(text,language,cues);
+    analysis.infoTerritory=analysis.semanticPlan.infoTerritory||null;
+    analysis.routeTerritories=[...(analysis.semanticPlan.routeTerritories||[])];
+    analysis.routeLabels=[...(analysis.semanticPlan.routeLabels||[])];
 
-    if(informationalCue) {
-      const boundary=
-        routeCue && routeCue.pos>informationalCue.pos
-          ? routeCue.pos
-          : n.length;
-      const infoSegment=n.slice(informationalCue.pos,boundary);
+    if(analysis.infoTerritory){
+      analysis.infoPlaces=territoryPois(analysis.infoTerritory).slice(0,8);
 
-      const infoTerritories=(territoryMatches(infoSegment,language)||[])
-        .map(hydrateTerritoryMatch)
-        .filter(Boolean);
-      const infoPlaces=(getPlaces(infoSegment)||[])
-        .map(place=>({place,pos:findPlacePosition(infoSegment,place)}))
-        .filter(item=>item.pos>=0)
-        .sort((a,b)=>a.pos-b.pos)
-        .map(item=>item.place);
-
-      analysis.infoTerritory=infoTerritories[0]||null;
-      analysis.infoPlaces=[...new Map(infoPlaces.map(place=>[place.id||place.name,place])).values()];
-
-      if(analysis.infoPlaces.length) {
-        for(const intentName of ["tell","see_place","near_place"]) {
-          if(analysis.intents.includes(intentName)) {
-            analysis.targets[intentName]=[...analysis.infoPlaces];
-          }
+      for(const intentName of ["tell","see_place","near_place"]){
+        if(analysis.intents.includes(intentName) && !(analysis.targets[intentName]?.length)){
+          const representative=representativePlaceForTerritory(analysis.infoTerritory);
+          if(representative)analysis.targets[intentName]=[representative];
         }
       }
+    }
+
+    if(
+      analysis.intents.includes("route")
+      &&
+      analysis.semanticPlan.routePlaces?.length>=2
+    ){
+      analysis.targets.route=[...analysis.semanticPlan.routePlaces];
+      analysis.routeExactSequence=true;
     }
 
     const toolRequests=capabilityQuery ? [] : detectToolRequests(text,language,places);
@@ -3688,6 +3808,8 @@
             intents:analysis.intents,
             routeRequest:{
               placeIds:routeTargets.map(place=>place.id).filter(Boolean),
+              territoryIds:(analysis.routeTerritories||[]).map(territory=>territory.id).filter(Boolean),
+              routeLabels:[...(analysis.routeLabels||[])],
               durationHours:analysis.durationHours,
               themes:[...(analysis.themes||[])],
               mode:analysis.mode||null,
@@ -3738,6 +3860,7 @@
         actions,
         language:analysis.language,
         analysis,
+        semanticPlan:analysis.semanticPlan,
         context,
         places:analysis.places,
         text:sections.filter(Boolean).join("\n\n")
