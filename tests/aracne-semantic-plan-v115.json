@@ -1,0 +1,98 @@
+{
+  "version": "1.1.5",
+  "purpose": "Protect semantic planning for long punctuation-light voice requests that mix city information, nearby discovery and a later multi-city route.",
+  "coreModel": {
+    "phases": [
+      "extract ordered city/territory mentions",
+      "identify informational subject",
+      "identify informational intents",
+      "identify route boundary",
+      "extract ordered route cities",
+      "map cities to representative routable POIs only after semantic interpretation"
+    ]
+  },
+  "cases": [
+    {
+      "id": "lecce-spoken-capture",
+      "input": "Puoi cortesemente parlarmi di Lecce E di cosa c'è da vedere e cosa c'è intorno Poi mi puoi fare un percorso tra Lecce Gallipoli Nardò e infine Otranto",
+      "expect": {
+        "cities": [
+          "Lecce",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ],
+        "primaryCity": "Lecce",
+        "infoCity": "Lecce",
+        "intents": [
+          "tell",
+          "see_place",
+          "near_place",
+          "route"
+        ],
+        "route": [
+          "Lecce",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ],
+        "routeExactSequence": true
+      }
+    },
+    {
+      "id": "lecce-no-punctuation",
+      "input": "parlarmi di Lecce cosa vedere cosa c'è intorno poi percorso Lecce Gallipoli Nardò Otranto",
+      "expect": {
+        "primaryCity": "Lecce",
+        "route": [
+          "Lecce",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ]
+      }
+    },
+    {
+      "id": "otranto-info-then-route",
+      "input": "parlami di Otranto dimmi cosa vedere e cosa c'è intorno poi fammi un percorso tra Otranto Gallipoli Lecce Nardò",
+      "expect": {
+        "primaryCity": "Otranto",
+        "route": [
+          "Otranto",
+          "Gallipoli",
+          "Lecce",
+          "Nardò"
+        ]
+      }
+    },
+    {
+      "id": "final-marker-inside-route",
+      "input": "fammi un percorso tra Lecce Gallipoli Nardò e infine Otranto",
+      "expect": {
+        "route": [
+          "Lecce",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ],
+        "note": "infine must not split Otranto out of the route"
+      }
+    },
+    {
+      "id": "poi-must-not-steal-city-focus",
+      "expect": [
+        "representative POIs are selected only after city-level semantic planning",
+        "a Gallipoli POI must never replace Lecce as the informational subject",
+        "route text and travel-booklet context use city labels when available"
+      ]
+    },
+    {
+      "id": "weave-reliability",
+      "expect": [
+        "route reveal is idempotent",
+        "mobile route geometry is retried briefly if not ready",
+        "a successful route should produce one post-answer spider weave"
+      ]
+    }
+  ]
+}
