@@ -1,0 +1,44 @@
+{
+  "version": "1.1.6",
+  "purpose": "Protect repeated city mentions across information and route clauses, and guarantee a weaveable local route fallback.",
+  "cases": [
+    {
+      "id": "same-city-mentioned-twice",
+      "input": "Puoi parlarmi di Lecce e di cosa c'è da vedere e cosa c'è intorno poi mi fai un percorso tra Lecce Gallipoli Nardò e infine Otranto",
+      "expect": {
+        "cityOccurrences": [
+          "Lecce (information subject)",
+          "Lecce (route origin)",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ],
+        "primaryCity": "Lecce",
+        "route": [
+          "Lecce",
+          "Gallipoli",
+          "Nardò",
+          "Otranto"
+        ],
+        "routeStops": 4
+      }
+    },
+    {
+      "id": "route-over-three-cities",
+      "input": "parti da Lecce vai a Gallipoli poi Nardò e infine Otranto",
+      "expect": [
+        "all four cities remain in the exact route sequence",
+        "exact routes are not capped by the generic maxStops value"
+      ]
+    },
+    {
+      "id": "external-router-failure",
+      "expect": [
+        "if primary and fallback external routing fail, a local LineString is built from all route waypoints",
+        "the local fallback computes indicative distance and duration",
+        "lastRouteGeometryPoints is populated from the fallback geometry",
+        "pendingAracneMapWeave becomes true and the spider can weave the fallback route"
+      ]
+    }
+  ]
+}
