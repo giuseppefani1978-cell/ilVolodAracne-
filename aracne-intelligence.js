@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.1";
+  const VERSION = "1.1.3";
 
   const LANGS = [
     "it",
@@ -21,6 +21,7 @@
   let currentLanguage = "it";
   let activeRequestLanguage = null;
   let askButton = null;
+  let speechRunId = 0;
 
   const CONVERSATION_MAX_TURNS = 4;
   const CLARIFICATION_MAX_AGE = 3;
@@ -3675,109 +3676,80 @@
      ========================================= */
 
   function stopSpeaking() {
+    speechRunId += 1;
 
     try {
-
       window
         .speechSynthesis
         ?.cancel();
-
     } catch (error) {}
   }
 
 
-  function speak(text, languageOverride=null) {
+  function speak(text, languageOverride=null, lifecycle={}) {
 
     if (
-
       !text
-
       ||
-
-      !(
-        "speechSynthesis"
-        in window
-      )
-
+      !("speechSynthesis" in window)
       ||
-
-      !(
-        "SpeechSynthesisUtterance"
-        in window
-      )
-
+      !("SpeechSynthesisUtterance" in window)
     ) {
-
-      return;
+      return null;
     }
-
 
     stopSpeaking();
 
-
-    const utterance =
-      new SpeechSynthesisUtterance(
-        text
-      );
-
-
+    const runId=++speechRunId;
+    const utterance=new SpeechSynthesisUtterance(text);
     const speechLanguage=
       normalizeLanguageCode(languageOverride)
       ||
       lang();
 
-    utterance.lang =
+    utterance.lang=
       LOCALES[speechLanguage]
       ||
       LOCALES.it;
 
+    utterance.rate=0.96;
 
-    utterance.rate =
-      0.96;
-
-
-    const voices =
+    const voices=
       window
         .speechSynthesis
         .getVoices?.()
       ||
       [];
 
-
-    const voice =
-
-      voices.find(
-        item =>
-          item.lang ===
-          utterance.lang
-      )
-
+    const voice=
+      voices.find(item=>item.lang===utterance.lang)
       ||
-
-      voices.find(
-        item =>
-          (
-            item.lang || ""
-          )
-            .toLowerCase()
-            .startsWith(
-              speechLanguage
-            )
+      voices.find(item=>
+        (item.lang||"")
+          .toLowerCase()
+          .startsWith(speechLanguage)
       );
 
+    if(voice)utterance.voice=voice;
 
-    if (voice) {
+    const invoke=(name,event)=>{
+      if(runId!==speechRunId)return;
+      try{lifecycle?.[name]?.(event);}catch(error){
+        console.warn("[Aracne speech lifecycle]",name,error);
+      }
+    };
 
-      utterance.voice =
-        voice;
+    utterance.onstart=event=>invoke("onStart",event);
+    utterance.onend=event=>invoke("onEnd",event);
+    utterance.onerror=event=>invoke("onError",event);
+
+    try{
+      window.speechSynthesis.speak(utterance);
+      return {runId,utterance};
+    }catch(error){
+      invoke("onError",error);
+      return null;
     }
-
-
-    window
-      .speechSynthesis
-      .speak(
-        utterance
-      );
   }
 
 
@@ -3794,60 +3766,89 @@
      * Evite qu'Aracne
      * écoute sa propre voix.
      */
-
     try {
-
       bridge
         ?.stopRecognition
         ?.();
-
     } catch (error) {}
-
 
     updateContextIndicator({thinking:true});
 
-    const result =
+    const result=
       await execute(
         text
       );
 
-
-    if (
-      options.show !== false
-    ) {
-
-      show(
-        result.text
-      );
+    /*
+     * Toujours écrire la réponse AVANT toute fermeture
+     * de panneau ou synthèse vocale.
+     */
+    if(options.show!==false){
+      show(result.text);
     }
 
-
-    try {
+    /*
+     * Le carnet est écrit immédiatement, avant la voix.
+     * Ainsi une fermeture de modal, un changement d'onglet
+     * ou une interruption de speech ne peut pas perdre la réponse.
+     */
+    try{
       bridge?.saveAnswer?.(result);
-    } catch (error) {
+    }catch(error){
       console.warn("[Aracne] saveAnswer",error);
     }
 
+    let speechStarted=false;
+    let speechFinished=false;
+    let speechHandle=null;
 
-    if (
-      options.speak !== false
-    ) {
-
-      speak(
+    if(options.speak!==false){
+      speechHandle=speak(
         result.text,
-        result.language
+        result.language,
+        {
+          onStart:()=>{
+            speechStarted=true;
+            try{bridge?.speechStart?.(result);}catch(error){
+              console.warn("[Aracne] speechStart",error);
+            }
+          },
+          onEnd:()=>{
+            speechFinished=true;
+            try{bridge?.speechEnd?.(result);}catch(error){
+              console.warn("[Aracne] speechEnd",error);
+            }
+          },
+          onError:()=>{
+            if(!speechStarted && options.reveal!==false){
+              try{bridge?.afterAnswer?.(result);}catch(error){
+                console.warn("[Aracne] afterAnswer",error);
+              }
+            }
+          }
+        }
       );
     }
 
-
-    if (options.reveal !== false) {
-      try {
-        bridge?.afterAnswer?.(result);
-      } catch (error) {
-        console.warn("[Aracne] afterAnswer",error);
+    /*
+     * Fallback mobile : certains WebKit ne déclenchent pas
+     * toujours onstart/onend de façon fiable.
+     */
+    if(options.reveal!==false){
+      if(!speechHandle){
+        try{bridge?.afterAnswer?.(result);}catch(error){
+          console.warn("[Aracne] afterAnswer",error);
+        }
+      }else{
+        setTimeout(()=>{
+          if(!speechStarted && !speechFinished){
+            try{bridge?.afterAnswer?.(result);}catch(error){
+              console.warn("[Aracne] afterAnswer fallback",error);
+            }
+          }
+        },900);
       }
     }
-
 
     updateContextIndicator();
 
