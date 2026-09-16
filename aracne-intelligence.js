@@ -3913,7 +3913,8 @@
             }
           },
           onError:()=>{
-            if(!speechStarted && options.reveal!==false){
+            speechFinished=true;
+            if(options.reveal!==false){
               try{bridge?.afterAnswer?.(result);}catch(error){
                 console.warn("[Aracne] afterAnswer",error);
               }
