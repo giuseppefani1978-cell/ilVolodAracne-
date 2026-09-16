@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.7";
+  const VERSION = "1.1.8";
 
   const LANGS = [
     "it",
@@ -4081,7 +4081,10 @@
         const words=String(result.text||"").trim().split(/\s+/).filter(Boolean).length;
         const fallbackEndMs=Math.max(4200,Math.min(26000,Math.round((words/2.15)*1000)+1200));
 
+        const fallbackRunId=speechHandle?.runId;
+
         setTimeout(()=>{
+          if(fallbackRunId!==speechRunId)return;
           if(!speechStarted && !speechFinished){
             speechStarted=true;
             try{bridge?.speechStart?.(result);}catch(error){
@@ -4091,6 +4094,7 @@
         },900);
 
         setTimeout(()=>{
+          if(fallbackRunId!==speechRunId)return;
           if(!speechFinished){
             speechFinished=true;
             try{bridge?.speechEnd?.(result);}catch(error){
