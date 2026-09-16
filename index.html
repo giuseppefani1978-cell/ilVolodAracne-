@@ -269,7 +269,7 @@
     .lang-item:hover{background:#f3f3f5}
 
     .toast{
-      position:fixed;z-index:2000;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(var(--safe-bottom) + 92px);
+      position:fixed;z-index:13050;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(var(--safe-bottom) + 92px);
       background:#171718;color:#fff;border-radius:999px;padding:11px 16px;font-size:.78rem;font-weight:700;opacity:0;pointer-events:none;transition:.28s;
       white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis
     }
@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.6"></script>
+  <script src="./aracne-intelligence.js?v=1.1.7"></script>
 
   <script>
   (() => {
@@ -2067,6 +2067,16 @@
 
     function addMarkers(){poiData.forEach(addMarkerForPoi);}
 
+    async function fetchWithTimeout(url,options={},timeoutMs=5000){
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),Math.max(500,Number(timeoutMs)||5000));
+      try{
+        return await fetch(url,{...options,signal:controller.signal});
+      }finally{
+        clearTimeout(timer);
+      }
+    }
+
     async function ensureCoords(p,silent=false){
       if(isSalentoCoordinate(p?.lat,p?.lng)){
         addMarkerForPoi(p);
@@ -2086,7 +2096,7 @@
         const q=encodeURIComponent(`${p.name}, Lecce, Puglia, Italy`);
         const viewbox=`${SALENTO_GEO_BOUNDS.west},${SALENTO_GEO_BOUNDS.north},${SALENTO_GEO_BOUNDS.east},${SALENTO_GEO_BOUNDS.south}`;
         const url=`https://nominatim.openstreetmap.org/search?format=json&limit=5&bounded=1&countrycodes=it&viewbox=${encodeURIComponent(viewbox)}&q=${q}`;
-        const res=await fetch(url,{cache:"no-store"});
+        const res=await fetchWithTimeout(url,{cache:"no-store"},3500);
         const data=await res.json();
         const candidate=(Array.isArray(data)?data:[])
           .map(item=>({lat:parseFloat(item.lat),lng:parseFloat(item.lon)}))
@@ -2512,13 +2522,53 @@
       lastRouteGeometryPoints=[];
       if(routeLayer){map.removeLayer(routeLayer);routeLayer=null}
       routeMarkers.forEach(m=>map.removeLayer(m));routeMarkers=[];
+
+      // Never hand Leaflet an invalid coordinate. The previous order created
+      // markers first and filtered afterwards, so one unresolved/geocoded POI
+      // could abort the whole Aracne request before the answer or speech.
+      const normalizedWaypoints=[];
+      for(const point of (Array.isArray(waypoints)?waypoints:[])){
+        let candidate={...point};
+
+        if(!isSalentoCoordinate(candidate?.lat,candidate?.lng)){
+          const canonical=candidate?.id ? getPoi(candidate.id) : null;
+          if(canonical){
+            try{
+              const ok=await ensureCoords(canonical,true);
+              if(ok && isSalentoCoordinate(canonical.lat,canonical.lng)){
+                candidate={
+                  ...candidate,
+                  lat:Number(canonical.lat),
+                  lng:Number(canonical.lng)
+                };
+              }
+            }catch(error){
+              console.warn("[Aracne route] coordinate recovery failed",candidate?.id,error);
+            }
+          }
+        }
+
+        if(isSalentoCoordinate(candidate?.lat,candidate?.lng)){
+          candidate.lat=Number(candidate.lat);
+          candidate.lng=Number(candidate.lng);
+          normalizedWaypoints.push(candidate);
+        }else{
+          console.warn("[Aracne route] skipped invalid waypoint",candidate?.id,candidate?.name,candidate?.lat,candidate?.lng);
+        }
+      }
+
+      waypoints=normalizedWaypoints;
+      saveState();
+
       waypoints.forEach((p,i)=>{
-        const m=L.marker([p.lat,p.lng],{icon:routeIcon}).addTo(map).bindTooltip(String(i+1),{permanent:true,direction:"right",className:"route-tooltip"}).bindPopup(popupHtml(p),{closeButton:false,offset:[0,-8]});
-        routeMarkers.push(m);
+        try{
+          const m=L.marker([p.lat,p.lng],{icon:routeIcon}).addTo(map).bindTooltip(String(i+1),{permanent:true,direction:"right",className:"route-tooltip"}).bindPopup(popupHtml(p),{closeButton:false,offset:[0,-8]});
+          routeMarkers.push(m);
+        }catch(error){
+          console.warn("[Aracne route] marker skipped",p?.id,p?.name,error);
+        }
       });
 
-      waypoints=waypoints.filter(p=>Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng)));
-      saveState();
       const status=$("#routeStatus");
       if(waypoints.length<2){
         lastRouteStats={distance:0,duration:0,carbon:0,carbonMin:0,carbonMax:0,legs:[],exact:true};
@@ -2536,7 +2586,7 @@
 
       let r=null, exact=true;
       try{
-        let res=await fetch(routers[mode],{cache:"no-store"});
+        let res=await fetchWithTimeout(routers[mode],{cache:"no-store"},5000);
         let data=await res.json();
         if(!res.ok || !data.routes?.[0]) throw new Error("routing provider");
         r=data.routes[0];
@@ -2544,7 +2594,7 @@
         // Fallback: road geometry + indicative speed, so the prototype still works
         // if the public bike/foot routing service is temporarily unavailable.
         try{
-          const res=await fetch(routers.driving,{cache:"no-store"});
+          const res=await fetchWithTimeout(routers.driving,{cache:"no-store"},3000);
           const data=await res.json();
           if(!res.ok || !data.routes?.[0]) throw new Error("fallback routing");
           r=data.routes[0]; exact=mode==="driving";
