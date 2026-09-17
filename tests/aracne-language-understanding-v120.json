@@ -1,0 +1,77 @@
+{
+  "version": "1.2.0",
+  "purpose": "Regression cases for natural written and spoken requests without changing UI, routing, knowledge data or other HIRUNDU features.",
+  "cases": [
+    {
+      "id": "it-spoken-fillers-multi-intent",
+      "language": "it",
+      "input": "Ehm allora parlami di Lecce e che cosa c'è da vedere e cosa c'è intorno poi costruiscimi un percorso Lecce Gallipoli Nardò Otranto no",
+      "expect": {
+        "intentsInclude": ["tell", "see_place", "near_place", "route"],
+        "infoTerritory": "lecce",
+        "routeLabels": ["Lecce", "Gallipoli", "Nardò", "Otranto"],
+        "trailingSpeechResidueIgnored": true
+      }
+    },
+    {
+      "id": "fr-spoken-no-punctuation",
+      "language": "fr",
+      "input": "Euh parle moi de Gallipoli qu est ce qu on peut voir autour et ensuite fais moi un parcours vers Nardò puis Otranto",
+      "expect": {
+        "intentsInclude": ["tell", "see_place", "near_place", "route"],
+        "infoTerritory": "gallipoli"
+      }
+    },
+    {
+      "id": "en-negated-route",
+      "language": "en",
+      "input": "I do not want a route, just tell me about Otranto and what I can see there",
+      "expect": {
+        "intentsInclude": ["tell", "see_place"],
+        "intentsExclude": ["route"]
+      }
+    },
+    {
+      "id": "es-sequential-route-without-route-noun",
+      "language": "es",
+      "input": "Lecce luego Gallipoli después Nardò y finalmente Otranto",
+      "expect": {
+        "intentsInclude": ["route"],
+        "routeLabels": ["Lecce", "Gallipoli", "Nardò", "Otranto"],
+        "routeExactSequence": true
+      }
+    },
+    {
+      "id": "territory-theme-followup",
+      "sequence": [
+        {"input": "Parle-moi de Nardò", "expectTerritory": "nardo"},
+        {"input": "Et les plages ?", "expectTerritory": "nardo", "expectIntent": "see_place", "expectTheme": "sea"}
+      ]
+    },
+    {
+      "id": "route-origin-ordinal-followup",
+      "sequence": [
+        {"input": "Fais-moi un parcours avec Lecce et Otranto", "expectClarification": "route_origin"},
+        {"input": "Le premier", "expectResolvedClarification": "route_origin"}
+      ]
+    },
+    {
+      "id": "coherent-see-near-response",
+      "language": "fr",
+      "input": "Parle-moi de Lecce, dis-moi quoi voir et ce qu'il y a autour",
+      "expect": {
+        "noDuplicateTerritoryPoiBlock": true,
+        "keepsDistinctAboutSeeNearbySections": true
+      }
+    },
+    {
+      "id": "it-negation-does-not-block-later-positive-intent",
+      "language": "it",
+      "input": "Non farmi un percorso, dimmi invece cosa vedere a Castro",
+      "expect": {
+        "intentsInclude": ["see_place"],
+        "intentsExclude": ["route"]
+      }
+    }
+  ]
+}
