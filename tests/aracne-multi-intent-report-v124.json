@@ -1,0 +1,47 @@
+{
+  "version": "1.2.4",
+  "purpose": "Regression cases for ordered multi-intent understanding, city-first semantics and conversation-to-carnet reports.",
+  "cases": [
+    {
+      "id": "fr-user-screenshot-sequence",
+      "language": "fr",
+      "input": "J'aimerais bien que tu me parles de Lecce et qu'est-ce qu'il y a à côté qu'est-ce qu'il y a à faire et à voir et ensuite j'aimerais bien que tu construise un parcours à partir de Lecce vers Gallipoli et après les plages de Porto Cesareo",
+      "expect": {
+        "orderedIntents": ["tell", "near_place", "see_place", "route"],
+        "informationFocus": "lecce",
+        "routeCities": ["lecce", "gallipoli", "porto_cesareo"],
+        "routeTheme": "sea",
+        "tellIntentMustNotBeDropped": true,
+        "cityNamesMustNotBeReplacedByPoiNamesInDisplayedRoute": true
+      }
+    },
+    {
+      "id": "it-long-multi-intent",
+      "language": "it",
+      "input": "Parlami di Lecce dimmi cosa c'è intorno e cosa vedere poi costruiscimi un percorso da Lecce a Gallipoli e infine Porto Cesareo passando per le spiagge",
+      "expect": {
+        "orderedIntents": ["tell", "near_place", "see_place", "route"],
+        "informationFocus": "lecce",
+        "routeCities": ["lecce", "gallipoli", "porto_cesareo"]
+      }
+    },
+    {
+      "id": "clarification-stays-in-thread",
+      "expect": {
+        "clarificationKeepsModalOpen": true,
+        "clarificationAndReplyRemainVisible": true,
+        "replyUsesPendingContext": true
+      }
+    },
+    {
+      "id": "conversation-report-on-finish",
+      "expect": {
+        "individualAssistantTurnsAreNotSavedAsSeparateNotes": true,
+        "routeCompletionSavesConversationReport": true,
+        "closingAssistantSavesUnsavedConversationReport": true,
+        "openingCarnetFlushesCurrentConversationReportFirst": true,
+        "reportContainsUserAndAracneTurns": true
+      }
+    }
+  ]
+}
