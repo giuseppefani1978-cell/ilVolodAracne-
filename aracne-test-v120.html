@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>HIRUNDU — Test Aracne v1.2</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff}
+    #app{display:block;width:100%;height:100%;border:0}
+    #badge{position:fixed;z-index:999999;top:max(6px,env(safe-area-inset-top));right:7px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.9);box-shadow:0 2px 12px rgba(0,0,0,.12);font:600 11px/1.1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;pointer-events:none;color:#5a2d67}
+  </style>
+</head>
+<body>
+  <div id="badge">ARACNE v1.2 TEST</div>
+  <iframe id="app" src="./index.html?aracne-test=v120" allow="microphone *; geolocation *; fullscreen *"></iframe>
+  <script>
+    (()=>{
+      const frame=document.getElementById('app');
+      frame.addEventListener('load',()=>{
+        try{
+          const doc=frame.contentDocument;
+          if(!doc)return;
+          const existing=doc.getElementById('aracneUnderstanding120Script');
+          if(existing)return;
+          const script=doc.createElement('script');
+          script.id='aracneUnderstanding120Script';
+          script.src='./aracne-understanding-v120.js?v=1.2.0';
+          script.async=false;
+          doc.head.appendChild(script);
+        }catch(error){
+          console.error('[Aracne v1.2 test] injection failed',error);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
