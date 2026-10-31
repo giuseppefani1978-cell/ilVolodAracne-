@@ -94,7 +94,10 @@
   function phrasePosition(n,phrases=[]){
     let best=-1;
     for(const phrase of phrases){
-      const p=n.indexOf(normalize(phrase));
+      // Match whole normalized phrases, never fragments such as ruta in fruta.
+      const normalized=normalize(phrase);
+      if(!normalized)continue;
+      const p=(` ${n} `).indexOf(` ${normalized} `);
       if(p>=0 && (best<0||p<best))best=p;
     }
     return best;
@@ -141,7 +144,7 @@
 
     // A sequence of named territories joined by temporal connectors is a route
     // even if the user never says "route" explicitly.
-    if(!intents.some(i=>i.name==="route") && territories.length>=2){
+    if(!routeNegated(n,language) && !intents.some(i=>i.name==="route") && territories.length>=2){
       const seqPos=phrasePosition(n,lex.sequence);
       if(seqPos>=0)intents.push({name:"route",pos:Math.max(0,territories[0].pos)});
     }
@@ -236,3 +239,4 @@
   window.AracneIntent130={version:VERSION,execute,baseExecute,detectIntents,orderedTerritories,cleanHesitations};
   console.info(`[Aracne Intent] v${VERSION} active — multilingual layered intent parsing`);
 })();
+
