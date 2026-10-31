@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.8";
+  const VERSION = "1.1.9";
 
   const LANGS = [
     "it",
@@ -2779,8 +2779,18 @@
       }
     }
 
+    // A refusal must also apply to route cues recovered from later clauses.
+    // Keep this conservative: a contradictory request needs clarification,
+    // never an unsolicited route mutation.
+    const routeRefused=hasAny(n,[
+      "ne me fais pas de parcours","ne fais pas de parcours","je ne veux pas de parcours","pas de parcours","sans parcours",
+      "non farmi un percorso","non fare un percorso","non voglio un percorso","niente percorso","senza percorso",
+      "do not make a route","don t make a route","i do not want a route","i don t want a route","no route","without a route",
+      "no hagas una ruta","no quiero una ruta","sin ruta","ninguna ruta"
+    ]);
     const cues=[];
     const addIntent=(name,pos,score=1)=>{
+      if(name==="route" && routeRefused)return;
       if(pos<0)return;
       const existing=cues.find(x=>x.name===name);
       if(existing){
