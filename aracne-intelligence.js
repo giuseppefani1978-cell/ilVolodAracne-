@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.9";
+  const VERSION = "1.1.10";
 
   const LANGS = [
     "it",
@@ -528,7 +528,7 @@
         (
           id
           &&
-          n.includes(id)
+          (` ${n} `).includes(` ${id} `)
         )
 
         ||
@@ -536,7 +536,7 @@
         (
           name.length > 3
           &&
-          n.includes(name)
+          (` ${n} `).includes(` ${name} `)
         )
       );
     });

@@ -1,0 +1,242 @@
+[
+  {
+    "id": "place-01",
+    "lang": "fr",
+    "input": "Que voir à Castrocaro ?",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-02",
+    "lang": "it",
+    "input": "Cosa vedere a Castrocaro?",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-03",
+    "lang": "en",
+    "input": "What can I see in Castrocaro?",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-04",
+    "lang": "es",
+    "input": "Qué ver en Castrocaro?",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-05",
+    "lang": "en",
+    "input": "Where can I buy ripe fruit?",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-06",
+    "lang": "fr",
+    "input": "Parle-moi de la gastronomie",
+    "expectedPlaces": [],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-07",
+    "lang": "it",
+    "input": "Parlami di Lecce",
+    "expectedPlaces": [
+      "lecce"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-08",
+    "lang": "fr",
+    "input": "Que voir à Lecce ?",
+    "expectedPlaces": [
+      "lecce"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-09",
+    "lang": "en",
+    "input": "Tell me about Otranto",
+    "expectedPlaces": [
+      "otranto"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-10",
+    "lang": "es",
+    "input": "Háblame de Otranto",
+    "expectedPlaces": [
+      "otranto"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-11",
+    "lang": "fr",
+    "input": "Parle-moi de Lecce, sans parcours",
+    "expectedPlaces": [
+      "lecce"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-12",
+    "lang": "it",
+    "input": "Parlami di Otranto, senza percorso",
+    "expectedPlaces": [
+      "otranto"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-13",
+    "lang": "en",
+    "input": "Tell me about Lecce; no route",
+    "expectedPlaces": [
+      "lecce"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-14",
+    "lang": "es",
+    "input": "Háblame de Lecce, sin ruta",
+    "expectedPlaces": [
+      "lecce"
+    ],
+    "expectedBehavior": "Reconnaître seulement les objets explicitement cités ; aucun objet local pour une ville hors catalogue ou une question sans lieu.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases",
+      "aracne-knowledge.js"
+    ]
+  },
+  {
+    "id": "place-15",
+    "lang": "fr",
+    "input": "Que voir entre Lecce-Otranto ?",
+    "expectedPlaces": [
+      "lecce",
+      "otranto"
+    ],
+    "expectedBehavior": "Préserver la reconnaissance avec ponctuation et trait d’union.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases"
+    ]
+  },
+  {
+    "id": "place-16",
+    "lang": "it",
+    "input": "Cosa vedere tra Lecce-Otranto?",
+    "expectedPlaces": [
+      "lecce",
+      "otranto"
+    ],
+    "expectedBehavior": "Préserver la reconnaissance avec ponctuation et trait d’union.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases"
+    ]
+  },
+  {
+    "id": "place-17",
+    "lang": "en",
+    "input": "What to see between Lecce-Otranto?",
+    "expectedPlaces": [
+      "lecce",
+      "otranto"
+    ],
+    "expectedBehavior": "Préserver la reconnaissance avec ponctuation et trait d’union.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases"
+    ]
+  },
+  {
+    "id": "place-18",
+    "lang": "es",
+    "input": "Qué ver entre Lecce-Otranto?",
+    "expectedPlaces": [
+      "lecce",
+      "otranto"
+    ],
+    "expectedBehavior": "Préserver la reconnaissance avec ponctuation et trait d’union.",
+    "sources": [
+      "index.html:poiData",
+      "index.html:assistantAliases"
+    ]
+  }
+]

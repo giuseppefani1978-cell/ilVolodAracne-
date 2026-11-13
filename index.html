@@ -848,7 +848,7 @@
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   <script src="./aracne-knowledge.js?v=1.0.0"></script>
-  <script src="./aracne-intelligence.js?v=1.1.9"></script>
+  <script src="./aracne-intelligence.js?v=1.1.10"></script>
 
   <script>
   (() => {
@@ -1806,9 +1806,9 @@
       "roca vecchia":"poesia","baia dei turchi":"turchi","laghi alimini":"alimini","punta della suina":"suina","santa maria al bagno":"santamaria","porto miggiano":"miggiano"
     };
     function findMentionedPois(text){
-      const n=normalizeAssistantText(text),found=[];
-      poiData.forEach(p=>{const full=normalizeAssistantText(p.name);if(full.length>5&&n.includes(full)&&!found.includes(p))found.push(p);});
-      Object.entries(assistantAliases).forEach(([alias,id])=>{if(n.includes(alias)){const p=getPoi(id);if(p&&!found.includes(p))found.push(p);}});
+      const n=normalizeAssistantText(text).replace(/-/g," "),found=[];
+      poiData.forEach(p=>{const full=normalizeAssistantText(p.name);if(full.length>5&&(` ${n} `).includes(` ${full} `)&&!found.includes(p))found.push(p);});
+      Object.entries(assistantAliases).forEach(([alias,id])=>{if((` ${n} `).includes(` ${alias} `)){const p=getPoi(id);if(p&&!found.includes(p))found.push(p);}});
       return found;
     }
     function detectAssistantMode(text){

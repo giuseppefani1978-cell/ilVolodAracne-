@@ -1,0 +1,191 @@
+{
+  "passed": 18,
+  "total": 18,
+  "results": [
+    {
+      "lang": "fr",
+      "input": "Pas de parcours, parle-moi de Lecce puis Otranto",
+      "expected": false,
+      "intents": [
+        "tell"
+      ],
+      "routeCalls": 0,
+      "answer": "À propos de Lecce\nLecce est le principal centre culturel du Salento, célèbre pour le baroque leccese",
+      "pass": true
+    },
+    {
+      "lang": "it",
+      "input": "Non voglio un percorso, parlami di Lecce poi Otranto",
+      "expected": false,
+      "intents": [
+        "tell"
+      ],
+      "routeCalls": 0,
+      "answer": "Su Lecce\nLecce è il principale centro culturale del Salento, celebre per il barocco leccese scolpito",
+      "pass": true
+    },
+    {
+      "lang": "en",
+      "input": "No route, tell me about Lecce then Otranto",
+      "expected": false,
+      "intents": [
+        "tell"
+      ],
+      "routeCalls": 0,
+      "answer": "About Lecce\nLecce is Salento’s main cultural centre, celebrated for Lecce Baroque carved in the warm",
+      "pass": true
+    },
+    {
+      "lang": "es",
+      "input": "Sin ruta, háblame de Lecce luego Otranto",
+      "expected": false,
+      "intents": [
+        "tell"
+      ],
+      "routeCalls": 0,
+      "answer": "Sobre Lecce\nLecce es el principal centro cultural del Salento, célebre por el barroco leccese esculp",
+      "pass": true
+    },
+    {
+      "lang": "es",
+      "input": "Háblame de la fruta en Lecce y Otranto",
+      "expected": false,
+      "intents": [
+        "tell"
+      ],
+      "routeCalls": 0,
+      "answer": "Sobre Lecce\nLecce es el principal centro cultural del Salento, célebre por el barroco leccese esculp",
+      "pass": true
+    },
+    {
+      "lang": "fr",
+      "input": "Crée un parcours de Lecce à Otranto",
+      "expected": true,
+      "intents": [
+        "route"
+      ],
+      "routeCalls": 0,
+      "answer": "Tu veux partir de Basilica di S.M Annunziata, Lecce ou Castello di Otranto ou simplement les inclure",
+      "pass": true
+    },
+    {
+      "lang": "it",
+      "input": "Crea un percorso da Lecce a Otranto",
+      "expected": true,
+      "intents": [
+        "route"
+      ],
+      "routeCalls": 1,
+      "answer": "Percorso proposto",
+      "pass": true
+    },
+    {
+      "lang": "en",
+      "input": "Create a route from Lecce to Otranto",
+      "expected": true,
+      "intents": [
+        "route"
+      ],
+      "routeCalls": 1,
+      "answer": "Suggested route",
+      "pass": true
+    },
+    {
+      "lang": "es",
+      "input": "Crea una ruta de Lecce a Otranto",
+      "expected": true,
+      "intents": [
+        "route"
+      ],
+      "routeCalls": 0,
+      "answer": "¿Quieres salir de Basilica di S.M Annunziata, Lecce o Castello di Otranto o simplemente incluirlos e",
+      "pass": true
+    },
+    {
+      "lang": "fr",
+      "input": "Parle-moi de Gallipoli et construis-moi un parcours nature de trois heures.",
+      "pass": true,
+      "intents": [
+        "tell",
+        "route"
+      ],
+      "durationHours": 3
+    },
+    {
+      "lang": "fr",
+      "input": "Propose-moi un trajet nature de 3 heures depuis Lecce.",
+      "pass": true,
+      "intents": [
+        "route"
+      ],
+      "durationHours": 3
+    },
+    {
+      "lang": "fr",
+      "input": "Parle-moi d'Otranto et propose une balade de deux heures et demie.",
+      "pass": true,
+      "intents": [
+        "tell",
+        "route"
+      ],
+      "durationHours": 2.5
+    },
+    {
+      "lang": "it",
+      "input": "Parlami di Gallipoli e costruisci un percorso natura di tre ore.",
+      "pass": true,
+      "intents": [
+        "tell",
+        "route"
+      ],
+      "durationHours": 3
+    },
+    {
+      "lang": "it",
+      "input": "Proponi un viaggio di due ore e mezza da Lecce.",
+      "pass": true,
+      "intents": [
+        "route"
+      ],
+      "durationHours": 2.5
+    },
+    {
+      "lang": "en",
+      "input": "Tell me about Gallipoli and build a three hour nature trip.",
+      "pass": true,
+      "intents": [
+        "tell",
+        "route"
+      ],
+      "durationHours": 3
+    },
+    {
+      "lang": "en",
+      "input": "Plan a two hours and a half trip from Lecce.",
+      "pass": true,
+      "intents": [
+        "route"
+      ],
+      "durationHours": 2.5
+    },
+    {
+      "lang": "es",
+      "input": "Háblame de Gallipoli y crea una ruta de naturaleza de tres horas.",
+      "pass": true,
+      "intents": [
+        "tell",
+        "route"
+      ],
+      "durationHours": 3
+    },
+    {
+      "lang": "es",
+      "input": "Construye un trayecto de dos horas y media desde Otranto.",
+      "pass": true,
+      "intents": [
+        "route"
+      ],
+      "durationHours": 2.5
+    }
+  ]
+}
