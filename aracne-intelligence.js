@@ -1201,7 +1201,7 @@
     return labels.sources+":\n"+sources.slice(0,4).map(function(source){
       const label=source.publisher||source.title||source.id;
       const suffix=(source.title&&source.publisher)?" — "+source.title:"";
-      return "• "+label+suffix;
+      return "• "+label+suffix+( /^https?:\/\//.test(source.url||"") ? " — "+source.url : "");
     }).join("\n");
   }
 
@@ -1216,7 +1216,7 @@
     }
     const summary=territoryLocalized(territory,"summary",language);
     const history=territoryLocalized(territory,"history",language);
-    return [summary,history].filter(Boolean).join("\n\n")||null;
+    return [summary,history,(summary||history)?formatTerritorySources(territory,language):null].filter(Boolean).join("\n\n")||null;
   }
 
   function formatTerritoryHighlights(territory,language){

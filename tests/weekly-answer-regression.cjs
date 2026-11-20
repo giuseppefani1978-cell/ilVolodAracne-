@@ -1,0 +1,10 @@
+const fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const root=path.resolve(__dirname,'..');
+const context=vm.createContext({window:{},document:{querySelector:()=>null,getElementById:()=>null,querySelectorAll:()=>[]},console:{info(){},warn(){}},setTimeout,clearTimeout});
+for(const file of ['aracne-knowledge.js','aracne-intelligence.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context);
+const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const places=JSON.parse(html.match(/const poiData = (\[.*?\]);/s)[1]);
+let language='fr',routeCalls=0;
+const engine=context.window.AracneIntelligence;
+engine.connect({getLanguage:()=>language,getVoiceLanguage:()=>language,getPlaces:()=>places,createRouteFromText:async()=>{routeCalls++;return {ok:true,selected:[]}}});
+(async()=>{const results=[];for(const [lang,prefix] of [['fr','Parle-moi de'],['it','Parlami di'],['en','Tell me about'],['es','Háblame de']]){language=lang;for(const name of ['Otranto','Paris']){engine.resetContext();const r=await engine.execute(prefix+' '+name);const pass=name==='Otranto'?r.text.includes('https://'):!(r.places?.length);results.push({lang,input:prefix+' '+name,expected:name==='Otranto'?'Réponse avec URL source':'Aucun POI attribué',source:'aracne-knowledge.js:territories.otranto.sourceIds',text:r.text,pass});}}console.log(JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length,results},null,2));process.exitCode=results.every(r=>r.pass)?0:1;})();

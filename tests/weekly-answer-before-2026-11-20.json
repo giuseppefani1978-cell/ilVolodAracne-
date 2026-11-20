@@ -1,0 +1,70 @@
+{
+  "passed": 4,
+  "total": 8,
+  "results": [
+    {
+      "lang": "fr",
+      "input": "Parle-moi de Otranto",
+      "expected": "Réponse avec URL source",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "À propos de Otranto\nOtranto est une ville adriatique installée sur un éperon rocheux, où la mer, les fortifications et la mémoire historique sont étroitement liées.\n\nL’épisode le plus traumatique de l’histoire de la ville fut le siège ottoman de 1480 et la mort des huit cents Martyrs, dont la mémoire est conservée dans la cathédrale. La reconstruction défensive qui suivit marqua profondément le château aragonais.",
+      "pass": false
+    },
+    {
+      "lang": "fr",
+      "input": "Parle-moi de Paris",
+      "expected": "Aucun POI attribué",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "De quel lieu parles-tu ?",
+      "pass": true
+    },
+    {
+      "lang": "it",
+      "input": "Parlami di Otranto",
+      "expected": "Réponse avec URL source",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "Su Otranto\nOtranto è una città adriatica costruita su uno sperone roccioso, dove mare, fortificazioni e memoria storica si intrecciano in modo particolarmente forte.\n\nL’episodio più traumatico della storia cittadina fu l’assedio ottomano del 1480 e la successiva uccisione degli Ottocento Martiri, la cui memoria è custodita nella Cattedrale. La ricostruzione difensiva successiva segnò profondamente il Castello aragonese.",
+      "pass": false
+    },
+    {
+      "lang": "it",
+      "input": "Parlami di Paris",
+      "expected": "Aucun POI attribué",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "Di quale luogo stai parlando?",
+      "pass": true
+    },
+    {
+      "lang": "en",
+      "input": "Tell me about Otranto",
+      "expected": "Réponse avec URL source",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "About Otranto\nOtranto is an Adriatic town set on a rocky spur, where the sea, fortifications and historical memory are especially closely intertwined.\n\nThe most traumatic episode in the town’s history was the Ottoman siege of 1480 and the killing of the Eight Hundred Martyrs, whose memory is preserved in the cathedral. The defensive rebuilding that followed strongly shaped the Aragonese Castle.",
+      "pass": false
+    },
+    {
+      "lang": "en",
+      "input": "Tell me about Paris",
+      "expected": "Aucun POI attribué",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "Which place are you referring to?",
+      "pass": true
+    },
+    {
+      "lang": "es",
+      "input": "Háblame de Otranto",
+      "expected": "Réponse avec URL source",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "Sobre Otranto\nOtranto es una ciudad adriática situada sobre un espolón rocoso, donde el mar, las fortificaciones y la memoria histórica están estrechamente unidos.\n\nEl episodio más traumático de la historia de la ciudad fue el asedio otomano de 1480 y la muerte de los Ochocientos Mártires, cuya memoria se conserva en la catedral. La reconstrucción defensiva posterior marcó profundamente el Castillo Aragonés.",
+      "pass": false
+    },
+    {
+      "lang": "es",
+      "input": "Háblame de Paris",
+      "expected": "Aucun POI attribué",
+      "source": "aracne-knowledge.js:territories.otranto.sourceIds",
+      "text": "¿De qué lugar hablas?",
+      "pass": true
+    }
+  ]
+}
