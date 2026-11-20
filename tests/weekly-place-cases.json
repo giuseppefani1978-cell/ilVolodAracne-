@@ -238,5 +238,83 @@
       "index.html:poiData",
       "index.html:assistantAliases"
     ]
+  },
+  {
+    "id": "place-19",
+    "lang": "fr",
+    "input": "Je cherche un espace verde",
+    "expectedPlaces": [],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-20",
+    "lang": "it",
+    "input": "Vorrei stare nel verde",
+    "expectedPlaces": [],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-21",
+    "lang": "es",
+    "input": "Quiero un lugar alto",
+    "expectedPlaces": [],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-22",
+    "lang": "en",
+    "input": "Tell me about Torre di Ripe",
+    "expectedPlaces": [
+      "ripe"
+    ],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-23",
+    "lang": "fr",
+    "input": "Parle-moi de Torre di Ripe",
+    "expectedPlaces": [
+      "ripe"
+    ],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-24",
+    "lang": "it",
+    "input": "Parlami di Torre di Ripe",
+    "expectedPlaces": [
+      "ripe"
+    ],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
+  },
+  {
+    "id": "place-25",
+    "lang": "es",
+    "input": "Háblame de Torre di Ripe",
+    "expectedPlaces": [
+      "ripe"
+    ],
+    "expectedBehavior": "Ne pas utiliser un identifiant ambigu seul ; accepter le nom complet.",
+    "sources": [
+      "index.html:poiData"
+    ]
   }
 ]

@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "1.1.10";
+  const VERSION = "1.1.11";
 
   const LANGS = [
     "it",
@@ -527,6 +527,8 @@
 
         (
           id
+          // Common words are internal IDs, not safe standalone place aliases.
+          && !["ripe", "verde", "alto"].includes(id)
           &&
           (` ${n} `).includes(` ${id} `)
         )

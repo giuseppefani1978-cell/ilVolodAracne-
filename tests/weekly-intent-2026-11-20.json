@@ -1,0 +1,165 @@
+{
+  "scope": "intent parser with real territorial knowledge base; not end-to-end RAG",
+  "passed": 16,
+  "total": 16,
+  "results": [
+    {
+      "id": "fr-negation",
+      "language": "fr",
+      "input": "Pas de parcours, parle-moi de Lecce puis Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "it-negation",
+      "language": "it",
+      "input": "Non voglio un percorso, parlami di Lecce poi Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "en-negation",
+      "language": "en",
+      "input": "No route, tell me about Lecce then Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "es-negation",
+      "language": "es",
+      "input": "Sin ruta, háblame de Lecce luego Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "fr-sequence",
+      "language": "fr",
+      "input": "Lecce puis Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "it-sequence",
+      "language": "it",
+      "input": "Lecce poi Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "en-sequence",
+      "language": "en",
+      "input": "Lecce then Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "es-sequence",
+      "language": "es",
+      "input": "Lecce luego Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "fr-substring",
+      "language": "fr",
+      "input": "Parle-moi de la préparation à Lecce et Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "it-substring",
+      "language": "it",
+      "input": "Parlami della panna a Lecce e Gallipoli",
+      "expectedRoute": false,
+      "intents": [],
+      "pass": true
+    },
+    {
+      "id": "en-substring",
+      "language": "en",
+      "input": "Tell me about craftsmanship in Lecce and Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "es-substring",
+      "language": "es",
+      "input": "Háblame de la fruta en Lecce y Otranto",
+      "expectedRoute": false,
+      "intents": [
+        "tell"
+      ],
+      "pass": true
+    },
+    {
+      "id": "fr-explicit",
+      "language": "fr",
+      "input": "Crée un parcours de Lecce à Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "it-explicit",
+      "language": "it",
+      "input": "Crea un percorso da Lecce a Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "en-explicit",
+      "language": "en",
+      "input": "Create a route from Lecce to Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    },
+    {
+      "id": "es-explicit",
+      "language": "es",
+      "input": "Crea una ruta de Lecce a Otranto",
+      "expectedRoute": true,
+      "intents": [
+        "route"
+      ],
+      "pass": true
+    }
+  ]
+}

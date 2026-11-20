@@ -1,0 +1,601 @@
+{
+  "passed": 50,
+  "total": 50,
+  "metric": "Exactitude des objets explicitement reconnus, pas qualité de réponse",
+  "results": [
+    {
+      "id": "place-01",
+      "mode": "pwa",
+      "input": "Que voir à Castrocaro ?",
+      "expected": [],
+      "actual": [],
+      "ms": 11.362059000000002,
+      "pass": true
+    },
+    {
+      "id": "place-02",
+      "mode": "pwa",
+      "input": "Cosa vedere a Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 5.08336700000001,
+      "pass": true
+    },
+    {
+      "id": "place-03",
+      "mode": "pwa",
+      "input": "What can I see in Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 3.467533000000003,
+      "pass": true
+    },
+    {
+      "id": "place-04",
+      "mode": "pwa",
+      "input": "Qué ver en Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 4.129796999999996,
+      "pass": true
+    },
+    {
+      "id": "place-05",
+      "mode": "pwa",
+      "input": "Where can I buy ripe fruit?",
+      "expected": [],
+      "actual": [],
+      "ms": 3.7335489999999965,
+      "pass": true
+    },
+    {
+      "id": "place-06",
+      "mode": "pwa",
+      "input": "Parle-moi de la gastronomie",
+      "expected": [],
+      "actual": [],
+      "ms": 6.685541000000015,
+      "pass": true
+    },
+    {
+      "id": "place-07",
+      "mode": "pwa",
+      "input": "Parlami di Lecce",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 4.3286779999999965,
+      "pass": true
+    },
+    {
+      "id": "place-08",
+      "mode": "pwa",
+      "input": "Que voir à Lecce ?",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.8764690000000144,
+      "pass": true
+    },
+    {
+      "id": "place-09",
+      "mode": "pwa",
+      "input": "Tell me about Otranto",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 2.927757000000014,
+      "pass": true
+    },
+    {
+      "id": "place-10",
+      "mode": "pwa",
+      "input": "Háblame de Otranto",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 2.633140999999995,
+      "pass": true
+    },
+    {
+      "id": "place-11",
+      "mode": "pwa",
+      "input": "Parle-moi de Lecce, sans parcours",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 4.014799000000011,
+      "pass": true
+    },
+    {
+      "id": "place-12",
+      "mode": "pwa",
+      "input": "Parlami di Otranto, senza percorso",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 2.648347000000001,
+      "pass": true
+    },
+    {
+      "id": "place-13",
+      "mode": "pwa",
+      "input": "Tell me about Lecce; no route",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.545460999999989,
+      "pass": true
+    },
+    {
+      "id": "place-14",
+      "mode": "pwa",
+      "input": "Háblame de Lecce, sin ruta",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.364947000000001,
+      "pass": true
+    },
+    {
+      "id": "place-15",
+      "mode": "pwa",
+      "input": "Que voir entre Lecce-Otranto ?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.991236000000015,
+      "pass": true
+    },
+    {
+      "id": "place-16",
+      "mode": "pwa",
+      "input": "Cosa vedere tra Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 3.034271000000018,
+      "pass": true
+    },
+    {
+      "id": "place-17",
+      "mode": "pwa",
+      "input": "What to see between Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.6957539999999938,
+      "pass": true
+    },
+    {
+      "id": "place-18",
+      "mode": "pwa",
+      "input": "Qué ver entre Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.81827100000001,
+      "pass": true
+    },
+    {
+      "id": "place-19",
+      "mode": "pwa",
+      "input": "Je cherche un espace verde",
+      "expected": [],
+      "actual": [],
+      "ms": 3.3232969999999966,
+      "pass": true
+    },
+    {
+      "id": "place-20",
+      "mode": "pwa",
+      "input": "Vorrei stare nel verde",
+      "expected": [],
+      "actual": [],
+      "ms": 2.8450140000000204,
+      "pass": true
+    },
+    {
+      "id": "place-21",
+      "mode": "pwa",
+      "input": "Quiero un lugar alto",
+      "expected": [],
+      "actual": [],
+      "ms": 2.7325409999999977,
+      "pass": true
+    },
+    {
+      "id": "place-22",
+      "mode": "pwa",
+      "input": "Tell me about Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.213581000000005,
+      "pass": true
+    },
+    {
+      "id": "place-23",
+      "mode": "pwa",
+      "input": "Parle-moi de Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.7603809999999953,
+      "pass": true
+    },
+    {
+      "id": "place-24",
+      "mode": "pwa",
+      "input": "Parlami di Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.5122580000000028,
+      "pass": true
+    },
+    {
+      "id": "place-25",
+      "mode": "pwa",
+      "input": "Háblame de Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.85124399999998,
+      "pass": true
+    },
+    {
+      "id": "place-01",
+      "mode": "fallback",
+      "input": "Que voir à Castrocaro ?",
+      "expected": [],
+      "actual": [],
+      "ms": 4.171861000000007,
+      "pass": true
+    },
+    {
+      "id": "place-02",
+      "mode": "fallback",
+      "input": "Cosa vedere a Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 3.2622890000000098,
+      "pass": true
+    },
+    {
+      "id": "place-03",
+      "mode": "fallback",
+      "input": "What can I see in Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 2.6870580000000075,
+      "pass": true
+    },
+    {
+      "id": "place-04",
+      "mode": "fallback",
+      "input": "Qué ver en Castrocaro?",
+      "expected": [],
+      "actual": [],
+      "ms": 3.2397279999999853,
+      "pass": true
+    },
+    {
+      "id": "place-05",
+      "mode": "fallback",
+      "input": "Where can I buy ripe fruit?",
+      "expected": [],
+      "actual": [],
+      "ms": 2.561981000000003,
+      "pass": true
+    },
+    {
+      "id": "place-06",
+      "mode": "fallback",
+      "input": "Parle-moi de la gastronomie",
+      "expected": [],
+      "actual": [],
+      "ms": 2.8678170000000023,
+      "pass": true
+    },
+    {
+      "id": "place-07",
+      "mode": "fallback",
+      "input": "Parlami di Lecce",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 4.072707000000008,
+      "pass": true
+    },
+    {
+      "id": "place-08",
+      "mode": "fallback",
+      "input": "Que voir à Lecce ?",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.585571999999985,
+      "pass": true
+    },
+    {
+      "id": "place-09",
+      "mode": "fallback",
+      "input": "Tell me about Otranto",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 2.776330999999999,
+      "pass": true
+    },
+    {
+      "id": "place-10",
+      "mode": "fallback",
+      "input": "Háblame de Otranto",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 3.2230749999999944,
+      "pass": true
+    },
+    {
+      "id": "place-11",
+      "mode": "fallback",
+      "input": "Parle-moi de Lecce, sans parcours",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 3.2370620000000088,
+      "pass": true
+    },
+    {
+      "id": "place-12",
+      "mode": "fallback",
+      "input": "Parlami di Otranto, senza percorso",
+      "expected": [
+        "otranto"
+      ],
+      "actual": [
+        "otranto"
+      ],
+      "ms": 3.2913639999999873,
+      "pass": true
+    },
+    {
+      "id": "place-13",
+      "mode": "fallback",
+      "input": "Tell me about Lecce; no route",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.7210509999999886,
+      "pass": true
+    },
+    {
+      "id": "place-14",
+      "mode": "fallback",
+      "input": "Háblame de Lecce, sin ruta",
+      "expected": [
+        "lecce"
+      ],
+      "actual": [
+        "lecce"
+      ],
+      "ms": 2.757597000000004,
+      "pass": true
+    },
+    {
+      "id": "place-15",
+      "mode": "fallback",
+      "input": "Que voir entre Lecce-Otranto ?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 3.5894680000000108,
+      "pass": true
+    },
+    {
+      "id": "place-16",
+      "mode": "fallback",
+      "input": "Cosa vedere tra Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.867557000000005,
+      "pass": true
+    },
+    {
+      "id": "place-17",
+      "mode": "fallback",
+      "input": "What to see between Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.5217130000000054,
+      "pass": true
+    },
+    {
+      "id": "place-18",
+      "mode": "fallback",
+      "input": "Qué ver entre Lecce-Otranto?",
+      "expected": [
+        "lecce",
+        "otranto"
+      ],
+      "actual": [
+        "lecce",
+        "otranto"
+      ],
+      "ms": 2.7544329999999775,
+      "pass": true
+    },
+    {
+      "id": "place-19",
+      "mode": "fallback",
+      "input": "Je cherche un espace verde",
+      "expected": [],
+      "actual": [],
+      "ms": 2.2016380000000026,
+      "pass": true
+    },
+    {
+      "id": "place-20",
+      "mode": "fallback",
+      "input": "Vorrei stare nel verde",
+      "expected": [],
+      "actual": [],
+      "ms": 2.720711999999992,
+      "pass": true
+    },
+    {
+      "id": "place-21",
+      "mode": "fallback",
+      "input": "Quiero un lugar alto",
+      "expected": [],
+      "actual": [],
+      "ms": 2.7131140000000187,
+      "pass": true
+    },
+    {
+      "id": "place-22",
+      "mode": "fallback",
+      "input": "Tell me about Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.111469999999997,
+      "pass": true
+    },
+    {
+      "id": "place-23",
+      "mode": "fallback",
+      "input": "Parle-moi de Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.1368889999999965,
+      "pass": true
+    },
+    {
+      "id": "place-24",
+      "mode": "fallback",
+      "input": "Parlami di Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.5638649999999643,
+      "pass": true
+    },
+    {
+      "id": "place-25",
+      "mode": "fallback",
+      "input": "Háblame de Torre di Ripe",
+      "expected": [
+        "ripe"
+      ],
+      "actual": [
+        "ripe"
+      ],
+      "ms": 2.3532089999999926,
+      "pass": true
+    }
+  ]
+}
